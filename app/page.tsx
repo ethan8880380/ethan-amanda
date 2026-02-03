@@ -1,5 +1,5 @@
-import { ComponentExample } from "@/components/component-example";
+import { EngagementHero } from "@/components/engagement-hero";
 
 export default function Page() {
-return <ComponentExample />;
+  return <EngagementHero />;
 }
