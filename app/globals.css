@@ -139,3 +139,7 @@ body {
 .font-sans {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
+
+.font-script {
+  font-family: var(--font-script), cursive;
+}
