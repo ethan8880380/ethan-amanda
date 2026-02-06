@@ -31,8 +31,8 @@ function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
     >
       <div className="relative flex flex-col items-center">
         <svg
-          width="140"
-          height="133"
+          width="105"
+          height="100"
           viewBox="0 0 467 444"
           fill="none"
           className="overflow-visible"
@@ -41,7 +41,7 @@ function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
           <motion.path
             d="M218.547 333.272C190.547 321.605 123.947 286.872 81.5474 241.272C28.5474 184.272 -5.95258 125.772 12.5474 81.7718C31.0474 37.7718 64.0474 21.7718 122.047 17.7718C180.047 13.7718 223.047 41.7718 251.047 69.2718C279.047 96.7718 311.547 138.772 316.047 162.772C320.547 186.772 316.047 200.772 308.047 200.772C300.047 200.772 291.547 181.772 294.047 151.772C296.547 121.772 320.547 58.7718 374.547 21.7718C428.547 -15.2282 455.547 29.2718 458.047 47.7718C460.547 66.2718 460.047 120.772 421.047 177.272C382.047 233.772 318.047 330.272 180.547 436.272"
             stroke="white"
-            strokeWidth="15"
+            strokeWidth="8"
             strokeLinecap="round"
             fill="none"
             initial={{ pathLength: 0, opacity: 0 }}
@@ -58,7 +58,7 @@ function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
           initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="mt-5 font-serif text-white/90 text-2xl tracking-wide"
+          className="mt-5 font-serif text-white/90 text-3xl tracking-wide"
         >
           <motion.span
             initial={{ opacity: 0, x: -6 }}
@@ -71,7 +71,7 @@ function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 0.6, scale: 1 }}
             transition={{ duration: 0.3, delay: 0.5, ease: "easeOut" }}
-            className="inline-block mx-2 text-lg text-white/50"
+            className="inline-block mx-2 text-xl text-white/50"
           >
             +
           </motion.span>
