@@ -16,8 +16,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CalendarPlus } from "lucide-react";
-import { FallingPetals } from "@/components/falling-petals";
+import { CalendarPlus, Loader2 } from "lucide-react";
+import { submitRSVP, type RSVPFormData } from "./actions";
+import Link from "next/link";
 
 // Scripty heart SVG path for loading animation
 function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
@@ -109,6 +110,23 @@ export default function EngagementPartyPage() {
     allergies: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Prevent body scroll on mobile
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    };
+  }, []);
 
   // Sequenced animation timing
   useEffect(() => {
@@ -135,10 +153,20 @@ export default function EngagementPartyPage() {
     };
   }, []);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("RSVP submitted:", formData);
-    setIsSubmitted(true);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const result = await submitRSVP(formData as RSVPFormData);
+
+    setIsSubmitting(false);
+
+    if (result.success) {
+      setIsSubmitted(true);
+    } else {
+      setSubmitError(result.error || "Something went wrong. Please try again.");
+    }
   }
 
   function handleInputChange(
@@ -210,33 +238,34 @@ export default function EngagementPartyPage() {
               </p>
             </div>
           
-            {/* RSVP Button */}
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-              <DialogTrigger asChild>
-                <button className="w-full px-8 py-4 bg-white text-red-700 font-medium tracking-wide uppercase text-sm hover:bg-white/90 transition-colors">
-                  RSVP Now
-                </button>
-              </DialogTrigger>
-              <DialogContent className="bg-[#151515] border-[#2a2a2a] text-white max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto">
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
+                  <button className="flex-1 px-6 py-4 bg-white text-red-700 font-medium tracking-wide uppercase text-sm hover:bg-white/90 transition-colors">
+                    RSVP Now
+                  </button>
+                </DialogTrigger>
+              <DialogContent className="bg-[#151515] border-[#2a2a2a] text-white w-[calc(100vw-3rem)] max-w-md mx-auto p-5 sm:p-6">
                 {!isSubmitted ? (
                   <>
                     <DialogHeader>
-                      <DialogTitle className="font-script text-3xl text-white">RSVP</DialogTitle>
-                      <DialogDescription className="text-white/60">
+                      <DialogTitle className="text-xl sm:text-2xl font-medium tracking-wide text-white">RSVP</DialogTitle>
+                      <DialogDescription className="text-white/60 text-sm">
                         Let us know if you can make it to our engagement party on March 15th.
                       </DialogDescription>
                     </DialogHeader>
                     
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                       <div className="space-y-2">
-                        <Label className="text-white/80">Will you be attending?</Label>
-                        <div className="flex flex-col sm:flex-row gap-2">
+                        <Label className="text-white/80 text-sm">Will you be attending?</Label>
+                        <div className="flex flex-col gap-2">
                           {attendingOptions.map((option) => (
                             <button
                               key={option.value}
                               type="button"
                               onClick={() => setFormData((prev) => ({ ...prev, attending: option.value }))}
-                              className={`px-4 py-3 text-sm border transition-colors ${
+                              className={`px-3 sm:px-4 py-2.5 sm:py-3 text-sm border transition-colors ${
                                 formData.attending === option.value
                                   ? "bg-primary border-primary text-primary-foreground"
                                   : "border-[#333] text-white/70 hover:border-primary/50"
@@ -248,74 +277,112 @@ export default function EngagementPartyPage() {
                         </div>
                       </div>
 
-                      {formData.attending === "yes" && (
-                        <>
-                          <div className="space-y-2">
-                            <Label htmlFor="guests-mobile" className="text-white/80">Who's coming?</Label>
-                            <Input
-                              id="guests-mobile"
-                              name="guests"
-                              value={formData.guests}
-                              onChange={handleInputChange}
-                              placeholder="e.g. John Smith, Jane Smith"
-                              required
-                              className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-white/30 focus-visible:border-primary focus-visible:ring-primary/20"
-                            />
-                          </div>
+                      <AnimatePresence mode="wait">
+                        {formData.attending && (
+                          <motion.div
+                            key="name-field"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="space-y-1.5 sm:space-y-2">
+                              <Label htmlFor="guests-mobile" className="text-white/80 text-sm">
+                                {formData.attending === "yes" ? "Guest names (separated by commas)" : "Your name"}
+                              </Label>
+                              <Input
+                                id="guests-mobile"
+                                name="guests"
+                                value={formData.guests}
+                                onChange={handleInputChange}
+                                placeholder={formData.attending === "yes" ? "e.g. John Smith, Jane Doe" : "e.g. John Smith"}
+                                required
+                                className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-white/30 focus-visible:border-primary focus-visible:ring-primary/20 text-base"
+                              />
+                              {formData.attending === "yes" && (
+                                <p className="text-white/40 text-xs">Include yourself and any plus ones</p>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
-                          <div className="space-y-2">
-                            <Label htmlFor="allergies-mobile" className="text-white/80">
-                              Dietary Restrictions or Allergies
-                            </Label>
-                            <Textarea
-                              id="allergies-mobile"
-                              name="allergies"
-                              value={formData.allergies}
-                              onChange={handleInputChange}
-                              placeholder="Let us know about any food allergies or dietary restrictions..."
-                              className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-white/30 focus-visible:border-primary focus-visible:ring-primary/20 min-h-[80px]"
-                            />
-                          </div>
-                        </>
+                      <AnimatePresence mode="wait">
+                        {formData.attending === "yes" && (
+                          <motion.div
+                            key="allergies-field"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="space-y-1.5 sm:space-y-2">
+                              <Label htmlFor="allergies-mobile" className="text-white/80 text-sm">
+                                Dietary Restrictions or Allergies
+                              </Label>
+                              <Textarea
+                                id="allergies-mobile"
+                                name="allergies"
+                                value={formData.allergies}
+                                onChange={handleInputChange}
+                                placeholder="Let us know about any food allergies or dietary restrictions..."
+                                className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-white/30 focus-visible:border-primary focus-visible:ring-primary/20 min-h-[70px] sm:min-h-[80px] text-base"
+                              />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {submitError && (
+                        <p className="text-red-400 text-sm">{submitError}</p>
                       )}
 
-                      <DialogFooter className="pt-4">
+                      <DialogFooter className="pt-2 sm:pt-4">
                         <Button
                           type="submit"
-                          disabled={!formData.attending || (formData.attending === "yes" && !formData.guests)}
-                          className="w-full bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50"
+                          disabled={isSubmitting || !formData.attending || !formData.guests}
+                          className="w-full bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50 py-2.5"
                         >
-                          Submit RSVP
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Submitting...
+                            </>
+                          ) : (
+                            "Submit RSVP"
+                          )}
                         </Button>
                       </DialogFooter>
                     </form>
                   </>
                 ) : (
-                  <div className="py-6 text-center">
-                    <div className="text-5xl mb-4">🎉</div>
-                    <h3 className="font-script text-3xl text-white mb-3">You're All Set!</h3>
-                    <p className="text-white/60 mb-6">
+                  <div className="py-4 sm:py-6 text-center">
+                    <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">🎉</div>
+                    <h3 className="text-xl sm:text-2xl font-medium tracking-wide text-white mb-2 sm:mb-3">You're All Set!</h3>
+                    <p className="text-white/60 text-sm mb-4 sm:mb-6">
                       {formData.attending === "yes" 
                         ? "We can't wait to see you there!" 
                         : "We'll miss you! Thanks for letting us know."}
                     </p>
                     
                     {formData.attending === "yes" && (
-                      <div className="bg-[#1a1a1a] border border-[#2a2a2a] p-4 mb-6 text-left">
-                        <p className="text-xs tracking-[0.2em] text-primary uppercase mb-3">Event Details</p>
-                        <p className="text-white font-medium">Ethan & Amanda's Engagement Party</p>
-                        <p className="text-white/60 text-sm mt-1">Saturday, March 15th, 2026 at 1:00 PM</p>
-                        <p className="text-white/50 text-sm">Local 104, Lake Forest Park, WA</p>
+                      <div className="bg-[#1a1a1a] border border-[#2a2a2a] p-3 sm:p-4 mb-4 sm:mb-6 text-left">
+                        <p className="text-xs tracking-[0.2em] text-primary uppercase mb-2 sm:mb-3">Event Details</p>
+                        <p className="text-white font-medium text-sm sm:text-base">Ethan & Amanda's Engagement Party</p>
+                        <p className="text-white/60 text-xs sm:text-sm mt-1">Saturday, March 15th, 2026 at 1:00 PM</p>
+                        <p className="text-white/50 text-xs sm:text-sm">Local 104, Lake Forest Park, WA</p>
                       </div>
                     )}
                     
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2 sm:gap-3">
                       {formData.attending === "yes" && (
                         <a
                           href={getGoogleCalendarUrl()}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-medium tracking-wide text-sm hover:bg-primary/80 transition-colors"
+                          className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-primary text-primary-foreground font-medium tracking-wide text-sm hover:bg-primary/80 transition-colors"
                         >
                           <CalendarPlus className="w-4 h-4" />
                           Add to Calendar
@@ -326,6 +393,7 @@ export default function EngagementPartyPage() {
                         onClick={() => {
                           setIsOpen(false);
                           setIsSubmitted(false);
+                          setSubmitError(null);
                           setFormData({
                             guests: "",
                             attending: "",
@@ -341,6 +409,13 @@ export default function EngagementPartyPage() {
                 )}
               </DialogContent>
             </Dialog>
+              <Link
+                href="/engagement-party/details"
+                className="px-6 py-4 border border-white/30 text-white font-medium tracking-wide uppercase text-sm hover:bg-white/10 transition-colors text-center"
+              >
+                Details
+              </Link>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -378,12 +453,12 @@ export default function EngagementPartyPage() {
             </p>
           </div>
           
-          {/* RSVP Button */}
+          {/* Action Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: showText ? 1 : 0, y: showText ? 0 : 10 }}
             transition={{ duration: 1, delay: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-            className="mt-8"
+            className="mt-8 flex gap-3"
           >
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
@@ -391,12 +466,12 @@ export default function EngagementPartyPage() {
                   RSVP Now
                 </button>
               </DialogTrigger>
-              <DialogContent className="bg-[#151515] border-[#2a2a2a] text-white max-w-md">
+              <DialogContent className="bg-[#151515] border-[#2a2a2a] text-white max-w-md p-6">
                 {!isSubmitted ? (
                   <>
                     <DialogHeader>
-                      <DialogTitle className="font-script text-3xl text-white">RSVP</DialogTitle>
-                      <DialogDescription className="text-white/60">
+                      <DialogTitle className="text-2xl font-medium tracking-wide text-white">RSVP</DialogTitle>
+                      <DialogDescription className="text-white/60 text-sm">
                         Let us know if you can make it to our engagement party on March 15th.
                       </DialogDescription>
                     </DialogHeader>
@@ -422,44 +497,82 @@ export default function EngagementPartyPage() {
                         </div>
                       </div>
 
-                      {formData.attending === "yes" && (
-                        <>
-                          <div className="space-y-2">
-                            <Label htmlFor="guests" className="text-white/80">Who's coming?</Label>
-                            <Input
-                              id="guests"
-                              name="guests"
-                              value={formData.guests}
-                              onChange={handleInputChange}
-                              placeholder="e.g. John Smith, Jane Smith"
-                              required
-                              className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-white/30 focus-visible:border-primary focus-visible:ring-primary/20"
-                            />
-                          </div>
+                      <AnimatePresence mode="wait">
+                        {formData.attending && (
+                          <motion.div
+                            key="name-field-desktop"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="space-y-2">
+                              <Label htmlFor="guests" className="text-white/80">
+                                {formData.attending === "yes" ? "Guest names (separated by commas)" : "Your name"}
+                              </Label>
+                              <Input
+                                id="guests"
+                                name="guests"
+                                value={formData.guests}
+                                onChange={handleInputChange}
+                                placeholder={formData.attending === "yes" ? "e.g. John Smith, Jane Doe" : "e.g. John Smith"}
+                                required
+                                className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-white/30 focus-visible:border-primary focus-visible:ring-primary/20"
+                              />
+                              {formData.attending === "yes" && (
+                                <p className="text-white/40 text-xs">Include yourself and any plus ones</p>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
-                          <div className="space-y-2">
-                            <Label htmlFor="allergies" className="text-white/80">
-                              Dietary Restrictions or Allergies
-                            </Label>
-                            <Textarea
-                              id="allergies"
-                              name="allergies"
-                              value={formData.allergies}
-                              onChange={handleInputChange}
-                              placeholder="Let us know about any food allergies or dietary restrictions..."
-                              className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-white/30 focus-visible:border-primary focus-visible:ring-primary/20 min-h-[80px]"
-                            />
-                          </div>
-                        </>
+                      <AnimatePresence mode="wait">
+                        {formData.attending === "yes" && (
+                          <motion.div
+                            key="allergies-field-desktop"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="space-y-2">
+                              <Label htmlFor="allergies" className="text-white/80">
+                                Dietary Restrictions or Allergies
+                              </Label>
+                              <Textarea
+                                id="allergies"
+                                name="allergies"
+                                value={formData.allergies}
+                                onChange={handleInputChange}
+                                placeholder="Let us know about any food allergies or dietary restrictions..."
+                                className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-white/30 focus-visible:border-primary focus-visible:ring-primary/20 min-h-[80px]"
+                              />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {submitError && (
+                        <p className="text-red-400 text-sm">{submitError}</p>
                       )}
 
                       <DialogFooter className="pt-4">
                         <Button
                           type="submit"
-                          disabled={!formData.attending || (formData.attending === "yes" && !formData.guests)}
+                          disabled={isSubmitting || !formData.attending || !formData.guests}
                           className="w-full bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50"
                         >
-                          Submit RSVP
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Submitting...
+                            </>
+                          ) : (
+                            "Submit RSVP"
+                          )}
                         </Button>
                       </DialogFooter>
                     </form>
@@ -467,7 +580,7 @@ export default function EngagementPartyPage() {
                 ) : (
                   <div className="py-6 text-center">
                     <div className="text-5xl mb-4">🎉</div>
-                    <h3 className="font-script text-3xl text-white mb-3">You're All Set!</h3>
+                    <h3 className="text-2xl font-medium tracking-wide text-white mb-3">You're All Set!</h3>
                     <p className="text-white/60 mb-6">
                       {formData.attending === "yes" 
                         ? "We can't wait to see you there!" 
@@ -500,6 +613,7 @@ export default function EngagementPartyPage() {
                         onClick={() => {
                           setIsOpen(false);
                           setIsSubmitted(false);
+                          setSubmitError(null);
                           setFormData({
                             guests: "",
                             attending: "",
@@ -515,6 +629,12 @@ export default function EngagementPartyPage() {
                 )}
               </DialogContent>
             </Dialog>
+            <Link
+              href="/engagement-party/details"
+              className="px-8 py-3 border border-white/30 text-white font-medium tracking-wide uppercase text-sm hover:bg-white/10 transition-colors"
+            >
+              Details
+            </Link>
           </motion.div>
           
           <div className="mt-8 pt-6 border-t border-white/10">
