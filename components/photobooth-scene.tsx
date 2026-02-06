@@ -15,7 +15,7 @@ function PhotoStrip({
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const [animationPhase, setAnimationPhase] = useState<
-    "waiting" | "dropping" | "settling" | "complete"
+    "waiting" | "printing" | "dropping" | "settling" | "complete"
   >("waiting");
   const startTime = useRef<number | null>(null);
   const hasCalledComplete = useRef(false);
@@ -34,7 +34,9 @@ function PhotoStrip({
       tex.generateMipmaps = false;
       
       // Calculate image aspect ratio
-      const imageAspect = tex.image.width / tex.image.height;
+      const image = tex.image as { width: number; height: number };
+      if (!image || !image.width || !image.height) return;
+      const imageAspect = image.width / image.height;
       
       // Apply "cover" style - crop to fill without stretching
       if (imageAspect > targetAspect) {
@@ -52,25 +54,47 @@ function PhotoStrip({
   }, [tex1, tex2, tex3, targetAspect]);
 
   useEffect(() => {
-    // Start dropping after a short delay
+    // Start printing after a short delay
     const timer = setTimeout(() => {
-      setAnimationPhase("dropping");
+      setAnimationPhase("printing");
       startTime.current = Date.now();
-    }, 800);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
+
+  // Animation positions
+  const hiddenY = 3.5; // Starting position (just above visible area)
+  const printedY = 1.5; // Halfway printed position
+  const finalY = -0.1; // Final resting position in tray
 
   useFrame(() => {
     if (!groupRef.current || !startTime.current) return;
 
     const elapsed = (Date.now() - startTime.current) / 1000;
 
+    // Phase 1: Printing - slow slide down to halfway
+    if (animationPhase === "printing") {
+      const printDuration = 2.0;
+      const progress = Math.min(elapsed / printDuration, 1);
+
+      // Ease out for smooth printing motion
+      const easeOutQuad = (x: number): number => 1 - (1 - x) * (1 - x);
+      const easedProgress = easeOutQuad(progress);
+
+      groupRef.current.position.y = hiddenY - (hiddenY - printedY) * easedProgress;
+
+      if (progress >= 1) {
+        setAnimationPhase("dropping");
+        startTime.current = Date.now();
+      }
+    }
+
+    // Phase 2: Dropping - falls from halfway into tray
     if (animationPhase === "dropping") {
-      // Smooth drop animation with easing
-      const dropDuration = 1.2;
+      const dropDuration = 0.8;
       const progress = Math.min(elapsed / dropDuration, 1);
 
-      // Easing function for natural drop
+      // Easing function for natural drop with bounce
       const easeOutBounce = (x: number): number => {
         const n1 = 7.5625;
         const d1 = 2.75;
@@ -85,22 +109,11 @@ function PhotoStrip({
         }
       };
 
-      // Start from above and drop down
-      const startY = 4;
-      const endY = -0.15;
       const easedProgress = easeOutBounce(progress);
-
-      groupRef.current.position.y = startY - (startY - endY) * easedProgress;
+      groupRef.current.position.y = printedY - (printedY - finalY) * easedProgress;
 
       // Slight rotation during fall
-      groupRef.current.rotation.z =
-        Math.sin(elapsed * 3) * 0.05 * (1 - progress);
-
-      // Very slight random tilt settling
-      if (progress > 0.8) {
-        const settleProgress = (progress - 0.8) / 0.2;
-        groupRef.current.rotation.x = Math.sin(settleProgress * Math.PI) * 0.02;
-      }
+      groupRef.current.rotation.z = Math.sin(elapsed * 4) * 0.03 * (1 - progress);
 
       if (progress >= 1) {
         setAnimationPhase("settling");
@@ -108,18 +121,19 @@ function PhotoStrip({
       }
     }
 
+    // Phase 3: Settling
     if (animationPhase === "settling") {
-      const settleDuration = 0.5;
+      const settleDuration = 0.4;
       const progress = Math.min(elapsed / settleDuration, 1);
 
       // Subtle settling oscillation
-      groupRef.current.rotation.z = Math.sin(progress * Math.PI * 4) * 0.02 * (1 - progress);
-      groupRef.current.position.y = -0.15 + Math.sin(progress * Math.PI * 3) * 0.02 * (1 - progress);
+      groupRef.current.rotation.z = Math.sin(progress * Math.PI * 3) * 0.015 * (1 - progress);
+      groupRef.current.position.y = finalY + Math.sin(progress * Math.PI * 2) * 0.01 * (1 - progress);
 
       if (progress >= 1) {
         setAnimationPhase("complete");
-        groupRef.current.rotation.z = 0.015; // Final slight tilt for realism
-        groupRef.current.position.y = -0.15;
+        groupRef.current.rotation.z = 0.01;
+        groupRef.current.position.y = finalY;
         if (!hasCalledComplete.current) {
           hasCalledComplete.current = true;
           onAnimationComplete?.();
@@ -141,45 +155,54 @@ function PhotoStrip({
   const photosOffsetY = (bottomPadding - borderPadding) / 2;
 
   return (
-    <group ref={groupRef} position={[0, 4, 0]}>
-      {/* White backing/frame of photo strip with rounded corners effect */}
+    <group ref={groupRef} position={[0, 3.5, 0]}>
+      {/* White backing/frame of photo strip */}
       <mesh position={[0, 0, -0.02]}>
         <boxGeometry args={[stripWidth, stripHeight, 0.025]} />
         <meshStandardMaterial
-          color="#fafafa"
-          roughness={0.15}
+          color="#fefefe"
+          roughness={0.3}
           metalness={0}
-        />
-      </mesh>
-
-      {/* Glossy paper surface overlay */}
-      <mesh position={[0, 0, -0.005]}>
-        <planeGeometry args={[stripWidth - 0.02, stripHeight - 0.02]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          roughness={0.08}
-          metalness={0.05}
-          transparent
-          opacity={0.3}
         />
       </mesh>
 
       {/* Photo 1 (top) */}
       <mesh position={[0, photoHeight + spacing + photosOffsetY, 0.001]}>
         <planeGeometry args={[photoWidth, photoHeight]} />
-        <meshStandardMaterial map={tex1} roughness={0.2} metalness={0.02} />
+        <meshStandardMaterial map={tex1} roughness={0.08} metalness={0.1} />
       </mesh>
 
       {/* Photo 2 (middle) */}
       <mesh position={[0, photosOffsetY, 0.001]}>
         <planeGeometry args={[photoWidth, photoHeight]} />
-        <meshStandardMaterial map={tex2} roughness={0.2} metalness={0.02} />
+        <meshStandardMaterial map={tex2} roughness={0.08} metalness={0.1} />
       </mesh>
 
       {/* Photo 3 (bottom) */}
       <mesh position={[0, -(photoHeight + spacing) + photosOffsetY, 0.001]}>
         <planeGeometry args={[photoWidth, photoHeight]} />
-        <meshStandardMaterial map={tex3} roughness={0.2} metalness={0.02} />
+        <meshStandardMaterial map={tex3} roughness={0.08} metalness={0.1} />
+      </mesh>
+
+      {/* Glossy clear coat overlay - covers all photos */}
+      <mesh position={[0, photosOffsetY, 0.003]}>
+        <planeGeometry args={[photoWidth + 0.02, (photoHeight * 3) + (spacing * 2) + 0.02]} />
+        <meshPhysicalMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.08}
+          roughness={0.02}
+          metalness={0.3}
+          clearcoat={1}
+          clearcoatRoughness={0.05}
+          reflectivity={0.9}
+        />
+      </mesh>
+
+      {/* Subtle glossy highlight strip */}
+      <mesh position={[-photoWidth * 0.25, photosOffsetY, 0.004]} rotation={[0, 0, 0.1]}>
+        <planeGeometry args={[0.15, (photoHeight * 3) + (spacing * 2)]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.06} />
       </mesh>
 
       {/* Subtle drop shadow */}
@@ -404,9 +427,9 @@ export interface PhotoboothSceneProps {
 
 export function PhotoboothScene({
   images = [
-    "/gallery/gallery-1.jpg",
-    "/gallery/gallery-2.jpg",
-    "/gallery/gallery-3.webp",
+    "/booth/booth-1.png",
+    "/booth/booth-2.png",
+    "/booth/booth-3.png",
   ],
   className = "",
   onAnimationComplete,
@@ -417,7 +440,7 @@ export function PhotoboothScene({
     <div className={`relative w-full h-full ${className}`} style={{ backgroundColor: '#0a0a0a' }}>
       {!isLoaded && <LoadingFallback />}
       <Canvas
-        camera={{ position: [0, 0.5, 6], fov: 45 }}
+        camera={{ position: [0, 0.5, 6.5], fov: 50 }}
         onCreated={() => setIsLoaded(true)}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}

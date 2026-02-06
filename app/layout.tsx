@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Manrope, Pinyon_Script } from "next/font/google";
+import { Manrope, Pinyon_Script } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+const adelia = localFont({
+  src: "../fonts/adelia.otf",
+  display: "swap",
   variable: "--font-serif",
 });
 
@@ -30,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${manrope.variable} ${pinyonScript.variable}`}>
+    <html lang="en" className={`${adelia.variable} ${manrope.variable} ${pinyonScript.variable}`}>
       <body className="antialiased font-sans">
         {children}
       </body>
