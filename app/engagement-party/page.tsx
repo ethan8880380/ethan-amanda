@@ -68,8 +68,8 @@ function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
 // Gallery images for the photo strip
 const photoStripImages = [
   "/booth/booth-1.png",
-  "/booth/booth-2.png", 
-  "/booth/booth-3.png",
+  "/booth/booth-3.png", 
+  "/booth/booth-2.png",
 ];
 
 const attendingOptions = [
@@ -243,7 +243,7 @@ export default function EngagementPartyPage() {
               <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
                   <button className="flex-1 px-6 py-4 bg-white text-red-700 font-medium tracking-wide uppercase text-sm hover:bg-white/90 transition-colors">
-                    RSVP Now
+                    RSVP
                   </button>
                 </DialogTrigger>
               <DialogContent className="bg-[#151515] border-[#2a2a2a] text-white w-[calc(100vw-3rem)] max-w-md mx-auto p-5 sm:p-6">
@@ -411,7 +411,7 @@ export default function EngagementPartyPage() {
             </Dialog>
               <Link
                 href="/engagement-party/details"
-                className="px-6 py-4 border border-white/30 text-white font-medium tracking-wide uppercase text-sm hover:bg-white/10 transition-colors text-center"
+                className="flex-1 px-6 py-4 border border-white/30 text-white font-medium tracking-wide uppercase text-sm hover:bg-white/10 transition-colors text-center"
               >
                 Details
               </Link>
@@ -462,8 +462,8 @@ export default function EngagementPartyPage() {
           >
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
-                <button className="px-8 py-3 bg-white text-red-700 font-medium tracking-wide uppercase text-sm hover:bg-white/80 transition-colors">
-                  RSVP Now
+                <button className="flex-1 px-8 py-3 bg-white text-red-700 font-medium tracking-wide uppercase text-sm hover:bg-white/80 transition-colors">
+                  RSVP
                 </button>
               </DialogTrigger>
               <DialogContent className="bg-[#151515] border-[#2a2a2a] text-white max-w-md p-6">
@@ -631,7 +631,7 @@ export default function EngagementPartyPage() {
             </Dialog>
             <Link
               href="/engagement-party/details"
-              className="px-8 py-3 border border-white/30 text-white font-medium tracking-wide uppercase text-sm hover:bg-white/10 transition-colors"
+              className="flex-1 px-8 py-3 border border-white/30 text-white font-medium tracking-wide uppercase text-sm hover:bg-white/10 transition-colors text-center"
             >
               Details
             </Link>

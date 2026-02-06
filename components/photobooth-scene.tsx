@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, useTexture } from "@react-three/drei";
+import { Environment, useTexture, RoundedBox, Text } from "@react-three/drei";
 import { useRef, useState, useEffect, Suspense, useMemo } from "react";
 import * as THREE from "three";
 
@@ -34,12 +34,12 @@ function PhotoStrip({
       tex.minFilter = THREE.LinearFilter;
       tex.magFilter = THREE.LinearFilter;
       tex.generateMipmaps = false;
-      
+
       // Calculate image aspect ratio
       const image = tex.image as { width: number; height: number };
       if (!image || !image.width || !image.height) return;
       const imageAspect = image.width / image.height;
-      
+
       // Apply "cover" style - crop to fill without stretching
       if (imageAspect > targetAspect) {
         // Image is wider - crop sides
@@ -65,25 +65,25 @@ function PhotoStrip({
   }, [startDelay]);
 
   // Animation positions - strip prints from top and drops to center
-  const hiddenY = 5.5; // Starting position (above visible area)
-  const printedY = 2.0; // Halfway printed position
-  const finalY = 0; // Final resting position (centered on screen)
+  const hiddenY = 5.5;
+  const printedY = 2.0;
+  const finalY = 0;
 
-  useFrame(() => {
-    if (!groupRef.current || !startTime.current) return;
+  useFrame((state) => {
+    if (!groupRef.current) return;
 
+    if (!startTime.current) return;
     const elapsed = (Date.now() - startTime.current) / 1000;
 
     // Phase 1: Printing - slow slide down
     if (animationPhase === "printing") {
       const printDuration = 2.0;
       const progress = Math.min(elapsed / printDuration, 1);
-
-      // Ease out for smooth printing motion
       const easeOutQuad = (x: number): number => 1 - (1 - x) * (1 - x);
       const easedProgress = easeOutQuad(progress);
 
-      groupRef.current.position.y = hiddenY - (hiddenY - printedY) * easedProgress;
+      groupRef.current.position.y =
+        hiddenY - (hiddenY - printedY) * easedProgress;
 
       if (progress >= 1) {
         setAnimationPhase("dropping");
@@ -96,7 +96,6 @@ function PhotoStrip({
       const dropDuration = 0.8;
       const progress = Math.min(elapsed / dropDuration, 1);
 
-      // Easing function for natural drop with bounce
       const easeOutBounce = (x: number): number => {
         const n1 = 7.5625;
         const d1 = 2.75;
@@ -112,10 +111,12 @@ function PhotoStrip({
       };
 
       const easedProgress = easeOutBounce(progress);
-      groupRef.current.position.y = printedY - (printedY - finalY) * easedProgress;
+      groupRef.current.position.y =
+        printedY - (printedY - finalY) * easedProgress;
 
       // Slight rotation during fall
-      groupRef.current.rotation.z = Math.sin(elapsed * 4) * 0.03 * (1 - progress);
+      groupRef.current.rotation.z =
+        Math.sin(elapsed * 4) * 0.03 * (1 - progress);
 
       if (progress >= 1) {
         setAnimationPhase("settling");
@@ -128,9 +129,11 @@ function PhotoStrip({
       const settleDuration = 0.4;
       const progress = Math.min(elapsed / settleDuration, 1);
 
-      // Subtle settling oscillation
-      groupRef.current.rotation.z = Math.sin(progress * Math.PI * 3) * 0.015 * (1 - progress);
-      groupRef.current.position.y = finalY + Math.sin(progress * Math.PI * 2) * 0.02 * (1 - progress);
+      groupRef.current.rotation.z =
+        Math.sin(progress * Math.PI * 3) * 0.015 * (1 - progress);
+      groupRef.current.position.y =
+        finalY +
+        Math.sin(progress * Math.PI * 2) * 0.02 * (1 - progress);
 
       if (progress >= 1) {
         setAnimationPhase("complete");
@@ -142,105 +145,196 @@ function PhotoStrip({
         }
       }
     }
+
+    // Phase 4: Gentle idle floating after complete
+    if (animationPhase === "complete") {
+      const t = state.clock.elapsedTime;
+      groupRef.current.position.y =
+        finalY + Math.sin(t * 0.6) * 0.035;
+      groupRef.current.rotation.z =
+        0.01 + Math.sin(t * 0.4 + 0.5) * 0.005;
+    }
   });
 
   // Photo strip dimensions - 4:3 aspect ratio for each photo
   const photoWidth = 1.1;
-  const photoHeight = photoWidth * 0.75; // 4:3 aspect ratio
+  const photoHeight = photoWidth * 0.75;
   const borderPadding = 0.12;
-  const bottomPadding = 0.5; // Extra space at the bottom
+  const bottomPadding = 0.5;
   const spacing = 0.1;
   const stripWidth = photoWidth + borderPadding * 2;
-  const stripHeight = (photoHeight * 3) + (spacing * 2) + borderPadding + bottomPadding;
-  
+  const stripHeight =
+    photoHeight * 3 + spacing * 2 + borderPadding + bottomPadding;
+
   // Offset to center photos accounting for extra bottom padding
   const photosOffsetY = (bottomPadding - borderPadding) / 2;
 
+  // Rounded corner radius for individual photos
+  const photoRadius = 0.02;
+
+  // Create rounded rectangle shape for photo clipping
+  const photoShape = useMemo(() => {
+    const shape = new THREE.Shape();
+    const w = photoWidth / 2;
+    const h = photoHeight / 2;
+    const r = photoRadius;
+    shape.moveTo(-w + r, -h);
+    shape.lineTo(w - r, -h);
+    shape.quadraticCurveTo(w, -h, w, -h + r);
+    shape.lineTo(w, h - r);
+    shape.quadraticCurveTo(w, h, w - r, h);
+    shape.lineTo(-w + r, h);
+    shape.quadraticCurveTo(-w, h, -w, h - r);
+    shape.lineTo(-w, -h + r);
+    shape.quadraticCurveTo(-w, -h, -w + r, -h);
+    return shape;
+  }, [photoWidth, photoHeight]);
+
+  const photoGeo = useMemo(() => {
+    const geo = new THREE.ShapeGeometry(photoShape);
+    // Generate UVs that map [0,1] across the shape
+    const pos = geo.attributes.position;
+    const uvs = new Float32Array(pos.count * 2);
+    for (let i = 0; i < pos.count; i++) {
+      uvs[i * 2] = (pos.getX(i) + photoWidth / 2) / photoWidth;
+      uvs[i * 2 + 1] = (pos.getY(i) + photoHeight / 2) / photoHeight;
+    }
+    geo.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
+    return geo;
+  }, [photoShape, photoWidth, photoHeight]);
+
   return (
     <group ref={groupRef} position={[0, hiddenY, 0]}>
-      {/* White backing/frame of photo strip */}
-      <mesh position={[0, 0, -0.02]}>
-        <boxGeometry args={[stripWidth, stripHeight, 0.025]} />
+      {/* White backing/frame of photo strip with rounded corners */}
+      <RoundedBox
+        args={[stripWidth, stripHeight, 0.025]}
+        radius={0.04}
+        smoothness={4}
+        position={[0, 0, -0.02]}
+      >
         <meshStandardMaterial
-          color="#fefefe"
-          roughness={0.3}
+          color="#fafafa"
+          roughness={0.25}
           metalness={0}
         />
-      </mesh>
+      </RoundedBox>
 
       {/* Photo 1 (top) */}
-      <mesh position={[0, photoHeight + spacing + photosOffsetY, 0.001]}>
-        <planeGeometry args={[photoWidth, photoHeight]} />
-        <meshStandardMaterial map={tex1} roughness={0.08} metalness={0.1} />
+      <mesh
+        geometry={photoGeo}
+        position={[0, photoHeight + spacing + photosOffsetY, 0.001]}
+      >
+        <meshStandardMaterial map={tex1} roughness={0.1} metalness={0.05} />
       </mesh>
 
       {/* Photo 2 (middle) */}
-      <mesh position={[0, photosOffsetY, 0.001]}>
-        <planeGeometry args={[photoWidth, photoHeight]} />
-        <meshStandardMaterial map={tex2} roughness={0.08} metalness={0.1} />
+      <mesh geometry={photoGeo} position={[0, photosOffsetY, 0.001]}>
+        <meshStandardMaterial map={tex2} roughness={0.1} metalness={0.05} />
       </mesh>
 
       {/* Photo 3 (bottom) */}
-      <mesh position={[0, -(photoHeight + spacing) + photosOffsetY, 0.001]}>
-        <planeGeometry args={[photoWidth, photoHeight]} />
-        <meshStandardMaterial map={tex3} roughness={0.08} metalness={0.1} />
+      <mesh
+        geometry={photoGeo}
+        position={[0, -(photoHeight + spacing) + photosOffsetY, 0.001]}
+      >
+        <meshStandardMaterial map={tex3} roughness={0.1} metalness={0.05} />
       </mesh>
 
-      {/* Glossy clear coat overlay - covers all photos */}
+      {/* Glossy clear coat overlay */}
       <mesh position={[0, photosOffsetY, 0.003]}>
-        <planeGeometry args={[photoWidth + 0.02, (photoHeight * 3) + (spacing * 2) + 0.02]} />
+        <planeGeometry
+          args={[
+            photoWidth + 0.02,
+            photoHeight * 3 + spacing * 2 + 0.02,
+          ]}
+        />
         <meshPhysicalMaterial
           color="#ffffff"
           transparent
-          opacity={0.08}
+          opacity={0.06}
           roughness={0.02}
-          metalness={0.3}
+          metalness={0.2}
           clearcoat={1}
-          clearcoatRoughness={0.05}
-          reflectivity={0.9}
+          clearcoatRoughness={0.03}
+          reflectivity={0.8}
         />
       </mesh>
 
-      {/* Subtle glossy highlight strip */}
-      <mesh position={[-photoWidth * 0.25, photosOffsetY, 0.004]} rotation={[0, 0, 0.1]}>
-        <planeGeometry args={[0.15, (photoHeight * 3) + (spacing * 2)]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.06} />
+      {/* Subtle diagonal specular highlight */}
+      <mesh
+        position={[-photoWidth * 0.22, photosOffsetY + 0.2, 0.004]}
+        rotation={[0, 0, 0.15]}
+      >
+        <planeGeometry args={[0.08, photoHeight * 3 + spacing * 2]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.045} />
       </mesh>
 
-      {/* Subtle drop shadow */}
-      <mesh position={[0.04, -0.04, -0.03]} rotation={[0, 0, 0]}>
-        <planeGeometry args={[stripWidth * 0.95, stripHeight * 0.98]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.15} />
+      {/* "E ♥ A" text at the bottom of the strip */}
+      <Text
+        position={[0, -(stripHeight / 2) + bottomPadding * 0.42, 0.002]}
+        fontSize={0.11}
+        color="#b0b0b0"
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.15}
+      >
+        E &amp; A
+      </Text>
+
+      {/* Soft drop shadow - multi-layered for realism */}
+      <mesh position={[0.03, -0.05, -0.04]}>
+        <planeGeometry args={[stripWidth * 1.05, stripHeight * 1.02]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.12} />
+      </mesh>
+      <mesh position={[0.05, -0.08, -0.05]}>
+        <planeGeometry args={[stripWidth * 1.1, stripHeight * 1.05]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.06} />
       </mesh>
     </group>
   );
 }
 
-// Ambient particles for atmosphere
+// Ambient particles for atmosphere — twinkling gold dust
 function Particles() {
   const particlesRef = useRef<THREE.Points>(null);
-  const particleCount = 50;
+  const particleCount = 80;
 
-  const positions = useMemo(() => {
+  const { positions, sizes, opacities, phases } = useMemo(() => {
     const pos = new Float32Array(particleCount * 3);
+    const sz = new Float32Array(particleCount);
+    const op = new Float32Array(particleCount);
+    const ph = new Float32Array(particleCount);
     for (let i = 0; i < particleCount; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 8;
-      pos[i * 3 + 1] = Math.random() * 6 - 1;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 4;
+      pos[i * 3] = (Math.random() - 0.5) * 10;
+      pos[i * 3 + 1] = Math.random() * 7 - 1.5;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 5 - 1;
+      sz[i] = 0.01 + Math.random() * 0.025;
+      op[i] = 0.15 + Math.random() * 0.35;
+      ph[i] = Math.random() * Math.PI * 2;
     }
-    return pos;
+    return { positions: pos, sizes: sz, opacities: op, phases: ph };
   }, []);
 
   useFrame((state) => {
     if (!particlesRef.current) return;
-    particlesRef.current.rotation.y = state.clock.elapsedTime * 0.02;
+    const t = state.clock.elapsedTime;
 
     const positionAttr = particlesRef.current.geometry.attributes.position;
     for (let i = 0; i < particleCount; i++) {
-      const y = positionAttr.getY(i);
-      positionAttr.setY(i, y + Math.sin(state.clock.elapsedTime + i) * 0.001);
+      const y = positions[i * 3 + 1];
+      // Gentle drift upward + sinusoidal wave
+      positionAttr.setY(
+        i,
+        y + Math.sin(t * 0.3 + phases[i]) * 0.15 + t * 0.005
+      );
+      // Subtle horizontal sway
+      const x = positions[i * 3];
+      positionAttr.setX(i, x + Math.sin(t * 0.2 + phases[i] * 2) * 0.08);
     }
     positionAttr.needsUpdate = true;
+
+    // Rotate the whole system very slowly
+    particlesRef.current.rotation.y = t * 0.015;
   });
 
   return (
@@ -252,17 +346,64 @@ function Particles() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.02}
-        color="#c9a66b"
+        size={0.018}
+        color="#d4a855"
         transparent
-        opacity={0.4}
+        opacity={0.3}
         sizeAttenuation
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
       />
     </points>
   );
 }
 
-// Main scene component - simplified without tray
+// Secondary particle layer - finer sparkles
+function Sparkles() {
+  const sparklesRef = useRef<THREE.Points>(null);
+  const count = 40;
+
+  const { positions, phases } = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    const ph = new Float32Array(count);
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 7;
+      pos[i * 3 + 1] = Math.random() * 6 - 1;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 3 - 0.5;
+      ph[i] = Math.random() * Math.PI * 2;
+    }
+    return { positions: pos, phases: ph };
+  }, []);
+
+  useFrame((state) => {
+    if (!sparklesRef.current) return;
+    const mat = sparklesRef.current.material as THREE.PointsMaterial;
+    // Twinkle effect through opacity oscillation
+    mat.opacity = 0.15 + Math.sin(state.clock.elapsedTime * 1.5) * 0.1;
+  });
+
+  return (
+    <points ref={sparklesRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          args={[positions, 3]}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.01}
+        color="#f0e0c0"
+        transparent
+        opacity={0.2}
+        sizeAttenuation
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+}
+
+// Main scene component
 function Scene({
   images,
   onAnimationComplete,
@@ -274,24 +415,48 @@ function Scene({
 }) {
   return (
     <>
-      {/* Lighting */}
-      <ambientLight intensity={0.5} />
+      {/* Lighting — warm, cinematic setup */}
+      <ambientLight intensity={0.4} color="#fff5eb" />
       <directionalLight
         position={[5, 8, 5]}
-        intensity={1.0}
+        intensity={0.9}
+        color="#ffffff"
         castShadow
         shadow-mapSize={[1024, 1024]}
       />
-      <directionalLight position={[-3, 4, -2]} intensity={0.4} color="#ffeedd" />
-      <pointLight position={[0, 3, 2]} intensity={0.5} color="#fff8f0" />
+      <directionalLight
+        position={[-4, 5, -2]}
+        intensity={0.3}
+        color="#ffeedd"
+      />
+      <pointLight
+        position={[0, 3, 3]}
+        intensity={0.4}
+        color="#fff8f0"
+        distance={10}
+        decay={2}
+      />
+      {/* Subtle warm fill from below */}
+      <pointLight
+        position={[0, -3, 2]}
+        intensity={0.15}
+        color="#ffd9b3"
+        distance={8}
+        decay={2}
+      />
 
-      {/* Photo strip only - no tray */}
+      {/* Photo strip */}
       <Suspense fallback={null}>
-        <PhotoStrip images={images} onAnimationComplete={onAnimationComplete} startDelay={startDelay} />
+        <PhotoStrip
+          images={images}
+          onAnimationComplete={onAnimationComplete}
+          startDelay={startDelay}
+        />
       </Suspense>
 
       {/* Atmospheric particles */}
       <Particles />
+      <Sparkles />
 
       {/* Environment for reflections */}
       <Environment preset="studio" />
@@ -302,7 +467,10 @@ function Scene({
 // Loading placeholder
 function LoadingFallback() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+    <div
+      className="absolute inset-0 flex items-center justify-center"
+      style={{ backgroundColor: "#0a0a0a" }}
+    >
       <div className="flex flex-col items-center gap-4">
         <div className="w-8 h-8 border-2 border-[#c9a66b] border-t-transparent rounded-full animate-spin" />
         <p className="text-[#c9a66b] text-sm tracking-widest uppercase">
@@ -333,18 +501,35 @@ export function PhotoboothScene({
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div className={`relative w-full h-full ${className}`} style={{ backgroundColor: '#0a0a0a' }}>
+    <div
+      className={`relative w-full h-full ${className}`}
+      style={{ backgroundColor: "#0a0a0a" }}
+    >
       {!isLoaded && <LoadingFallback />}
+
+      {/* Vignette overlay for depth */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%)",
+        }}
+      />
+
       <Canvas
         camera={{ position: [0, 0, 5], fov: 50 }}
         onCreated={() => setIsLoaded(true)}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
         dpr={[1, 2]}
-        style={{ background: 'transparent' }}
+        style={{ background: "transparent" }}
       >
-        <color attach="background" args={["#0a0a0a"]} />
-        <fog attach="fog" args={["#0a0a0a", 8, 20]} />
-        <Scene images={images} onAnimationComplete={onAnimationComplete} startDelay={startDelay} />
+        <color attach="background" args={["#080808"]} />
+        <fog attach="fog" args={["#080808", 8, 18]} />
+        <Scene
+          images={images}
+          onAnimationComplete={onAnimationComplete}
+          startDelay={startDelay}
+        />
       </Canvas>
     </div>
   );
