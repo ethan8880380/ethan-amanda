@@ -1,19 +1,17 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, useTexture } from "@react-three/drei";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { Environment, Float, useTexture } from "@react-three/drei";
 import { useRef, useState, useEffect, Suspense, useMemo } from "react";
 import * as THREE from "three";
 
-// Photo strip with 3 stacked images - prints and drops into view
+// Photo strip with 3 stacked images
 function PhotoStrip({
   images,
   onAnimationComplete,
-  startDelay = 500,
 }: {
   images: string[];
   onAnimationComplete?: () => void;
-  startDelay?: number;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const [animationPhase, setAnimationPhase] = useState<
@@ -56,25 +54,25 @@ function PhotoStrip({
   }, [tex1, tex2, tex3, targetAspect]);
 
   useEffect(() => {
-    // Start printing after the specified delay
+    // Start printing after a short delay
     const timer = setTimeout(() => {
       setAnimationPhase("printing");
       startTime.current = Date.now();
-    }, startDelay);
+    }, 500);
     return () => clearTimeout(timer);
-  }, [startDelay]);
+  }, []);
 
-  // Animation positions - strip prints from top and drops to center
-  const hiddenY = 5.5; // Starting position (above visible area)
-  const printedY = 2.0; // Halfway printed position
-  const finalY = 0; // Final resting position (centered on screen)
+  // Animation positions
+  const hiddenY = 3.5; // Starting position (just above visible area)
+  const printedY = 1.5; // Halfway printed position
+  const finalY = -0.1; // Final resting position in tray
 
   useFrame(() => {
     if (!groupRef.current || !startTime.current) return;
 
     const elapsed = (Date.now() - startTime.current) / 1000;
 
-    // Phase 1: Printing - slow slide down
+    // Phase 1: Printing - slow slide down to halfway
     if (animationPhase === "printing") {
       const printDuration = 2.0;
       const progress = Math.min(elapsed / printDuration, 1);
@@ -91,7 +89,7 @@ function PhotoStrip({
       }
     }
 
-    // Phase 2: Dropping - falls to center
+    // Phase 2: Dropping - falls from halfway into tray
     if (animationPhase === "dropping") {
       const dropDuration = 0.8;
       const progress = Math.min(elapsed / dropDuration, 1);
@@ -130,7 +128,7 @@ function PhotoStrip({
 
       // Subtle settling oscillation
       groupRef.current.rotation.z = Math.sin(progress * Math.PI * 3) * 0.015 * (1 - progress);
-      groupRef.current.position.y = finalY + Math.sin(progress * Math.PI * 2) * 0.02 * (1 - progress);
+      groupRef.current.position.y = finalY + Math.sin(progress * Math.PI * 2) * 0.01 * (1 - progress);
 
       if (progress >= 1) {
         setAnimationPhase("complete");
@@ -157,7 +155,7 @@ function PhotoStrip({
   const photosOffsetY = (bottomPadding - borderPadding) / 2;
 
   return (
-    <group ref={groupRef} position={[0, hiddenY, 0]}>
+    <group ref={groupRef} position={[0, 3.5, 0]}>
       {/* White backing/frame of photo strip */}
       <mesh position={[0, 0, -0.02]}>
         <boxGeometry args={[stripWidth, stripHeight, 0.025]} />
@@ -210,8 +208,117 @@ function PhotoStrip({
       {/* Subtle drop shadow */}
       <mesh position={[0.04, -0.04, -0.03]} rotation={[0, 0, 0]}>
         <planeGeometry args={[stripWidth * 0.95, stripHeight * 0.98]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.15} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.12} />
       </mesh>
+    </group>
+  );
+}
+
+// Photo booth catch tray - sleek modern design
+function PhotoboothTray() {
+  const trayRef = useRef<THREE.Group>(null);
+
+  // Brushed stainless steel material
+  const steelMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: "#e8e8e8",
+        metalness: 0.92,
+        roughness: 0.18,
+      }),
+    []
+  );
+
+  // Dark inner material
+  const velvetMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: "#1a1a1a",
+        metalness: 0.0,
+        roughness: 0.95,
+      }),
+    []
+  );
+
+  // Gold accent material
+  const goldMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: "#c9a66b",
+        metalness: 0.85,
+        roughness: 0.2,
+      }),
+    []
+  );
+
+  const slotDepth = 0.45;
+  const slotWidth = 1.8;
+  const slotHeight = 3.8;
+  const wallThickness = 0.08;
+
+  return (
+    <group ref={trayRef} position={[0, -1.85, 0]}>
+      {/* Back panel - main structure */}
+      <mesh position={[0, slotHeight / 2, -slotDepth / 2 - wallThickness / 2]}>
+        <boxGeometry args={[slotWidth + wallThickness * 2.5, slotHeight + 0.1, wallThickness]} />
+        <primitive object={steelMaterial} attach="material" />
+      </mesh>
+
+      {/* Left wall */}
+      <mesh position={[-slotWidth / 2 - wallThickness / 2, slotHeight / 2, 0]}>
+        <boxGeometry args={[wallThickness, slotHeight, slotDepth + wallThickness * 0.5]} />
+        <primitive object={steelMaterial} attach="material" />
+      </mesh>
+
+      {/* Right wall */}
+      <mesh position={[slotWidth / 2 + wallThickness / 2, slotHeight / 2, 0]}>
+        <boxGeometry args={[wallThickness, slotHeight, slotDepth + wallThickness * 0.5]} />
+        <primitive object={steelMaterial} attach="material" />
+      </mesh>
+
+      {/* Bottom tray */}
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[slotWidth + wallThickness * 2.5, wallThickness * 1.5, slotDepth + wallThickness]} />
+        <primitive object={steelMaterial} attach="material" />
+      </mesh>
+
+      {/* Front catch lip - curved appearance */}
+      <mesh position={[0, wallThickness * 2, slotDepth / 2 + wallThickness * 0.25]}>
+        <boxGeometry args={[slotWidth + wallThickness * 2.5, wallThickness * 4, wallThickness * 0.6]} />
+        <primitive object={steelMaterial} attach="material" />
+      </mesh>
+
+      {/* Inner velvet lining - bottom */}
+      <mesh position={[0, wallThickness * 0.8, 0]}>
+        <boxGeometry args={[slotWidth - 0.02, 0.01, slotDepth - 0.02]} />
+        <primitive object={velvetMaterial} attach="material" />
+      </mesh>
+
+      {/* Inner velvet lining - back */}
+      <mesh position={[0, slotHeight / 2, -slotDepth / 2 + 0.01]}>
+        <boxGeometry args={[slotWidth - 0.02, slotHeight - 0.1, 0.01]} />
+        <primitive object={velvetMaterial} attach="material" />
+      </mesh>
+
+      {/* Gold accent strip - top */}
+      <mesh position={[0, slotHeight + 0.02, -slotDepth / 2 - wallThickness / 2]}>
+        <boxGeometry args={[slotWidth + wallThickness * 2, 0.04, wallThickness + 0.02]} />
+        <primitive object={goldMaterial} attach="material" />
+      </mesh>
+
+      {/* Gold accent strip - bottom front */}
+      <mesh position={[0, wallThickness * 4.2, slotDepth / 2 + wallThickness * 0.25]}>
+        <boxGeometry args={[slotWidth + wallThickness * 2, 0.025, wallThickness * 0.7]} />
+        <primitive object={goldMaterial} attach="material" />
+      </mesh>
+
+      {/* Subtle ambient glow at slot opening */}
+      <pointLight
+        position={[0, slotHeight + 0.3, 0]}
+        color="#fff8f0"
+        intensity={0.15}
+        distance={1.5}
+      />
     </group>
   );
 }
@@ -262,32 +369,31 @@ function Particles() {
   );
 }
 
-// Main scene component - simplified without tray
+// Main scene component
 function Scene({
   images,
   onAnimationComplete,
-  startDelay,
 }: {
   images: string[];
   onAnimationComplete?: () => void;
-  startDelay?: number;
 }) {
   return (
     <>
       {/* Lighting */}
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.4} />
       <directionalLight
         position={[5, 8, 5]}
-        intensity={1.0}
+        intensity={1.2}
         castShadow
         shadow-mapSize={[1024, 1024]}
       />
       <directionalLight position={[-3, 4, -2]} intensity={0.4} color="#ffeedd" />
       <pointLight position={[0, 3, 2]} intensity={0.5} color="#fff8f0" />
 
-      {/* Photo strip only - no tray */}
+      {/* Photobooth elements */}
       <Suspense fallback={null}>
-        <PhotoStrip images={images} onAnimationComplete={onAnimationComplete} startDelay={startDelay} />
+        <PhotoboothTray />
+        <PhotoStrip images={images} onAnimationComplete={onAnimationComplete} />
       </Suspense>
 
       {/* Atmospheric particles */}
@@ -313,14 +419,13 @@ function LoadingFallback() {
   );
 }
 
-export interface PhotoboothSceneProps {
+export interface PhotoboothSceneWithTrayProps {
   images?: string[];
   className?: string;
   onAnimationComplete?: () => void;
-  startDelay?: number;
 }
 
-export function PhotoboothScene({
+export function PhotoboothSceneWithTray({
   images = [
     "/booth/booth-1.png",
     "/booth/booth-2.png",
@@ -328,15 +433,14 @@ export function PhotoboothScene({
   ],
   className = "",
   onAnimationComplete,
-  startDelay = 500,
-}: PhotoboothSceneProps) {
+}: PhotoboothSceneWithTrayProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
     <div className={`relative w-full h-full ${className}`} style={{ backgroundColor: '#0a0a0a' }}>
       {!isLoaded && <LoadingFallback />}
       <Canvas
-        camera={{ position: [0, 0, 5], fov: 50 }}
+        camera={{ position: [0, 0.5, 6.5], fov: 50 }}
         onCreated={() => setIsLoaded(true)}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
@@ -344,7 +448,7 @@ export function PhotoboothScene({
       >
         <color attach="background" args={["#0a0a0a"]} />
         <fog attach="fog" args={["#0a0a0a", 8, 20]} />
-        <Scene images={images} onAnimationComplete={onAnimationComplete} startDelay={startDelay} />
+        <Scene images={images} onAnimationComplete={onAnimationComplete} />
       </Canvas>
     </div>
   );
