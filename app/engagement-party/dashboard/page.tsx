@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getRSVPs, type RSVPWithParsedGuests } from "../actions";
 import { motion } from "framer-motion";
-import { Users, UserCheck, UserX, AlertTriangle, Utensils } from "lucide-react";
+import { Users, UserCheck, UserX, AlertTriangle, Utensils, type LucideIcon } from "lucide-react";
 
 interface DashboardStats {
   totalResponses: number;
@@ -21,7 +21,7 @@ function StatCard({
   subvalue,
   color,
 }: {
-  icon: React.ElementType;
+  icon: LucideIcon;
   label: string;
   value: number | string;
   subvalue?: string;

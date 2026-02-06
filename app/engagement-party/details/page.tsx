@@ -2,10 +2,10 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Clock, Utensils, Wine, Users, Car, MessageCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Utensils, Wine, Users, Car, MessageCircle, type LucideIcon } from "lucide-react";
 
 interface SectionProps {
-  icon: React.ElementType;
+  icon: LucideIcon;
   title: string;
   children: React.ReactNode;
   delay?: number;
