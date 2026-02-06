@@ -107,26 +107,31 @@ const attendingOptions = [
   { value: "no", label: "Sorry, I can't make it" },
 ];
 
-// Generate Google Calendar URL
-function getGoogleCalendarUrl() {
-  const event = {
-    title: "Ethan & Amanda's Engagement Party",
-    startDate: "20260315T130000",
-    endDate: "20260315T170000",
-    location: "Local 104, 18498 Ballinger Way NE, Lake Forest Park, WA 98155",
-    description: "Join us as we celebrate our engagement!",
-  };
-  
-  const baseUrl = "https://calendar.google.com/calendar/render";
-  const params = new URLSearchParams({
-    action: "TEMPLATE",
-    text: event.title,
-    dates: `${event.startDate}/${event.endDate}`,
-    location: event.location,
-    details: event.description,
-  });
-  
-  return `${baseUrl}?${params.toString()}`;
+// Generate .ics calendar file and trigger download (opens native calendar app on mobile)
+function handleAddToCalendar() {
+  const icsContent = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Ethan & Amanda//Engagement Party//EN",
+    "BEGIN:VEVENT",
+    "DTSTART:20260315T200000Z",
+    "DTEND:20260316T000000Z",
+    "SUMMARY:Ethan & Amanda's Engagement Party",
+    "LOCATION:Local 104\\, 18498 Ballinger Way NE\\, Lake Forest Park\\, WA 98155",
+    "DESCRIPTION:Join us as we celebrate our engagement!",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "engagement-party.ics";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 export default function EngagementPartyPage() {
@@ -408,15 +413,13 @@ export default function EngagementPartyPage() {
                     
                     <div className="flex flex-col gap-2 sm:gap-3">
                       {formData.attending === "yes" && (
-                        <a
-                          href={getGoogleCalendarUrl()}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={handleAddToCalendar}
                           className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-primary text-primary-foreground font-medium tracking-wide text-sm hover:bg-primary/80 transition-colors"
                         >
                           <CalendarPlus className="w-4 h-4" />
                           Add to Calendar
-                        </a>
+                        </button>
                       )}
                       <Button
                         variant="outline"
@@ -628,15 +631,13 @@ export default function EngagementPartyPage() {
                     
                     <div className="flex flex-col gap-3">
                       {formData.attending === "yes" && (
-                        <a
-                          href={getGoogleCalendarUrl()}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={handleAddToCalendar}
                           className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-medium tracking-wide text-sm hover:bg-primary/80 transition-colors"
                         >
                           <CalendarPlus className="w-4 h-4" />
                           Add to Calendar
-                        </a>
+                        </button>
                       )}
                       <Button
                         variant="outline"
