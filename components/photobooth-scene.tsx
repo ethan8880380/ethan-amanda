@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, useTexture, RoundedBox, Text } from "@react-three/drei";
+import { Environment, useTexture, RoundedBox } from "@react-three/drei";
 import { useRef, useState, useEffect, Suspense, useMemo } from "react";
 import * as THREE from "three";
 
@@ -268,18 +268,6 @@ function PhotoStrip({
         <planeGeometry args={[0.08, photoHeight * 3 + spacing * 2]} />
         <meshBasicMaterial color="#ffffff" transparent opacity={0.045} />
       </mesh>
-
-      {/* "E ♥ A" text at the bottom of the strip */}
-      <Text
-        position={[0, -(stripHeight / 2) + bottomPadding * 0.42, 0.002]}
-        fontSize={0.11}
-        color="#b0b0b0"
-        anchorX="center"
-        anchorY="middle"
-        letterSpacing={0.15}
-      >
-        E &amp; A
-      </Text>
 
       {/* Soft drop shadow - multi-layered for realism */}
       <mesh position={[0.03, -0.05, -0.04]}>

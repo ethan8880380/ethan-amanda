@@ -29,30 +29,60 @@ function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
     >
-      <div className="relative">
+      <div className="relative flex flex-col items-center">
         <svg
-          width="120"
-          height="78"
-          viewBox="0 0 467 301"
+          width="140"
+          height="133"
+          viewBox="0 0 467 444"
           fill="none"
           className="overflow-visible"
         >
-          {/* Single continuous line heart with loop and flourish */}
+          {/* Hand-drawn heart from heart-3.svg */}
           <motion.path
-            d="M4.50122 290.61C25.5012 297.443 82.5012 302.51 142.501 268.11C217.501 225.11 259.501 137.11 242.001 60.1096C224.501 -16.8904 153.501 -1.29935 134.501 31.6096C120.175 56.424 112.501 74.6096 111.501 100.61C110.501 126.61 117.001 151.61 134.501 151.61C152.001 151.61 152.107 102.61 136.501 80.6096C120.896 58.6096 102.501 37.1096 77.5012 46.6096C52.5012 56.1096 41.5012 126.61 92.0012 170.61C142.501 214.61 265.501 295.11 462.001 179.61"
+            d="M218.547 333.272C190.547 321.605 123.947 286.872 81.5474 241.272C28.5474 184.272 -5.95258 125.772 12.5474 81.7718C31.0474 37.7718 64.0474 21.7718 122.047 17.7718C180.047 13.7718 223.047 41.7718 251.047 69.2718C279.047 96.7718 311.547 138.772 316.047 162.772C320.547 186.772 316.047 200.772 308.047 200.772C300.047 200.772 291.547 181.772 294.047 151.772C296.547 121.772 320.547 58.7718 374.547 21.7718C428.547 -15.2282 455.547 29.2718 458.047 47.7718C460.547 66.2718 460.047 120.772 421.047 177.272C382.047 233.772 318.047 330.272 180.547 436.272"
             stroke="white"
-            strokeWidth="6"
+            strokeWidth="15"
             strokeLinecap="round"
-            strokeLinejoin="round"
             fill="none"
             initial={{ pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 1 }}
             transition={{
-              pathLength: { duration: 2.2, ease: "easeInOut" },
+              pathLength: { duration: 2.4, ease: [0.65, 0, 0.35, 1] },
               opacity: { duration: 0.3 }
             }}
           />
         </svg>
+
+        {/* Ethan + Amanda text */}
+        <motion.p
+          initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          className="mt-5 font-serif text-white/90 text-2xl tracking-wide"
+        >
+          <motion.span
+            initial={{ opacity: 0, x: -6 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.3, ease: "easeOut" }}
+          >
+            Ethan
+          </motion.span>
+          <motion.span
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 0.6, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.5, ease: "easeOut" }}
+            className="inline-block mx-2 text-lg text-white/50"
+          >
+            +
+          </motion.span>
+          <motion.span
+            initial={{ opacity: 0, x: 6 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.6, ease: "easeOut" }}
+          >
+            Amanda
+          </motion.span>
+        </motion.p>
         
         {/* Subtle glow effect */}
         <motion.div 

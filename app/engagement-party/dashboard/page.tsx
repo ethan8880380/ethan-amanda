@@ -12,6 +12,7 @@ interface DashboardStats {
   totalGuests: number;
   allergies: { guests: string; allergies: string }[];
   allGuests: string[];
+  declinedNames: string[];
 }
 
 function StatCard({
@@ -55,6 +56,7 @@ export default function DashboardPage() {
     totalGuests: 0,
     allergies: [],
     allGuests: [],
+    declinedNames: [],
   });
 
   useEffect(() => {
@@ -68,6 +70,7 @@ export default function DashboardPage() {
         const notAttending = result.data.filter((r) => !r.attending);
 
         const allGuests = attending.flatMap((r) => r.parsedGuests);
+        const declinedNames = notAttending.flatMap((r) => r.parsedGuests);
         const allergies = attending
           .filter((r) => r.allergies)
           .map((r) => ({
@@ -82,6 +85,7 @@ export default function DashboardPage() {
           totalGuests: allGuests.length,
           allergies,
           allGuests,
+          declinedNames,
         });
       }
       setIsLoading(false);
@@ -143,7 +147,7 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Guest List */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -172,6 +176,40 @@ export default function DashboardPage() {
                       {guest.charAt(0).toUpperCase()}
                     </div>
                     <span className="text-white/90">{guest}</span>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+
+          {/* Not Attending */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="bg-[#151515] border border-[#2a2a2a] p-6"
+          >
+            <h2 className="text-xl font-medium mb-6 flex items-center gap-2">
+              <UserX className="w-5 h-5 text-red-400" />
+              Not Attending ({stats.declinedNames.length})
+            </h2>
+
+            {stats.declinedNames.length === 0 ? (
+              <p className="text-white/40 text-center py-8">No declines yet</p>
+            ) : (
+              <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+                {stats.declinedNames.map((name, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.03 }}
+                    className="flex items-center gap-3 py-2 px-3 bg-[#1a1a1a] border border-[#252525]"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500/30 to-red-700/30 flex items-center justify-center text-sm font-medium text-red-400">
+                      {name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-white/60">{name}</span>
                   </motion.div>
                 ))}
               </div>

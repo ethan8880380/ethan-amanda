@@ -28,7 +28,7 @@ export async function submitRSVP(formData: RSVPFormData): Promise<RSVPResult> {
 
   const rsvpData: RSVPInsert = {
     attending: isAttending,
-    guests: isAttending ? formData.guests : null,
+    guests: formData.guests || null,
     allergies: isAttending && formData.allergies ? formData.allergies : null,
   };
 
