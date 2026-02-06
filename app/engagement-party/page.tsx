@@ -149,7 +149,7 @@ export default function EngagementPartyPage() {
   }
 
   return (
-    <div className="h-screen overflow-hidden text-white relative" style={{ backgroundColor: '#0a0a0a' }}>
+    <div className="fixed inset-0 overflow-hidden text-white" style={{ backgroundColor: '#0a0a0a' }}>
       {/* Heart loader - fades out after drawing */}
       <ScriptyHeartLoader isVisible={showHeart} />
       {/* Subtle grain texture */}
@@ -166,7 +166,7 @@ export default function EngagementPartyPage() {
       </div>
 
       {/* Mobile Layout */}
-      <div className="lg:hidden h-screen relative overflow-hidden">
+      <div className="lg:hidden absolute inset-0 overflow-hidden">
         {/* Photobooth - fixed to top, full screen */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -346,7 +346,7 @@ export default function EngagementPartyPage() {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden lg:flex h-screen flex-row items-center justify-center px-20 gap-16 overflow-hidden">
+      <div className="hidden lg:flex absolute inset-0 flex-row items-center justify-center px-20 gap-16 overflow-hidden">
         {/* Left side - Text content */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
