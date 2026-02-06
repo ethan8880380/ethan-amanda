@@ -29,7 +29,7 @@ function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
     >
-      <div className="relative flex flex-col items-center">
+      <div className="relative flex flex-col items-center overflow-visible">
         <svg
           width="105"
           height="100"
@@ -58,7 +58,7 @@ function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
           initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="mt-5 font-serif text-white/90 text-3xl tracking-wide leading-[1] overflow-visible py-2"
+          className="mt-5 font-serif text-white/90 text-3xl tracking-wide leading-[2] overflow-visible"
         >
           <motion.span
             initial={{ opacity: 0, x: -6 }}
@@ -107,32 +107,8 @@ const attendingOptions = [
   { value: "no", label: "Sorry, I can't make it" },
 ];
 
-// Generate .ics calendar file and trigger download (opens native calendar app on mobile)
-function handleAddToCalendar() {
-  const icsContent = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Ethan & Amanda//Engagement Party//EN",
-    "BEGIN:VEVENT",
-    "DTSTART:20260315T200000Z",
-    "DTEND:20260316T000000Z",
-    "SUMMARY:Ethan & Amanda's Engagement Party",
-    "LOCATION:Local 104\\, 18498 Ballinger Way NE\\, Lake Forest Park\\, WA 98155",
-    "DESCRIPTION:Join us as we celebrate our engagement!",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
-
-  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "engagement-party.ics";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
+// Calendar .ics file served from /engagement-party/calendar route
+const calendarUrl = "/engagement-party/calendar";
 
 export default function EngagementPartyPage() {
   const [showHeart, setShowHeart] = useState(true);
@@ -413,13 +389,13 @@ export default function EngagementPartyPage() {
                     
                     <div className="flex flex-col gap-2 sm:gap-3">
                       {formData.attending === "yes" && (
-                        <button
-                          onClick={handleAddToCalendar}
+                        <a
+                          href={calendarUrl}
                           className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-primary text-primary-foreground font-medium tracking-wide text-sm hover:bg-primary/80 transition-colors"
                         >
                           <CalendarPlus className="w-4 h-4" />
                           Add to Calendar
-                        </button>
+                        </a>
                       )}
                       <Button
                         variant="outline"
@@ -631,13 +607,13 @@ export default function EngagementPartyPage() {
                     
                     <div className="flex flex-col gap-3">
                       {formData.attending === "yes" && (
-                        <button
-                          onClick={handleAddToCalendar}
+                        <a
+                          href={calendarUrl}
                           className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-medium tracking-wide text-sm hover:bg-primary/80 transition-colors"
                         >
                           <CalendarPlus className="w-4 h-4" />
                           Add to Calendar
-                        </button>
+                        </a>
                       )}
                       <Button
                         variant="outline"
