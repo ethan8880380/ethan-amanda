@@ -460,7 +460,7 @@ export default function EngagementPartyPage() {
               You're Invited
             </p>
 
-            <h1 className="font-serif text-5xl xl:text-6xl text-white mb-5 leading-[1.1]">
+            <h1 className="font-serif text-5xl xl:text-6xl text-white mb-5 leading-[1.8]">
               We're Getting Married!
             </h1>
 
