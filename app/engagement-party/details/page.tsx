@@ -179,7 +179,7 @@ export default function DetailsPage() {
           {/* When */}
           <DetailCard icon={Clock} label="When" delay={0.3}>
             <p className="text-white text-lg sm:text-xl font-medium leading-snug">
-              Saturday, March 15th
+              Sunday, March 15th
             </p>
             <p className="text-white/60 text-sm">1:00 PM – 4:00 PM</p>
           </DetailCard>
@@ -421,7 +421,7 @@ export default function DetailsPage() {
                       <div className="bg-[#1a1a1a] border border-[#2a2a2a] p-3 sm:p-4 mb-4 sm:mb-6 text-left">
                         <p className="text-xs tracking-[0.2em] text-primary uppercase mb-2 sm:mb-3">Event Details</p>
                         <p className="text-white font-medium text-sm sm:text-base">Ethan & Amanda's Engagement Party</p>
-                        <p className="text-white/60 text-xs sm:text-sm mt-1">Saturday, March 15th, 2026 · 1:00 – 4:00 PM</p>
+                        <p className="text-white/60 text-xs sm:text-sm mt-1">Sunday, March 15th, 2026 · 1:00 – 4:00 PM</p>
                         <p className="text-white/50 text-xs sm:text-sm">Local 104, Lake Forest Park, WA</p>
                       </div>
                     )}
