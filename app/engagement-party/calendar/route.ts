@@ -5,7 +5,7 @@ export async function GET() {
     "PRODID:-//Ethan & Amanda//Engagement Party//EN",
     "BEGIN:VEVENT",
     "DTSTART:20260315T200000Z",
-    "DTEND:20260316T000000Z",
+    "DTEND:20260315T230000Z",
     "SUMMARY:Ethan & Amanda's Engagement Party",
     "LOCATION:Local 104\\, 18498 Ballinger Way NE\\, Lake Forest Park\\, WA 98155",
     "DESCRIPTION:Join us as we celebrate our engagement!",

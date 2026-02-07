@@ -181,7 +181,7 @@ export default function DetailsPage() {
             <p className="text-white text-lg sm:text-xl font-medium leading-snug">
               Saturday, March 15th
             </p>
-            <p className="text-white/60 text-sm">1:00 PM</p>
+            <p className="text-white/60 text-sm">1:00 PM – 4:00 PM</p>
           </DetailCard>
 
           {/* Where */}
@@ -224,7 +224,10 @@ export default function DetailsPage() {
             A casual get-together to celebrate with friends and family.
             Come hang out, eat, drink, and spend time together.
           </p>
-          <p className="text-white/40 text-sm mt-4 italic">
+          <p className="text-white/60 text-sm mt-4">
+            Drop by anytime between 1:00 and 4:00 — no need to be there right at the start.
+          </p>
+          <p className="text-white/40 text-sm mt-2 italic">
             The party will be held on the back patio.
           </p>
         </motion.div>
@@ -418,7 +421,7 @@ export default function DetailsPage() {
                       <div className="bg-[#1a1a1a] border border-[#2a2a2a] p-3 sm:p-4 mb-4 sm:mb-6 text-left">
                         <p className="text-xs tracking-[0.2em] text-primary uppercase mb-2 sm:mb-3">Event Details</p>
                         <p className="text-white font-medium text-sm sm:text-base">Ethan & Amanda's Engagement Party</p>
-                        <p className="text-white/60 text-xs sm:text-sm mt-1">Saturday, March 15th, 2026 at 1:00 PM</p>
+                        <p className="text-white/60 text-xs sm:text-sm mt-1">Saturday, March 15th, 2026 · 1:00 – 4:00 PM</p>
                         <p className="text-white/50 text-xs sm:text-sm">Local 104, Lake Forest Park, WA</p>
                       </div>
                     )}

@@ -242,7 +242,7 @@ export default function EngagementPartyPage() {
             
             <div className="mb-6">
               <p className="text-white text-base sm:text-lg">
-              Local 104 · March 15th, 2026 · 1:00 PM
+              Local 104 · March 15th, 2026 · 1–4 PM
               </p>
               <p className="text-white/50 text-xs mt-1">
                 18498 Ballinger Way NE, Lake Forest Park, WA
@@ -382,7 +382,7 @@ export default function EngagementPartyPage() {
                       <div className="bg-[#1a1a1a] border border-[#2a2a2a] p-3 sm:p-4 mb-4 sm:mb-6 text-left">
                         <p className="text-xs tracking-[0.2em] text-primary uppercase mb-2 sm:mb-3">Event Details</p>
                         <p className="text-white font-medium text-sm sm:text-base">Ethan & Amanda's Engagement Party</p>
-                        <p className="text-white/60 text-xs sm:text-sm mt-1">Saturday, March 15th, 2026 at 1:00 PM</p>
+                        <p className="text-white/60 text-xs sm:text-sm mt-1">Saturday, March 15th, 2026 · 1:00 – 4:00 PM</p>
                         <p className="text-white/50 text-xs sm:text-sm">Local 104, Lake Forest Park, WA</p>
                       </div>
                     )}
@@ -473,7 +473,7 @@ export default function EngagementPartyPage() {
 
             <div className="mb-8">
               <p className="text-white text-lg">
-                March 15th, 2026 · 1:00 PM
+                March 15th, 2026 · 1–4 PM
               </p>
               <p className="text-white/45 text-sm mt-1">
                 Local 104 · 18498 Ballinger Way NE, Lake Forest Park, WA
@@ -618,7 +618,7 @@ export default function EngagementPartyPage() {
                         <div className="bg-[#1a1a1a] border border-[#2a2a2a] p-4 mb-6 text-left">
                           <p className="text-xs tracking-[0.2em] text-primary uppercase mb-3">Event Details</p>
                           <p className="text-white font-medium">Ethan & Amanda's Engagement Party</p>
-                          <p className="text-white/60 text-sm mt-1">Saturday, March 15th, 2026 at 1:00 PM</p>
+                          <p className="text-white/60 text-sm mt-1">Saturday, March 15th, 2026 · 1:00 – 4:00 PM</p>
                           <p className="text-white/50 text-sm">Local 104, Lake Forest Park, WA</p>
                         </div>
                       )}
