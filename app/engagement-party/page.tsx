@@ -58,7 +58,7 @@ function ScriptyHeartLoader({ isVisible }: { isVisible: boolean }) {
           initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="mt-5 font-serif text-white/90 text-3xl tracking-wide leading-[2] overflow-visible"
+          className="mt-5 font-serif text-white/90 text-3xl tracking-wide leading-normal overflow-visible"
         >
           <motion.span
             initial={{ opacity: 0, x: -6 }}
@@ -460,7 +460,7 @@ export default function EngagementPartyPage() {
               You're Invited
             </p>
 
-            <h1 className="font-serif text-5xl xl:text-6xl text-white mb-5 leading-[1.8]">
+            <h1 className="font-serif text-5xl xl:text-6xl text-white mb-5 leading-tight">
               We're Getting Married!
             </h1>
 

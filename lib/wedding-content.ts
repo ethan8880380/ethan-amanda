@@ -1,0 +1,172 @@
+/**
+ * Wedding website content — edit this file to fill in your details.
+ * Anything marked with TODO is a placeholder waiting for real info.
+ */
+
+export const weddingContent = {
+  couple: {
+    partnerOne: "Ethan",
+    partnerTwo: "Amanda",
+    short: "Ethan & Amanda",
+  },
+
+  // TODO: set your wedding date
+  date: {
+    display: "Saturday, Month Day, Year",
+    short: "Month Day, Year",
+    // Used for countdown / calendar — update when date is final
+    iso: "2027-06-15",
+    time: "4:00 PM",
+  },
+
+  // TODO: set ceremony + reception venues
+  venue: {
+    ceremony: {
+      name: "Ceremony Venue",
+      address: "123 Ceremony Lane",
+      city: "City, ST 00000",
+      mapUrl: "https://maps.google.com",
+      notes: "Ceremony begins promptly — please arrive 15 minutes early.",
+    },
+    reception: {
+      name: "Reception Venue",
+      address: "456 Celebration Ave",
+      city: "City, ST 00000",
+      mapUrl: "https://maps.google.com",
+      notes: "Dinner, dancing, and drinks to follow.",
+    },
+    // Set true if ceremony and reception are at the same place
+    sameLocation: false,
+  },
+
+  hero: {
+    eyebrow: "We're getting married",
+    headline: "Ethan & Amanda",
+    subhead: "Join us as we celebrate a lifetime together.",
+    cta: "RSVP",
+    image: "/gallery/gallery-4.jpg",
+  },
+
+  story: {
+    eyebrow: "Our story",
+    title: "How we got here",
+    paragraphs: [
+      "TODO: A short paragraph about how you met — keep it warm and personal.",
+      "TODO: A second paragraph about the proposal or what this day means to you.",
+    ],
+    image: "/gallery/featured.jpg",
+  },
+
+  schedule: {
+    eyebrow: "The day",
+    title: "Celebration timeline",
+    items: [
+      {
+        time: "3:30 PM",
+        title: "Guest arrival",
+        description: "TODO: Where guests should gather before the ceremony.",
+      },
+      {
+        time: "4:00 PM",
+        title: "Ceremony",
+        description: "TODO: Brief note about the ceremony.",
+      },
+      {
+        time: "5:00 PM",
+        title: "Cocktail hour",
+        description: "TODO: Drinks, photos, mingling.",
+      },
+      {
+        time: "6:30 PM",
+        title: "Dinner & toasts",
+        description: "TODO: Meal style, speeches, etc.",
+      },
+      {
+        time: "8:00 PM",
+        title: "Dancing",
+        description: "TODO: Party details — open bar, playlist vibes, etc.",
+      },
+    ],
+  },
+
+  travel: {
+    eyebrow: "Travel & stay",
+    title: "Getting there",
+    intro:
+      "TODO: A short note for out-of-town guests — nearest airport, driving tips, etc.",
+    hotels: [
+      {
+        name: "Hotel Name",
+        detail: "TODO: Room block code, rate, cutoff date",
+        url: "#",
+      },
+      {
+        name: "Second Hotel",
+        detail: "TODO: Alternate option nearby",
+        url: "#",
+      },
+    ],
+    parking: "TODO: Parking details for the venue.",
+  },
+
+  registry: {
+    eyebrow: "Registry",
+    title: "Gifts",
+    intro:
+      "Your presence is the best gift. If you'd like to celebrate with something more, we've registered at the places below.",
+    links: [
+      { label: "Registry One", url: "#" },
+      { label: "Registry Two", url: "#" },
+      { label: "Honeymoon fund", url: "#" },
+    ],
+  },
+
+  faq: {
+    eyebrow: "FAQ",
+    title: "A few things to know",
+    items: [
+      {
+        question: "What should I wear?",
+        answer: "TODO: Dress code — e.g. cocktail attire, garden formal, etc.",
+      },
+      {
+        question: "Can I bring a plus one?",
+        answer:
+          "TODO: Plus-one policy — usually based on the invitation.",
+      },
+      {
+        question: "Are kids welcome?",
+        answer: "TODO: Kids policy.",
+      },
+      {
+        question: "When should I RSVP by?",
+        answer: "TODO: RSVP deadline — e.g. Month Day, Year.",
+      },
+    ],
+  },
+
+  rsvp: {
+    eyebrow: "RSVP",
+    title: "Will you be there?",
+    intro: "Please let us know if you can make it. We can't wait to celebrate with you.",
+    deadline: "TODO: Kindly reply by Month Day, Year.",
+    successYes: "We can't wait to see you there!",
+    successNo: "We'll miss you — thank you for letting us know.",
+  },
+
+  footer: {
+    note: "With love,",
+    year: "2027",
+  },
+
+  // Gallery strip images (reuse engagement photos for now)
+  gallery: [
+    "/gallery/gallery-1.jpg",
+    "/gallery/gallery-2.jpg",
+    "/gallery/gallery-3.webp",
+    "/gallery/gallery-4.jpg",
+    "/gallery/featured.jpg",
+  ],
+} as const;
+
+export type WeddingContent = typeof weddingContent;

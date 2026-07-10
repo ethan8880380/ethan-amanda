@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+@import "./tw-animate.css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -129,7 +129,9 @@
 }
 
 .font-serif {
-  font-family: var(--font-serif), ui-serif, Georgia, serif;
+  font-family: var(--font-serif), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.03em;
 }
 
 .font-sans {
@@ -137,5 +139,8 @@
 }
 
 .font-script {
-  font-family: var(--font-script), cursive;
+  font-family: var(--font-serif), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: -0.02em;
 }

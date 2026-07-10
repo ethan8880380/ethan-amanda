@@ -1,6 +1,9 @@
 "use server";
 
 import { supabase, type RSVP, type RSVPInsert } from "@/lib/supabase";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export interface RSVPFormData {
   attending: "yes" | "no";
@@ -40,6 +43,36 @@ export async function submitRSVP(formData: RSVPFormData): Promise<RSVPResult> {
       success: false,
       error: "Failed to submit RSVP. Please try again.",
     };
+  }
+
+  // Send email backup (fire-and-forget — don't block the response)
+  try {
+    const status = isAttending ? "✅ Attending" : "❌ Not Attending";
+    const guestLine = formData.guests || "Unknown";
+    const allergyLine =
+      isAttending && formData.allergies
+        ? `<p><strong>Dietary Notes:</strong> ${formData.allergies}</p>`
+        : "";
+
+    await resend.emails.send({
+      from: "RSVP <onboarding@resend.dev>",
+      to: "ethan0380@gmail.com",
+      subject: `RSVP: ${guestLine} — ${isAttending ? "Attending" : "Not Attending"}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px;">
+          <h2 style="margin-bottom: 4px;">New RSVP Submission</h2>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 12px 0;" />
+          <p><strong>Status:</strong> ${status}</p>
+          <p><strong>Guest(s):</strong> ${guestLine}</p>
+          ${allergyLine}
+          <hr style="border: none; border-top: 1px solid #eee; margin: 12px 0;" />
+          <p style="color: #999; font-size: 12px;">Engagement Party RSVP Backup</p>
+        </div>
+      `,
+    });
+  } catch (emailError) {
+    // Log but don't fail the RSVP if email fails
+    console.error("Failed to send email backup:", emailError);
   }
 
   return { success: true };

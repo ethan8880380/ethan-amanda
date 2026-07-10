@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Manrope, Pinyon_Script } from "next/font/google";
-import localFont from "next/font/local";
+import { Manrope, Syne } from "next/font/google";
 import "./globals.css";
 
-const adelia = localFont({
-  src: "../fonts/adelia.otf",
-  display: "swap",
+const syne = Syne({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-serif",
 });
 
@@ -14,15 +13,9 @@ const manrope = Manrope({
   variable: "--font-sans",
 });
 
-const pinyonScript = Pinyon_Script({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-script",
-});
-
 export const metadata: Metadata = {
-  title: "Ethan & Amanda | Engagement Party",
-  description: "Join us in celebrating our engagement",
+  title: "Ethan & Amanda | Wedding",
+  description: "Join us as we celebrate our wedding",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -39,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${adelia.variable} ${manrope.variable} ${pinyonScript.variable}`}>
+    <html lang="en" className={`${syne.variable} ${manrope.variable}`}>
       <body className="antialiased font-sans">
         {children}
       </body>

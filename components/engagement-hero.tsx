@@ -64,26 +64,29 @@ export function EngagementHero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              href="#details"
+              href="/wedding"
               className="text-xs sm:text-sm tracking-wide text-[#1a1a1a] hover:text-[#b8956b] transition-colors border-b border-[#1a1a1a] pb-0.5"
             >
-              Details
+              Wedding
             </motion.a>
             <motion.a
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              href="#rsvp"
+              href="/wedding#rsvp"
               className="text-xs sm:text-sm tracking-wide text-[#1a1a1a] hover:text-[#b8956b] transition-colors"
             >
               RSVP
             </motion.a>
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="hidden sm:block w-6 h-6 bg-[#1a1a1a] rounded-full cursor-pointer hover:bg-[#b8956b] transition-colors"
-            />
+            <motion.a
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35, duration: 0.6 }}
+              href="/engagement-party"
+              className="text-xs sm:text-sm tracking-wide text-[#1a1a1a] hover:text-[#b8956b] transition-colors"
+            >
+              Party
+            </motion.a>
           </nav>
         </header>
 
@@ -116,10 +119,10 @@ export function EngagementHero() {
                 className="max-w-xs mb-8"
               >
                 <p className="text-xs tracking-[0.3em] text-[#666] mb-4 uppercase">
-                  01/ Engagement Party
+                  01/ Our Wedding
                 </p>
                 <p className="text-base text-[#1a1a1a] leading-relaxed">
-                  Join us as we celebrate our next chapter together—a night of love, laughter, and new beginnings.
+                  Join us as we celebrate our next chapter together—a day of love, laughter, and new beginnings.
                 </p>
               </motion.div>
 
@@ -141,10 +144,10 @@ export function EngagementHero() {
             className="lg:hidden mb-6"
           >
             <p className="text-xs tracking-[0.3em] text-[#666] mb-3 uppercase">
-              01/ Engagement Party
+              01/ Our Wedding
             </p>
             <p className="text-sm sm:text-base text-[#1a1a1a] leading-relaxed">
-              Join us as we celebrate our next chapter together—a night of love, laughter, and new beginnings.
+              Join us as we celebrate our next chapter together—a day of love, laughter, and new beginnings.
             </p>
           </motion.div>
 
@@ -165,14 +168,13 @@ export function EngagementHero() {
           >
             <p className="text-sm sm:text-base text-[#444] leading-relaxed mb-4">
               After years of adventures, late-night conversations, and countless
-              shared dreams, we're thrilled to announce that we're engaged.
+              shared dreams, we&apos;re thrilled to begin this next chapter.
             </p>
             <p className="text-sm sm:text-base text-[#444] leading-relaxed">
-              <span className="border-b border-[#1a1a1a]">
+              <a href="/wedding" className="border-b border-[#1a1a1a] hover:text-[#b8956b] hover:border-[#b8956b] transition-colors">
                 We invite you to join us
-              </span>{" "}
-              for an evening of celebration, connection, and joy as we mark
-              this beautiful milestone.
+              </a>{" "}
+              for a day of celebration, connection, and joy as we say I do.
             </p>
           </motion.div>
 

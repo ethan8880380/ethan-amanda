@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { EngagementHero } from "@/components/engagement-hero";
 
 export default function Page() {
-  redirect("/engagement-party");
+  return <EngagementHero />;
 }
