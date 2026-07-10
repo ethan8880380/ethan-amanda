@@ -44,7 +44,7 @@ export const weddingContent = {
     headline: "Ethan & Amanda",
     subhead: "Join us as we celebrate a lifetime together.",
     cta: "RSVP",
-    image: "/gallery/gallery-4.jpg",
+    image: "/wedding/wedding-04.png",
   },
 
   story: {
@@ -54,7 +54,7 @@ export const weddingContent = {
       "TODO: A short paragraph about how you met — keep it warm and personal.",
       "TODO: A second paragraph about the proposal or what this day means to you.",
     ],
-    image: "/gallery/featured.jpg",
+    image: "/wedding/wedding-02.png",
   },
 
   schedule: {
@@ -159,13 +159,14 @@ export const weddingContent = {
     year: "2027",
   },
 
-  // Gallery strip images (reuse engagement photos for now)
   gallery: [
-    "/gallery/gallery-1.jpg",
-    "/gallery/gallery-2.jpg",
-    "/gallery/gallery-3.webp",
-    "/gallery/gallery-4.jpg",
-    "/gallery/featured.jpg",
+    "/wedding/wedding-01.png",
+    "/wedding/wedding-02.png",
+    "/wedding/wedding-03.png",
+    "/wedding/wedding-04.png",
+    "/wedding/wedding-05.png",
+    "/wedding/wedding-06.png",
+    "/wedding/wedding-07.png",
   ],
 } as const;
 

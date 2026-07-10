@@ -192,45 +192,6 @@ function SplitLetters({
   );
 }
 
-function FloatingBits() {
-  const bits = [
-    { top: "18%", left: "8%", size: 8, delay: 0 },
-    { top: "32%", left: "88%", size: 12, delay: 0.4 },
-    { top: "62%", left: "12%", size: 6, delay: 0.8 },
-    { top: "72%", left: "78%", size: 10, delay: 1.2 },
-    { top: "48%", left: "92%", size: 5, delay: 0.2 },
-  ];
-
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      {bits.map((bit, i) => (
-        <motion.span
-          key={i}
-          className="absolute rounded-full bg-[var(--wedding-red)]"
-          style={{
-            top: bit.top,
-            left: bit.left,
-            width: bit.size,
-            height: bit.size,
-          }}
-          animate={{
-            y: [0, -18, 0, 12, 0],
-            x: [0, 10, -6, 4, 0],
-            scale: [1, 1.35, 0.9, 1.2, 1],
-            opacity: [0.25, 0.7, 0.35, 0.6, 0.25],
-          }}
-          transition={{
-            duration: 5 + i,
-            delay: bit.delay,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 function ImageReveal({
   src,
   alt,
@@ -492,7 +453,6 @@ function Hero() {
         className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_40%,rgba(225,29,46,0.35),transparent_55%)]"
       />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,10,10,0.6)_100%)]" />
-      <FloatingBits />
 
       <motion.div
         style={reduce ? undefined : { opacity: contentOpacity, y: contentY }}
@@ -565,85 +525,50 @@ function Hero() {
           </motion.div>
         </div>
       </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.6 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2"
-      >
-        <motion.div
-          animate={{ y: [0, 10, 0], opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          className="w-px h-10 bg-gradient-to-b from-[var(--wedding-red)] to-transparent"
-        />
-        <motion.span
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          className="text-[9px] tracking-[0.3em] uppercase text-white/40"
-        >
-          Scroll
-        </motion.span>
-      </motion.div>
     </section>
   );
 }
 
 function Marquee() {
-  const text = `${c.couple.short}  ·  ${c.date.short}  ·  We're getting married  ·  `;
-  return (
-    <div className="bg-[var(--wedding-red)] text-white overflow-hidden">
-      <motion.div
-        className="py-2 border-b border-white/15 overflow-hidden"
-        initial={{ y: -40, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        viewport={{ once: true }}
-        transition={springBouncy}
+  const parts = [c.couple.short, c.date.short, "We're getting married"];
+
+  function Star() {
+    return (
+      <motion.span
+        animate={{ rotate: [0, 360] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+        className="inline-block mx-3 opacity-70"
       >
-        <motion.div
-          className="flex whitespace-nowrap"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 22, ease: "linear", repeat: Infinity }}
-        >
-          {[0, 1].map((copy) => (
-            <p
-              key={copy}
-              className="font-serif text-sm sm:text-base tracking-[0.08em] uppercase px-2"
-            >
-              {Array.from({ length: 8 }).map((_, i) => (
-                <span key={i} className="inline-flex items-center">
-                  {text}
-                  <motion.span
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    className="inline-block mx-1 opacity-70"
-                  >
-                    ✦
-                  </motion.span>
-                </span>
-              ))}
-            </p>
-          ))}
-        </motion.div>
+        ✦
+      </motion.span>
+    );
+  }
+
+  return (
+    <div className="bg-[var(--wedding-red)] text-white py-3.5 overflow-hidden">
+      <motion.div
+        className="flex whitespace-nowrap"
+        animate={{ x: ["0%", "-50%"] }}
+        transition={{ duration: 22, ease: "linear", repeat: Infinity }}
+      >
+        {[0, 1].map((copy) => (
+          <p
+            key={copy}
+            className="font-serif text-sm sm:text-base tracking-[0.08em] uppercase px-2 inline-flex items-center"
+          >
+            {Array.from({ length: 8 }).map((_, i) => (
+              <span key={i} className="inline-flex items-center">
+                {parts.map((part, j) => (
+                  <span key={j} className="inline-flex items-center">
+                    {part}
+                    <Star />
+                  </span>
+                ))}
+              </span>
+            ))}
+          </p>
+        ))}
       </motion.div>
-      <div className="py-2 overflow-hidden opacity-70">
-        <motion.div
-          className="flex whitespace-nowrap"
-          animate={{ x: ["-50%", "0%"] }}
-          transition={{ duration: 28, ease: "linear", repeat: Infinity }}
-        >
-          {[0, 1].map((copy) => (
-            <p
-              key={copy}
-              className="font-serif text-xs sm:text-sm tracking-[0.12em] uppercase px-2"
-            >
-              {Array.from({ length: 10 }).map((_, i) => (
-                <span key={i}>{text}</span>
-              ))}
-            </p>
-          ))}
-        </motion.div>
-      </div>
     </div>
   );
 }
