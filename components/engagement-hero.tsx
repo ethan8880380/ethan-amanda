@@ -64,19 +64,19 @@ export function EngagementHero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              href="/wedding"
+              href="/save-the-date"
               className="text-xs sm:text-sm tracking-wide text-[#1a1a1a] hover:text-[#b8956b] transition-colors border-b border-[#1a1a1a] pb-0.5"
             >
-              Wedding
+              Save the date
             </motion.a>
             <motion.a
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              href="/wedding#rsvp"
+              href="/wedding"
               className="text-xs sm:text-sm tracking-wide text-[#1a1a1a] hover:text-[#b8956b] transition-colors"
             >
-              RSVP
+              Wedding
             </motion.a>
             <motion.a
               initial={{ opacity: 0 }}

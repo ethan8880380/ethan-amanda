@@ -47,6 +47,18 @@ export const weddingContent = {
     image: "/wedding/wedding-04.png",
   },
 
+  saveTheDate: {
+    eyebrow: "Save the date",
+    headline: "We're getting married",
+    subhead:
+      "Formal invitations with all the details will follow — for now, mark your calendar and share your mailing address.",
+    image: "/wedding/wedding-04.png",
+    addressIntro:
+      "Where should we send your invitation? One address for your household is perfect.",
+    addressThanks: "You're all set — thank you. We'll send your invitation here.",
+    cityHint: "City details coming soon",
+  },
+
   story: {
     eyebrow: "Our story",
     title: "How we got here",
