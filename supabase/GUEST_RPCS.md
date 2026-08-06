@@ -54,6 +54,7 @@ const { data, error } = await supabase.rpc("get_party", {
     "rsvp_status": "pending|attending|declined",
     "rsvp_submitted_at": "timestamptz|null",
     "notes": "string|null",
+    "food_allergies": "string|null",
     "created_at": "timestamptz",
     "updated_at": "timestamptz"
   },
@@ -93,6 +94,7 @@ const { data, error } = await supabase.rpc("update_address", {
   p_country: "US",
   p_contact_email: "guest@example.com",
   p_contact_phone: "555-0100",
+  p_food_allergies: "Peanut allergy",
 });
 ```
 
@@ -109,6 +111,7 @@ const { data, error } = await supabase.rpc("update_address", {
 | `p_country` | `text` | no (default `US`) |
 | `p_contact_email` | `text` | no |
 | `p_contact_phone` | `text` | no |
+| `p_food_allergies` | `text` | no |
 
 Sets `address_collected_at = now()`. Returns the same shape as `get_party`.
 

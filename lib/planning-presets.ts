@@ -189,45 +189,27 @@ export const TASK_PRESETS: TaskPreset[] = [
 export interface BudgetPreset {
   label: string;
   category: BudgetCategory;
-  estimated_amount: number;
   notes?: string;
 }
 
-/** Starter budget template (edit amounts after seeding). */
+/** Empty starter line items — fill in amounts as you pay. */
 export const BUDGET_PRESETS: BudgetPreset[] = [
-  { label: "Ceremony venue", category: "venue", estimated_amount: 3000 },
-  { label: "Reception venue", category: "venue", estimated_amount: 8000 },
-  { label: "Catering & bar", category: "catering", estimated_amount: 12000 },
-  { label: "Cake / dessert", category: "catering", estimated_amount: 800 },
+  { label: "Ceremony venue", category: "venue" },
+  { label: "Reception venue", category: "venue" },
+  { label: "Catering & bar", category: "catering" },
+  { label: "Cake / dessert", category: "catering" },
+  { label: "Photography", category: "photo_video" },
+  { label: "Videography", category: "photo_video" },
+  { label: "Florals & décor", category: "florals" },
+  { label: "Wedding attire", category: "attire" },
+  { label: "DJ / band", category: "music" },
+  { label: "Save-the-dates & invitations", category: "stationery" },
+  { label: "Hotel block / guest travel help", category: "travel" },
+  { label: "Wedding party gifts", category: "gifts" },
   {
-    label: "Photography",
-    category: "photo_video",
-    estimated_amount: 4000,
-  },
-  {
-    label: "Videography",
-    category: "photo_video",
-    estimated_amount: 2500,
-  },
-  { label: "Florals & décor", category: "florals", estimated_amount: 2500 },
-  { label: "Wedding attire", category: "attire", estimated_amount: 2500 },
-  { label: "DJ / band", category: "music", estimated_amount: 1800 },
-  {
-    label: "Save-the-dates & invitations",
-    category: "stationery",
-    estimated_amount: 600,
-  },
-  {
-    label: "Hotel block / guest travel help",
-    category: "travel",
-    estimated_amount: 500,
-  },
-  { label: "Wedding party gifts", category: "gifts", estimated_amount: 600 },
-  {
-    label: "Misc / contingency (10%)",
+    label: "Misc / contingency",
     category: "misc",
-    estimated_amount: 4000,
-    notes: "Buffer for tips, overtime, and surprises.",
+    notes: "Tips, overtime, and surprises.",
   },
 ];
 

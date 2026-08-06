@@ -2,7 +2,6 @@ import {
   createNote,
   deleteNote,
   listNotes,
-  seedNotePresets,
   toggleNotePinned,
 } from "@/app/plan/actions";
 import { PlanShell } from "@/components/planning/plan-shell";
@@ -12,26 +11,11 @@ export default async function NotesPage() {
 
   return (
     <PlanShell title="Notes" active="/plan/notes">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border border-[#e4ddd4] bg-white px-5 py-4">
-        <div>
-          <p className="font-serif text-2xl">Planning notes</p>
-          <p className="mt-1 text-sm text-[#6f6258]">
-            Seed vision, decision log, open questions, and day-of contacts.
-          </p>
-        </div>
-        <form
-          action={async () => {
-            "use server";
-            await seedNotePresets();
-          }}
-        >
-          <button
-            type="submit"
-            className="border border-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em]"
-          >
-            Load note templates
-          </button>
-        </form>
+      <div className="mb-6 border border-[#e4ddd4] bg-white px-5 py-4">
+        <p className="font-serif text-2xl">Planning notes</p>
+        <p className="mt-1 text-sm text-[#6f6258]">
+          Scratchpad for decisions, questions, and day-of details.
+        </p>
       </div>
 
       <form
@@ -74,7 +58,7 @@ export default async function NotesPage() {
       <div className="grid gap-4 md:grid-cols-2">
         {notes.length === 0 ? (
           <p className="text-[#6f6258] md:col-span-2">
-            No notes yet — load templates to get structured scratchpads.
+            No notes yet — add one above.
           </p>
         ) : null}
         {notes.map((note) => (

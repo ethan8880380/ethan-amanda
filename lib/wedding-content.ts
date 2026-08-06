@@ -10,32 +10,28 @@ export const weddingContent = {
     short: "Ethan & Amanda",
   },
 
-  // TODO: set your wedding date
   date: {
-    display: "Saturday, Month Day, Year",
-    short: "Month Day, Year",
-    // Used for countdown / calendar — update when date is final
-    iso: "2027-06-15",
-    time: "4:00 PM",
+    display: "Saturday, January 23, 2027",
+    short: "January 23, 2027",
+    iso: "2027-01-23",
+    time: "Exact time TBD",
   },
 
-  // TODO: set ceremony + reception venues
   venue: {
     ceremony: {
-      name: "Ceremony Venue",
-      address: "123 Ceremony Lane",
-      city: "City, ST 00000",
+      name: "Cross and Crown Church",
+      address: "",
+      city: "Seattle, WA",
       mapUrl: "https://maps.google.com",
       notes: "Ceremony begins promptly — please arrive 15 minutes early.",
     },
     reception: {
-      name: "Reception Venue",
-      address: "456 Celebration Ave",
-      city: "City, ST 00000",
+      name: "Rosehill Community Center",
+      address: "",
+      city: "Mukilteo, WA",
       mapUrl: "https://maps.google.com",
       notes: "Dinner, dancing, and drinks to follow.",
     },
-    // Set true if ceremony and reception are at the same place
     sameLocation: false,
   },
 
@@ -50,13 +46,19 @@ export const weddingContent = {
   saveTheDate: {
     eyebrow: "Save the date",
     headline: "We're getting married",
+    guestInviteLine:
+      "We can't wait to celebrate with you. Hold the date — a proper invitation is on its way.",
     subhead:
-      "Formal invitations with all the details will follow — for now, mark your calendar and share your mailing address.",
+      "We're so glad you're part of our story. Formal invitations with all the details will follow.",
+    guestSubhead:
+      "Leave your mailing address and we'll send your invitation when the time comes.",
     image: "/wedding/wedding-04.png",
     addressIntro:
-      "Where should we send your invitation? One address for your household is perfect.",
+      "One address for your household is perfect.",
+    allergiesIntro:
+      "Any food allergies or dietary restrictions we should know about for your household?",
     addressThanks: "You're all set — thank you. We'll send your invitation here.",
-    cityHint: "City details coming soon",
+    cityHint: "Seattle & Mukilteo",
   },
 
   story: {

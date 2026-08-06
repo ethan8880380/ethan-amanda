@@ -1,6 +1,5 @@
 import {
   getGuestPhase,
-  seedPlanningStarterKit,
   setGuestPhase,
   syncTimelineFromSite,
 } from "@/app/plan/actions";
@@ -21,7 +20,7 @@ export default async function SettingsPage() {
         <div className="border border-[#e4ddd4] bg-white p-6">
           <p className="font-serif text-2xl">Wedding date source</p>
           <p className="mt-2 text-sm text-[#6f6258]">
-            Task due dates and timeline sync read from{" "}
+            Timeline sync reads from{" "}
             <code className="bg-[#f7f3ee] px-1">lib/wedding-content.ts</code>.
           </p>
           <p className="mt-4 font-serif text-3xl">{formatWeddingDateLabel()}</p>
@@ -85,39 +84,25 @@ export default async function SettingsPage() {
         </div>
 
         <div className="border border-[#e4ddd4] bg-white p-6">
-          <p className="font-serif text-2xl">Automations</p>
+          <p className="font-serif text-2xl">Day-of timeline</p>
           <p className="mt-2 text-sm text-[#6f6258]">
-            Presets skip rows that already exist (by title/name/label). Timeline
-            sync replaces the current day-of list.
+            Replaces the current timeline with the schedule from the wedding
+            site.
           </p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <form
-              action={async () => {
-                "use server";
-                await seedPlanningStarterKit();
-              }}
+          <form
+            action={async () => {
+              "use server";
+              await syncTimelineFromSite();
+            }}
+            className="mt-5"
+          >
+            <button
+              type="submit"
+              className="border border-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em]"
             >
-              <button
-                type="submit"
-                className="bg-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em] text-[#f7f3ee]"
-              >
-                Load full starter kit
-              </button>
-            </form>
-            <form
-              action={async () => {
-                "use server";
-                await syncTimelineFromSite();
-              }}
-            >
-              <button
-                type="submit"
-                className="border border-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em]"
-              >
-                Re-sync day-of timeline
-              </button>
-            </form>
-          </div>
+              Re-sync day-of timeline
+            </button>
+          </form>
         </div>
       </div>
     </PlanShell>

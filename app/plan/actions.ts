@@ -4,12 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { GuestPhase } from "@/lib/guests";
 import {
-  BUDGET_PRESETS,
-  NOTE_PRESETS,
-  TASK_PRESETS,
-  VENDOR_PRESETS,
   buildTimelinePresets,
-  dueDateMonthsBefore,
   type BudgetCategory,
 } from "@/lib/planning-presets";
 import {
@@ -30,101 +25,6 @@ async function requireAdmin() {
 
 function revalidatePlan(path = "/plan") {
   revalidatePath(path);
-}
-
-function revalidateAllPlan() {
-  for (const path of [
-    "/plan",
-    "/plan/guests",
-    "/plan/tasks",
-    "/plan/vendors",
-    "/plan/budget",
-    "/plan/timeline",
-    "/plan/notes",
-    "/plan/settings",
-  ]) {
-    revalidatePath(path);
-  }
-}
-
-async function insertMissingTaskPresets(db: SupabaseClient) {
-  const { data: existing } = await db.from("planning_tasks").select("title");
-  const existingTitles = new Set((existing ?? []).map((t) => t.title));
-  const rows = TASK_PRESETS.filter((t) => !existingTitles.has(t.title)).map(
-    (task, index) => ({
-      title: task.title,
-      description: task.description,
-      category: task.category,
-      assignee: task.assignee ?? null,
-      due_date: dueDateMonthsBefore(task.monthsBefore),
-      sort_order: index,
-      status: "todo" as const,
-    }),
-  );
-  if (rows.length) {
-    const { error } = await db.from("planning_tasks").insert(rows);
-    if (error) throw error;
-  }
-  return { inserted: rows.length, skipped: TASK_PRESETS.length - rows.length };
-}
-
-async function insertMissingVendorPresets(db: SupabaseClient) {
-  const { data: existing } = await db.from("vendors").select("name");
-  const existingNames = new Set((existing ?? []).map((v) => v.name));
-  const rows = VENDOR_PRESETS.filter((v) => !existingNames.has(v.name)).map(
-    (vendor) => ({
-      name: vendor.name,
-      category: vendor.category,
-      notes: vendor.notes,
-      status: "researching" as const,
-    }),
-  );
-  if (rows.length) {
-    const { error } = await db.from("vendors").insert(rows);
-    if (error) throw error;
-  }
-  return {
-    inserted: rows.length,
-    skipped: VENDOR_PRESETS.length - rows.length,
-  };
-}
-
-async function insertMissingBudgetPresets(db: SupabaseClient) {
-  const { data: existing } = await db.from("budget_items").select("label");
-  const existingLabels = new Set((existing ?? []).map((b) => b.label));
-  const rows = BUDGET_PRESETS.filter((b) => !existingLabels.has(b.label)).map(
-    (item) => ({
-      label: item.label,
-      category: item.category,
-      estimated_amount: item.estimated_amount,
-      notes: item.notes ?? null,
-    }),
-  );
-  if (rows.length) {
-    const { error } = await db.from("budget_items").insert(rows);
-    if (error) throw error;
-  }
-  return {
-    inserted: rows.length,
-    skipped: BUDGET_PRESETS.length - rows.length,
-  };
-}
-
-async function insertMissingNotePresets(db: SupabaseClient) {
-  const { data: existing } = await db.from("planning_notes").select("title");
-  const existingTitles = new Set((existing ?? []).map((n) => n.title));
-  const rows = NOTE_PRESETS.filter((n) => !existingTitles.has(n.title)).map(
-    (note) => ({
-      title: note.title,
-      body: note.body,
-      pinned: Boolean(note.pinned),
-    }),
-  );
-  if (rows.length) {
-    const { error } = await db.from("planning_notes").insert(rows);
-    if (error) throw error;
-  }
-  return { inserted: rows.length, skipped: NOTE_PRESETS.length - rows.length };
 }
 
 async function replaceTimelineFromSite(db: SupabaseClient) {
@@ -172,7 +72,7 @@ export async function getDashboardStats() {
     db.from("vendors").select("id, status, quoted_amount, deposit_amount"),
     db
       .from("budget_items")
-      .select("estimated_amount, actual_amount, category"),
+      .select("id, actual_amount, category"),
     db
       .from("timeline_events")
       .select("id, title, starts_at, location")
@@ -194,16 +94,12 @@ export async function getDashboardStats() {
       (mealCounts[guest.meal_choice] ?? 0) + 1;
   }
 
-  const budgetByCategory: Record<
-    string,
-    { estimated: number; actual: number }
-  > = {};
+  const budgetByCategory: Record<string, { actual: number }> = {};
   for (const row of budgetRows) {
     const key = row.category as string;
     if (!budgetByCategory[key]) {
-      budgetByCategory[key] = { estimated: 0, actual: 0 };
+      budgetByCategory[key] = { actual: 0 };
     }
-    budgetByCategory[key].estimated += Number(row.estimated_amount ?? 0);
     budgetByCategory[key].actual += Number(row.actual_amount ?? 0);
   }
 
@@ -247,10 +143,7 @@ export async function getDashboardStats() {
       (sum, row) => sum + Number(row.deposit_amount ?? 0),
       0,
     ),
-    budgetEstimated: budgetRows.reduce(
-      (sum, row) => sum + Number(row.estimated_amount ?? 0),
-      0,
-    ),
+    budgetItemCount: budgetRows.length,
     budgetActual: budgetRows.reduce(
       (sum, row) => sum + Number(row.actual_amount ?? 0),
       0,
@@ -278,8 +171,17 @@ export async function createParty(input: {
   notes?: string;
   guest_names: string[];
   plus_one_name?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string;
 }) {
   const db = await requireAdmin();
+  const addressLine1 = input.address_line1?.trim() || null;
+  const hasAddress = Boolean(addressLine1);
+
   const { data: party, error } = await db
     .from("parties")
     .insert({
@@ -287,6 +189,17 @@ export async function createParty(input: {
       contact_email: input.contact_email?.trim() || null,
       contact_phone: input.contact_phone?.trim() || null,
       notes: input.notes?.trim() || null,
+      ...(hasAddress
+        ? {
+            address_line1: addressLine1,
+            address_line2: input.address_line2?.trim() || null,
+            city: input.city?.trim() || null,
+            state: input.state?.trim() || null,
+            postal_code: input.postal_code?.trim() || null,
+            country: input.country?.trim() || "US",
+            address_collected_at: new Date().toISOString(),
+          }
+        : {}),
     })
     .select("*")
     .single();
@@ -315,8 +228,23 @@ export async function createParty(input: {
   }
 
   revalidatePlan("/plan/guests");
+  revalidatePlan("/plan/mail");
   revalidatePlan();
   return party;
+}
+
+export async function setSaveTheDateSent(partyId: string, sent: boolean) {
+  const db = await requireAdmin();
+  const { error } = await db
+    .from("parties")
+    .update({
+      save_the_date_sent_at: sent ? new Date().toISOString() : null,
+    })
+    .eq("id", partyId);
+  if (error) throw error;
+  revalidatePlan("/plan/mail");
+  revalidatePlan("/plan/guests");
+  revalidatePlan();
 }
 
 export async function addGuestToParty(input: {
@@ -348,6 +276,7 @@ export async function deleteParty(partyId: string) {
   const { error } = await db.from("parties").delete().eq("id", partyId);
   if (error) throw error;
   revalidatePlan("/plan/guests");
+  revalidatePlan("/plan/mail");
   revalidatePlan();
 }
 
@@ -427,14 +356,6 @@ export async function deleteTask(id: string) {
   revalidatePlan();
 }
 
-export async function seedTaskPresets() {
-  const db = await requireAdmin();
-  const result = await insertMissingTaskPresets(db);
-  revalidatePlan("/plan/tasks");
-  revalidatePlan();
-  return result;
-}
-
 export async function listVendors() {
   const db = await requireAdmin();
   const { data, error } = await db
@@ -507,14 +428,6 @@ export async function deleteVendor(id: string) {
   revalidatePlan();
 }
 
-export async function seedVendorPresets() {
-  const db = await requireAdmin();
-  const result = await insertMissingVendorPresets(db);
-  revalidatePlan("/plan/vendors");
-  revalidatePlan();
-  return result;
-}
-
 export async function listBudgetItems() {
   const db = await requireAdmin();
   const { data, error } = await db
@@ -528,7 +441,7 @@ export async function listBudgetItems() {
 export async function createBudgetItem(input: {
   label: string;
   category: BudgetCategory;
-  estimated_amount: number;
+  estimated_amount?: number;
   actual_amount?: number;
   notes?: string;
   vendor_id?: string;
@@ -537,7 +450,7 @@ export async function createBudgetItem(input: {
   const { error } = await db.from("budget_items").insert({
     label: input.label.trim(),
     category: input.category,
-    estimated_amount: input.estimated_amount,
+    estimated_amount: input.estimated_amount ?? 0,
     actual_amount: input.actual_amount ?? null,
     notes: input.notes?.trim() || null,
     vendor_id: input.vendor_id || null,
@@ -558,20 +471,39 @@ export async function updateBudgetActual(id: string, actual_amount: number | nul
   revalidatePlan();
 }
 
+export async function updateBudgetItem(
+  id: string,
+  input: {
+    label?: string;
+    category?: BudgetCategory;
+    estimated_amount?: number;
+    actual_amount?: number | null;
+    notes?: string | null;
+  },
+) {
+  const db = await requireAdmin();
+  const patch: Record<string, unknown> = {};
+  if (input.label !== undefined) patch.label = input.label.trim();
+  if (input.category !== undefined) patch.category = input.category;
+  if (input.estimated_amount !== undefined)
+    patch.estimated_amount = input.estimated_amount;
+  if (input.actual_amount !== undefined)
+    patch.actual_amount = input.actual_amount;
+  if (input.notes !== undefined)
+    patch.notes = input.notes?.trim() || null;
+
+  const { error } = await db.from("budget_items").update(patch).eq("id", id);
+  if (error) throw error;
+  revalidatePlan("/plan/budget");
+  revalidatePlan();
+}
+
 export async function deleteBudgetItem(id: string) {
   const db = await requireAdmin();
   const { error } = await db.from("budget_items").delete().eq("id", id);
   if (error) throw error;
   revalidatePlan("/plan/budget");
   revalidatePlan();
-}
-
-export async function seedBudgetPresets() {
-  const db = await requireAdmin();
-  const result = await insertMissingBudgetPresets(db);
-  revalidatePlan("/plan/budget");
-  revalidatePlan();
-  return result;
 }
 
 export async function listTimelineEvents() {
@@ -664,23 +596,3 @@ export async function deleteNote(id: string) {
   revalidatePlan("/plan/notes");
 }
 
-export async function seedNotePresets() {
-  const db = await requireAdmin();
-  const result = await insertMissingNotePresets(db);
-  revalidatePlan("/plan/notes");
-  return result;
-}
-
-/** One-click: tasks, vendors, budget, notes, and day-of timeline from site content. */
-export async function seedPlanningStarterKit() {
-  const db = await requireAdmin();
-  const [tasks, vendors, budget, notes, timeline] = await Promise.all([
-    insertMissingTaskPresets(db),
-    insertMissingVendorPresets(db),
-    insertMissingBudgetPresets(db),
-    insertMissingNotePresets(db),
-    replaceTimelineFromSite(db),
-  ]);
-  revalidateAllPlan();
-  return { tasks, vendors, budget, notes, timeline };
-}

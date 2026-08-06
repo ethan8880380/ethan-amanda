@@ -6,16 +6,10 @@ export async function GET() {
   const day = date.iso.replace(/-/g, "");
   const nextDay = getNextDay(day);
 
-  // TODO: refine once final date/time/timezone are set
-  // Currently assumes 4:00 PM – 11:00 PM Pacific (UTC-7)
-  const dtStart = `${day}T230000Z`;
-  const dtEnd = `${nextDay}T060000Z`;
-
-  const location = [
-    venue.ceremony.name,
-    venue.ceremony.address,
-    venue.ceremony.city,
-  ].join(", ");
+  // All-day until ceremony time is finalized
+  const location = [venue.ceremony.name, venue.ceremony.city]
+    .filter(Boolean)
+    .join(", ");
 
   const ics = [
     "BEGIN:VCALENDAR",
@@ -26,8 +20,8 @@ export async function GET() {
     "BEGIN:VEVENT",
     `UID:wedding-${day}@ethan-amanda`,
     `DTSTAMP:${day}T000000Z`,
-    `DTSTART:${dtStart}`,
-    `DTEND:${dtEnd}`,
+    `DTSTART;VALUE=DATE:${day}`,
+    `DTEND;VALUE=DATE:${nextDay}`,
     `SUMMARY:${couple.partnerOne} & ${couple.partnerTwo}'s Wedding`,
     `LOCATION:${escapeIcs(location)}`,
     `DESCRIPTION:${escapeIcs(`Join us for ${couple.short}'s wedding celebration.`)}`,

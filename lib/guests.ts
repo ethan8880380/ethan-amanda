@@ -26,6 +26,7 @@ export interface PartyPublic {
   rsvp_status: RsvpStatus;
   rsvp_submitted_at: string | null;
   notes: string | null;
+  food_allergies: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -57,6 +58,7 @@ export interface AddressInput {
   country?: string | null;
   contact_email?: string | null;
   contact_phone?: string | null;
+  food_allergies?: string | null;
 }
 
 export interface RsvpGuestResponse {
@@ -86,6 +88,7 @@ export async function updateAddress(
     p_country: address.country ?? "US",
     p_contact_email: address.contact_email ?? null,
     p_contact_phone: address.contact_phone ?? null,
+    p_food_allergies: address.food_allergies ?? null,
   });
   if (error) throw error;
   return data as PartyPayload;

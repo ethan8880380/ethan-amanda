@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
@@ -7,6 +8,14 @@ import { CalendarPlus } from "lucide-react";
 import type { PartyPayload } from "@/lib/guests";
 import { weddingContent as c } from "@/lib/wedding-content";
 import { AddressForm } from "@/components/save-the-date/address-form";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -17,178 +26,333 @@ interface SaveTheDateSiteProps {
 
 export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
   const reduce = useReducedMotion();
-  const showAddress = Boolean(token && party);
+  const isGuest = Boolean(token && party);
+  const greeting = party ? getPersonalGreeting(party) : null;
+  const partyName = party?.party.party_name?.trim() || null;
+  const [addressCollected, setAddressCollected] = useState(
+    Boolean(party?.party.address_collected_at),
+  );
+  const [addressOpen, setAddressOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#14110f] text-[#f7f3ee]">
-      <section className="relative min-h-[100svh] overflow-hidden">
-        <motion.div
-          initial={reduce ? false : { scale: 1.12 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.8, ease }}
-          className="absolute inset-0"
-        >
-          <Image
-            src={c.saveTheDate.image}
-            alt={`${c.couple.short} — save the date`}
-            fill
-            priority
-            className="object-cover"
-            sizes="100vw"
-          />
-        </motion.div>
-
-        <div className="absolute inset-0 bg-gradient-to-t from-[#14110f] via-[#14110f]/55 to-[#14110f]/25" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(20,17,15,0.45)_100%)]" />
-
-        <div className="relative z-10 flex min-h-[100svh] flex-col px-6 pb-14 pt-8 sm:px-10 lg:px-16">
+    <div className="min-h-screen bg-[#f7f6f3] text-[#171512]">
+      {/* Hero: photo plane + light type plane — same structure, new look */}
+      <section className="flex min-h-[100svh] flex-col">
+        <div className="relative h-[46svh] min-h-[16rem] w-full overflow-hidden sm:h-[52svh]">
           <motion.div
-            initial={reduce ? false : { opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15, ease }}
-            className="flex items-center justify-between"
+            initial={reduce ? false : { scale: 1.08 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 1.6, ease }}
+            className="absolute inset-0"
           >
-            <p className="text-[11px] uppercase tracking-[0.28em] text-white/70">
-              {c.saveTheDate.eyebrow}
+            <Image
+              src={c.saveTheDate.image}
+              alt={`${c.couple.short} — save the date`}
+              fill
+              priority
+              className="object-cover object-[center_25%]"
+              sizes="100vw"
+            />
+          </motion.div>
+        </div>
+
+        <div className="flex flex-1 flex-col px-5 pb-10 pt-10 sm:px-10 sm:pb-12 sm:pt-12 lg:px-16">
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease }}
+            className="flex items-baseline justify-between gap-3"
+          >
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[#7a736a]">
+              {c.couple.partnerTwo}{" "}
+              <span className="text-[#e11d2e]">&</span>{" "}
+              {c.couple.partnerOne}
             </p>
-            <Link
-              href="/wedding"
-              className="text-[11px] uppercase tracking-[0.2em] text-white/55 transition hover:text-white"
-            >
-              Wedding site
-            </Link>
+            {!isGuest ? (
+              <Link
+                href="/wedding"
+                className="text-[11px] uppercase tracking-[0.18em] text-[#7a736a] transition hover:text-[#171512]"
+              >
+                Wedding site
+              </Link>
+            ) : partyName ? (
+              <p className="max-w-[50%] truncate text-right text-[11px] uppercase tracking-[0.16em] text-[#7a736a]">
+                {partyName}
+              </p>
+            ) : (
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#7a736a]">
+                {c.saveTheDate.eyebrow}
+              </p>
+            )}
           </motion.div>
 
-          <div className="mt-auto max-w-4xl pb-4 pt-24">
-            <motion.p
-              initial={reduce ? false : { opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.25, ease }}
-              className="font-serif text-[clamp(3.4rem,12vw,8.5rem)] leading-[0.9] tracking-tight text-white"
-            >
-              {c.couple.partnerOne}
-              <span className="mx-[0.12em] text-[#e11d2e]">&</span>
-              {c.couple.partnerTwo}
-            </motion.p>
-
-            <motion.h1
-              initial={reduce ? false : { opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, delay: 0.45, ease }}
-              className="mt-6 max-w-xl font-serif text-2xl text-white/95 sm:text-3xl"
-            >
-              {c.saveTheDate.headline}
-            </motion.h1>
-
-            <motion.p
-              initial={reduce ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6, ease }}
-              className="mt-4 max-w-md text-base leading-relaxed text-white/70 sm:text-lg"
-            >
-              {c.date.display}
-              <span className="mx-2 text-white/35">·</span>
-              {c.saveTheDate.cityHint}
-            </motion.p>
+          <div className="mt-10 max-w-lg sm:mt-12">
+            {isGuest && greeting ? (
+              <motion.h1
+                initial={reduce ? false : { opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.75, delay: 0.2, ease }}
+                className="font-serif text-[2rem] leading-[1.15] tracking-tight text-[#171512] sm:text-4xl"
+              >
+                {greeting}
+                <span>,</span>
+              </motion.h1>
+            ) : (
+              <motion.h1
+                initial={reduce ? false : { opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.75, delay: 0.2, ease }}
+                className="font-serif text-[2rem] leading-[1.15] tracking-tight text-[#171512] sm:text-4xl"
+              >
+                {c.saveTheDate.headline}
+              </motion.h1>
+            )}
 
             <motion.div
-              initial={reduce ? false : { opacity: 0, y: 16 }}
+              initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.75, ease }}
-              className="mt-9 flex flex-wrap items-center gap-3"
+              transition={{ duration: 0.65, delay: 0.35, ease }}
+              className="mt-4 space-y-2"
             >
-              <a
-                href="/wedding/calendar"
-                className="inline-flex items-center gap-2 bg-[#e11d2e] px-5 py-3.5 text-[11px] uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-[#14110f]"
-              >
-                <CalendarPlus className="size-4" />
-                Add to calendar
-              </a>
-              {showAddress ? (
+              {isGuest ? (
+                <>
+                  <p className="text-base font-medium leading-snug text-[#171512] sm:text-lg">
+                    {c.saveTheDate.headline}
+                  </p>
+                  <p className="max-w-md text-[15px] leading-relaxed text-[#5c564e]">
+                    {c.saveTheDate.guestInviteLine}
+                  </p>
+                </>
+              ) : (
+                <p className="max-w-md text-[15px] leading-relaxed text-[#5c564e]">
+                  {c.saveTheDate.subhead}
+                </p>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.5, ease }}
+              className="mt-8 grid grid-cols-2 gap-6 border-t border-[#d8d2c8] pt-6 sm:max-w-md"
+            >
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#8a8378]">
+                  When
+                </p>
+                <p className="mt-1.5 text-base font-medium leading-snug text-[#171512] sm:text-lg">
+                  {formatShortDate(c.date.iso, c.date.short)}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#8a8378]">
+                  Where
+                </p>
+                <p className="mt-1.5 text-base font-medium leading-snug text-[#171512] sm:text-lg">
+                  {c.saveTheDate.cityHint}
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.62, ease }}
+              className="mt-8 sm:max-w-md"
+            >
+              {isGuest && token && party ? (
+                <div className="flex w-full flex-col gap-2.5 sm:flex-row sm:gap-3">
+                  <Drawer open={addressOpen} onOpenChange={setAddressOpen}>
+                    <DrawerTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex w-full items-center justify-center bg-[#171512] px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#f7f6f3] transition active:scale-[0.98] hover:bg-[#e11d2e] sm:flex-1"
+                      >
+                        {addressCollected
+                          ? "Update your address"
+                          : "Share your address"}
+                      </button>
+                    </DrawerTrigger>
+                    <DrawerContent className="gap-0 border-0 bg-[#f7f6f3] p-0 text-[#171512] before:inset-0 before:rounded-t-2xl before:bg-[#f7f6f3] data-[vaul-drawer-direction=bottom]:max-h-[88vh] [&>div:first-child]:!hidden">
+                      <div className="mx-auto mt-3 h-1.5 w-14 shrink-0 rounded-full bg-[#b8b0a4]" />
+                      <DrawerHeader className="gap-1 px-5 pb-1 pt-4 text-left">
+                        <DrawerTitle className="font-serif text-2xl font-normal tracking-tight">
+                          Your address
+                        </DrawerTitle>
+                        <DrawerDescription className="text-left text-sm text-[#5c564e]">
+                          {c.saveTheDate.guestSubhead}
+                        </DrawerDescription>
+                      </DrawerHeader>
+                      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3">
+                        <AddressForm
+                          token={token}
+                          initial={party}
+                          onSaved={() => {
+                            setAddressCollected(true);
+                            setAddressOpen(false);
+                          }}
+                        />
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
+                  <a
+                    href="/wedding/calendar"
+                    className="inline-flex w-full items-center justify-center gap-2 border border-[#171512]/20 px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#171512] transition active:scale-[0.98] hover:border-[#171512] sm:w-auto"
+                  >
+                    <CalendarPlus className="size-4" />
+                    Calendar
+                  </a>
+                </div>
+              ) : (
                 <a
-                  href="#address"
-                  className="inline-flex items-center border border-white/35 px-5 py-3.5 text-[11px] uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-[#14110f]"
+                  href="/wedding/calendar"
+                  className="inline-flex w-full items-center justify-center gap-2 bg-[#171512] px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#f7f6f3] transition active:scale-[0.98] hover:bg-[#e11d2e] sm:w-auto"
                 >
-                  Share your address
+                  <CalendarPlus className="size-4" />
+                  Add to calendar
                 </a>
+              )}
+              {isGuest && addressCollected ? (
+                <p className="mt-3 text-sm text-[#5c564e]">
+                  You&apos;re all set — we&apos;ll send your invitation here.
+                </p>
               ) : null}
             </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="relative border-t border-white/10 bg-[#f4efe8] px-6 py-20 text-[#1c1714] sm:px-10 lg:px-16">
-        <div className="mx-auto grid max-w-6xl gap-14 lg:grid-cols-[1fr_1.05fr] lg:items-start">
+      <section className="relative h-[40vh] min-h-[14rem] max-h-[26rem] overflow-hidden bg-[#f7f6f3] sm:h-[48vh] sm:max-h-[34rem]">
+        <Image
+          src="/wedding/wedding-03.png"
+          alt={`${c.couple.short}`}
+          fill
+          className="object-cover object-[center_40%]"
+          sizes="100vw"
+        />
+      </section>
+
+      <section className="border-t border-[#e4dfd6] bg-[#f7f6f3] px-5 py-14 sm:px-10 sm:py-20 lg:px-16">
+        <div className="mx-auto grid max-w-5xl gap-10 sm:gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:gap-20">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-[#8a7462]">
-              What&apos;s next
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[#8a8378]">
+              The celebration
             </p>
-            <h2 className="mt-3 font-serif text-4xl tracking-tight sm:text-5xl">
-              Invitations to follow
+            <h2 className="mt-3 font-serif text-3xl tracking-tight text-[#171512] sm:text-4xl">
+              {isGuest ? "A little more detail" : "Invitations to follow"}
             </h2>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-[#5c5046]">
-              {c.saveTheDate.subhead}
+            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[#5c564e]">
+              {isGuest
+                ? "Ceremony in Seattle, reception in Mukilteo — more to come with your invitation."
+                : c.saveTheDate.subhead}
             </p>
-            <dl className="mt-10 space-y-5 text-sm">
-              <div>
-                <dt className="uppercase tracking-[0.18em] text-[#8a7462]">
-                  Date
-                </dt>
-                <dd className="mt-1 font-serif text-2xl">{c.date.display}</dd>
-              </div>
-              <div>
-                <dt className="uppercase tracking-[0.18em] text-[#8a7462]">
-                  Time
-                </dt>
-                <dd className="mt-1 font-serif text-2xl">{c.date.time}</dd>
-              </div>
-              <div>
-                <dt className="uppercase tracking-[0.18em] text-[#8a7462]">
-                  Place
-                </dt>
-                <dd className="mt-1 font-serif text-2xl">
-                  {c.saveTheDate.cityHint}
-                </dd>
-              </div>
-            </dl>
           </div>
 
-          {showAddress && token && party ? (
-            <div
-              id="address"
-              className="scroll-mt-10 border border-[#e0d5c7] bg-white/70 p-6 sm:p-8"
-            >
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[#8a7462]">
-                Mailing address
-              </p>
-              <h2 className="mt-2 font-serif text-3xl tracking-tight">
-                Where should we write you?
-              </h2>
-              <p className="mt-3 text-[#5c5046]">{c.saveTheDate.addressIntro}</p>
-              <div className="mt-6">
-                <AddressForm token={token} initial={party} />
-              </div>
-            </div>
-          ) : (
-            <div className="relative min-h-[28rem] overflow-hidden">
-              <Image
-                src="/wedding/wedding-02.png"
-                alt={`${c.couple.short}`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-            </div>
-          )}
+          <dl className="space-y-6">
+            <DetailRow
+              label="Ceremony"
+              value={c.venue.ceremony.name}
+              detail={c.venue.ceremony.city}
+            />
+            <DetailRow
+              label="Reception"
+              value={c.venue.reception.name}
+              detail={c.venue.reception.city}
+            />
+          </dl>
         </div>
       </section>
 
-      <footer className="bg-[#14110f] px-6 py-10 text-center sm:px-10">
-        <p className="font-serif text-2xl text-white/90">{c.couple.short}</p>
-        <p className="mt-2 text-xs uppercase tracking-[0.22em] text-white/40">
+      <section className="relative h-[42vh] min-h-[15rem] max-h-[28rem] overflow-hidden bg-[#f7f6f3] sm:h-[50vh] sm:max-h-[36rem]">
+        <Image
+          src="/wedding/wedding-02.png"
+          alt={`${c.couple.short}`}
+          fill
+          className="object-cover object-[center_40%]"
+          sizes="100vw"
+        />
+      </section>
+
+      <footer className="border-t border-[#e4dfd6] bg-[#f7f6f3] px-5 py-10 text-center sm:px-10">
+        <p className="font-serif text-xl text-[#171512] sm:text-2xl">
+          {c.couple.short}
+        </p>
+        <p className="mt-2 text-[11px] uppercase tracking-[0.18em] text-[#8a8378]">
           {c.footer.note} {c.footer.year}
         </p>
       </footer>
+    </div>
+  );
+}
+
+function getGuestFirstNames(party: PartyPayload) {
+  const fromGuests = party.guests
+    .filter((guest) => !guest.is_plus_one && guest.full_name.trim())
+    .map((guest) => firstName(guest.full_name));
+
+  if (fromGuests.length > 0) return fromGuests;
+
+  const partyName = party.party.party_name?.trim();
+  if (!partyName) return [];
+
+  if (/^the\s+/i.test(partyName) || partyName.includes("&")) {
+    return [partyName.replace(/^the\s+/i, "").trim()];
+  }
+
+  return [firstName(partyName)];
+}
+
+function getPersonalGreeting(party: PartyPayload) {
+  const names = getGuestFirstNames(party);
+  if (names.length === 0) return "Hello friends";
+  if (names.length === 1 && /^the\s+/i.test(party.party.party_name ?? "")) {
+    return `Hello the ${names[0]}`;
+  }
+  return `Hello ${formatNameList(names)}`;
+}
+
+function formatNameList(names: string[]) {
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} & ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, & ${names[names.length - 1]}`;
+}
+
+function firstName(fullName: string) {
+  return fullName.trim().split(/\s+/)[0] ?? fullName.trim();
+}
+
+function formatShortDate(iso: string, fallback: string) {
+  const date = new Date(`${iso}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return fallback;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function DetailRow({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail?: string;
+}) {
+  return (
+    <div>
+      <dt className="text-[11px] uppercase tracking-[0.16em] text-[#8a8378]">
+        {label}
+      </dt>
+      <dd className="mt-1.5 font-serif text-xl leading-snug text-[#171512] sm:text-2xl">
+        {value}
+        {detail ? (
+          <span className="mt-1 block text-sm font-sans tracking-normal text-[#8a8378]">
+            {detail}
+          </span>
+        ) : null}
+      </dd>
     </div>
   );
 }

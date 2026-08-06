@@ -2,7 +2,6 @@ import {
   createTask,
   deleteTask,
   listTasks,
-  seedTaskPresets,
   updateTaskStatus,
 } from "@/app/plan/actions";
 import { PlanShell } from "@/components/planning/plan-shell";
@@ -23,27 +22,12 @@ export default async function TasksPage() {
 
   return (
     <PlanShell title="Tasks" active="/plan/tasks">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border border-[#e4ddd4] bg-white px-5 py-4">
-        <div>
-          <p className="font-serif text-2xl">Checklist</p>
-          <p className="mt-1 text-sm text-[#6f6258]">
-            {done.length}/{tasks.length} done
-            {overdue.length ? ` · ${overdue.length} overdue` : ""}
-          </p>
-        </div>
-        <form
-          action={async () => {
-            "use server";
-            await seedTaskPresets();
-          }}
-        >
-          <button
-            type="submit"
-            className="border border-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em]"
-          >
-            Load checklist presets
-          </button>
-        </form>
+      <div className="mb-6 border border-[#e4ddd4] bg-white px-5 py-4">
+        <p className="font-serif text-2xl">Checklist</p>
+        <p className="mt-1 text-sm text-[#6f6258]">
+          {done.length}/{tasks.length} done
+          {overdue.length ? ` · ${overdue.length} overdue` : ""}
+        </p>
       </div>
 
       {byCategory.length ? (
@@ -118,9 +102,7 @@ export default async function TasksPage() {
 
       <div className="space-y-3">
         {tasks.length === 0 ? (
-          <p className="text-[#6f6258]">
-            No tasks yet — load the checklist presets to get started.
-          </p>
+          <p className="text-[#6f6258]">No tasks yet — add one above.</p>
         ) : null}
         {tasks.map((task) => {
           const isOverdue =

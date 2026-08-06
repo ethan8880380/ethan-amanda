@@ -1,18 +1,16 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import {
-  type PartyPayload,
-  updateAddress,
-} from "@/lib/guests";
+import { type PartyPayload, updateAddress } from "@/lib/guests";
 import { weddingContent as c } from "@/lib/wedding-content";
 
 interface AddressFormProps {
   token: string;
   initial: PartyPayload;
+  onSaved?: () => void;
 }
 
-export function AddressForm({ token, initial }: AddressFormProps) {
+export function AddressForm({ token, initial, onSaved }: AddressFormProps) {
   const [payload, setPayload] = useState(initial);
   const [message, setMessage] = useState<string | null>(
     initial.party.address_collected_at ? c.saveTheDate.addressThanks : null,
@@ -35,9 +33,12 @@ export function AddressForm({ token, initial }: AddressFormProps) {
           country: String(formData.get("country") ?? "US") || "US",
           contact_email: String(formData.get("contact_email") ?? "") || null,
           contact_phone: String(formData.get("contact_phone") ?? "") || null,
+          food_allergies:
+            String(formData.get("food_allergies") ?? "").trim() || null,
         });
         setPayload(next);
         setMessage(c.saveTheDate.addressThanks);
+        onSaved?.();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Could not save address");
       }
@@ -45,67 +46,99 @@ export function AddressForm({ token, initial }: AddressFormProps) {
   }
 
   return (
-    <div className="w-full max-w-lg">
-      {party.party_name ? (
-        <p className="mb-4 text-sm text-[#8a7462]">For {party.party_name}</p>
-      ) : null}
-
+    <div className="w-full">
       {message ? (
-        <p className="mb-5 border border-emerald-800/20 bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
+        <p className="mb-3 border-l-2 border-[#171512] bg-[#171512]/[0.04] px-3 py-2 text-sm text-[#171512]">
           {message}
         </p>
       ) : null}
       {error ? (
-        <p className="mb-5 border border-red-800/20 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <p className="mb-3 border-l-2 border-[#e11d2e] bg-[#e11d2e]/[0.06] px-3 py-2 text-sm text-[#7a1520]">
           {error}
         </p>
       ) : null}
 
-      <form action={onSubmit} className="space-y-4">
+      <form action={onSubmit} className="space-y-2.5">
+        <input type="hidden" name="country" value={party.country || "US"} />
+
         <Field
-          label="Address line 1"
+          label="Street address"
           name="address_line1"
           required
           defaultValue={party.address_line1}
+          autoComplete="address-line1"
+          placeholder="123 Main St"
         />
         <Field
-          label="Address line 2"
+          label="Apt / suite"
           name="address_line2"
           defaultValue={party.address_line2}
+          autoComplete="address-line2"
+          placeholder="Optional"
         />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="City" name="city" defaultValue={party.city} />
-          <Field label="State" name="state" defaultValue={party.state} />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+
+        <div className="flex w-full gap-2">
           <Field
-            label="Postal code"
-            name="postal_code"
-            defaultValue={party.postal_code}
+            className="min-w-0 flex-1"
+            label="City"
+            name="city"
+            defaultValue={party.city}
+            autoComplete="address-level2"
+          />
+          <div className="flex min-w-0 flex-1 gap-2">
+            <Field
+              className="min-w-0 flex-1"
+              label="State"
+              name="state"
+              defaultValue={party.state}
+              autoComplete="address-level1"
+            />
+            <Field
+              className="min-w-0 flex-1"
+              label="ZIP"
+              name="postal_code"
+              defaultValue={party.postal_code}
+              autoComplete="postal-code"
+            />
+          </div>
+        </div>
+
+        <div className="flex w-full gap-2">
+          <Field
+            className="min-w-0 flex-1"
+            label="Email"
+            name="contact_email"
+            type="email"
+            defaultValue={party.contact_email}
+            autoComplete="email"
           />
           <Field
-            label="Country"
-            name="country"
-            defaultValue={party.country || "US"}
+            className="min-w-0 flex-1"
+            label="Phone"
+            name="contact_phone"
+            type="tel"
+            defaultValue={party.contact_phone}
+            autoComplete="tel"
           />
         </div>
-        <Field
-          label="Email"
-          name="contact_email"
-          type="email"
-          defaultValue={party.contact_email}
-        />
-        <Field
-          label="Phone"
-          name="contact_phone"
-          defaultValue={party.contact_phone}
-        />
+
+        <label className="block w-full pt-0.5 text-[12px] text-[#5c564e]">
+          <span className="mb-1 block">Food allergies</span>
+          <textarea
+            name="food_allergies"
+            rows={2}
+            defaultValue={party.food_allergies ?? ""}
+            placeholder="None, or list any for your household"
+            className="w-full resize-none border border-[#d8d2c8] bg-white px-3 py-2 text-[15px] text-[#171512] outline-none transition placeholder:text-[#b5a89a] focus:border-[#171512]"
+          />
+        </label>
+
         <button
           type="submit"
           disabled={isPending}
-          className="mt-2 w-full bg-[#1c1714] px-4 py-3.5 text-xs uppercase tracking-[0.2em] text-[#f7f3ee] transition hover:bg-[#e11d2e] disabled:opacity-60"
+          className="mt-1 w-full bg-[#171512] px-4 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#f7f6f3] transition hover:bg-[#e11d2e] disabled:opacity-60"
         >
-          {isPending ? "Saving…" : "Save mailing address"}
+          {isPending ? "Saving…" : "Save details"}
         </button>
       </form>
     </div>
@@ -118,22 +151,30 @@ function Field({
   defaultValue,
   required,
   type = "text",
+  autoComplete,
+  placeholder,
+  className,
 }: {
   label: string;
   name: string;
   defaultValue?: string | null;
   required?: boolean;
   type?: string;
+  autoComplete?: string;
+  placeholder?: string;
+  className?: string;
 }) {
   return (
-    <label className="block text-sm text-[#4d433c]">
-      {label}
+    <label className={`block text-[12px] text-[#5c564e] ${className ?? ""}`}>
+      <span className="mb-1 block">{label}</span>
       <input
         name={name}
         type={type}
         required={required}
         defaultValue={defaultValue ?? ""}
-        className="mt-1.5 w-full border border-[#d4c8b8] bg-white/80 px-3 py-2.5 outline-none transition focus:border-[#1c1714]"
+        autoComplete={autoComplete}
+        placeholder={placeholder}
+        className="w-full min-w-0 border border-[#d8d2c8] bg-white px-3 py-2 text-[15px] text-[#171512] outline-none transition placeholder:text-[#b5a89a] focus:border-[#171512]"
       />
     </label>
   );

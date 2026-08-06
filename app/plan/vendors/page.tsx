@@ -2,7 +2,6 @@ import {
   createVendor,
   deleteVendor,
   listVendors,
-  seedVendorPresets,
   updateVendorMoney,
   updateVendorStatus,
 } from "@/app/plan/actions";
@@ -29,26 +28,11 @@ export default async function VendorsPage() {
 
   return (
     <PlanShell title="Vendors" active="/plan/vendors">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border border-[#e4ddd4] bg-white px-5 py-4">
-        <div>
-          <p className="font-serif text-2xl">Vendor tracker</p>
-          <p className="mt-1 text-sm text-[#6f6258]">
-            {booked}/{vendors.length} booked or paid
-          </p>
-        </div>
-        <form
-          action={async () => {
-            "use server";
-            await seedVendorPresets();
-          }}
-        >
-          <button
-            type="submit"
-            className="border border-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em]"
-          >
-            Load vendor stubs
-          </button>
-        </form>
+      <div className="mb-6 border border-[#e4ddd4] bg-white px-5 py-4">
+        <p className="font-serif text-2xl">Vendor tracker</p>
+        <p className="mt-1 text-sm text-[#6f6258]">
+          {booked}/{vendors.length} booked or paid
+        </p>
       </div>
 
       <form
@@ -140,9 +124,7 @@ export default async function VendorsPage() {
 
       <div className="space-y-3">
         {vendors.length === 0 ? (
-          <p className="text-[#6f6258]">
-            No vendors yet — load stubs for the usual categories.
-          </p>
+          <p className="text-[#6f6258]">No vendors yet — add one above.</p>
         ) : null}
         {vendors.map((vendor) => (
           <div

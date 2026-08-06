@@ -1,9 +1,5 @@
 import Link from "next/link";
-import {
-  getDashboardStats,
-  getGuestPhase,
-  seedPlanningStarterKit,
-} from "@/app/plan/actions";
+import { getDashboardStats, getGuestPhase } from "@/app/plan/actions";
 import { PlanShell } from "@/components/planning/plan-shell";
 import {
   budgetCategoryLabel,
@@ -54,44 +50,14 @@ export default async function PlanHomePage() {
   });
 
   const days = daysUntilWedding();
-  const isEmpty =
-    stats.totalTasks === 0 &&
-    stats.totalVendors === 0 &&
-    stats.budgetEstimated === 0;
   const rsvpResponded = stats.attendingParties + stats.declinedParties;
   const mealEntries = Object.entries(stats.mealCounts);
   const budgetCategories = Object.entries(stats.budgetByCategory).sort(
-    (a, b) => b[1].estimated - a[1].estimated,
+    (a, b) => b[1].actual - a[1].actual,
   );
 
   return (
     <PlanShell title="Overview" active="/plan">
-      {isEmpty ? (
-        <div className="mb-8 border border-[#1c1714] bg-white px-5 py-5">
-          <p className="font-serif text-2xl">Start with a full kit</p>
-          <p className="mt-2 max-w-2xl text-sm text-[#6f6258]">
-            One click loads a 20-item checklist (due dates from{" "}
-            {formatWeddingDateLabel()}), vendor research stubs, a starter
-            budget, planning notes, and the day-of timeline from your site
-            content.
-          </p>
-          <form
-            action={async () => {
-              "use server";
-              await seedPlanningStarterKit();
-            }}
-            className="mt-4"
-          >
-            <button
-              type="submit"
-              className="bg-[#1c1714] px-5 py-3 text-xs uppercase tracking-[0.18em] text-[#f7f3ee]"
-            >
-              Load starter kit
-            </button>
-          </form>
-        </div>
-      ) : null}
-
       <div className="mb-8 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <div className="border border-[#e4ddd4] bg-white px-5 py-4">
           <p className="text-xs uppercase tracking-[0.18em] text-[#6f6258]">
@@ -152,9 +118,9 @@ export default async function PlanHomePage() {
           hint={`Quotes ${currency.format(stats.vendorQuoted)}`}
         />
         <Stat
-          label="Budget est."
-          value={currency.format(stats.budgetEstimated)}
-          hint={`Actual ${currency.format(stats.budgetActual)}`}
+          label="Budget spent"
+          value={currency.format(stats.budgetActual)}
+          hint={`${stats.budgetItemCount} line item${stats.budgetItemCount === 1 ? "" : "s"}`}
         />
         <Stat
           label="Deposits paid"
@@ -259,12 +225,12 @@ export default async function PlanHomePage() {
                   <div className="flex justify-between gap-3 text-sm">
                     <span>{budgetCategoryLabel(category)}</span>
                     <span className="text-[#6f6258]">
-                      {currency.format(amounts.estimated)}
+                      {currency.format(amounts.actual)}
                     </span>
                   </div>
                   <ProgressBar
                     value={amounts.actual}
-                    max={amounts.estimated || 1}
+                    max={stats.budgetActual || 1}
                   />
                 </li>
               ))}
