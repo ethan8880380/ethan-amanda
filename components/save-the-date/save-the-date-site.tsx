@@ -273,13 +273,22 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
         />
       </section>
 
-      <footer className="border-t border-[#e4dfd6] bg-[#f7f6f3] px-5 py-10 text-center sm:px-10">
-        <p className="font-serif text-xl text-[#171512] sm:text-2xl">
-          {c.couple.short}
-        </p>
-        <p className="mt-2 text-[11px] uppercase tracking-[0.18em] text-[#8a8378]">
-          {c.footer.note} {c.footer.year}
-        </p>
+      <footer className="flex items-end justify-between gap-4 border-t border-[#e4dfd6] bg-[#f7f6f3] px-5 pt-8 sm:px-10">
+        <div className="pb-8 text-left">
+          <p className="font-serif text-xl text-[#171512] sm:text-2xl">
+            {c.couple.short}
+          </p>
+          <p className="mt-2 text-[11px] uppercase tracking-[0.18em] text-[#8a8378]">
+            {c.footer.note} {c.footer.year}
+          </p>
+        </div>
+        <Image
+          src="/gallery/mona-bg.png"
+          alt=""
+          width={96}
+          height={96}
+          className="h-20 w-20 shrink-0 object-contain object-bottom sm:h-24 sm:w-24"
+        />
       </footer>
     </div>
   );
