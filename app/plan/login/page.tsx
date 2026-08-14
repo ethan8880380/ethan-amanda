@@ -7,7 +7,7 @@ export default async function PlanLoginPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  if (await isPlanningAuthenticated()) redirect("/plan");
+  if (await isPlanningAuthenticated()) redirect("/plan/guests");
   const params = await searchParams;
 
   async function loginAction(formData: FormData) {

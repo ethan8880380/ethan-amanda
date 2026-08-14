@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Check, Copy, Share2, Trash2 } from "lucide-react";
+import { Check, Copy, Pencil, Share2, Trash2 } from "lucide-react";
 import { addGuestToParty, deleteGuest, deleteParty } from "@/app/plan/actions";
+import { EditPartyDialog } from "@/components/planning/edit-party-dialog";
 
 interface PartyGuest {
   id: string;
@@ -39,6 +40,7 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
   const addGuestFormRef = useRef<HTMLFormElement>(null);
   const [copied, setCopied] = useState(false);
   const [canShare, setCanShare] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -112,21 +114,31 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
             <p className="mt-1 text-sm text-[#6f6258]">{party.notes}</p>
           ) : null}
         </div>
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={() => {
-            if (!window.confirm(`Delete ${party.party_name || "this party"}?`))
-              return;
-            startTransition(async () => {
-              await deleteParty(party.id);
-            });
-          }}
-          className="inline-flex size-10 shrink-0 items-center justify-center text-red-700 disabled:opacity-50"
-          aria-label="Delete party"
-        >
-          <Trash2 className="size-4" />
-        </button>
+        <div className="flex shrink-0 items-center gap-0.5">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="inline-flex size-10 items-center justify-center text-[#6f6258] hover:text-[#1c1714]"
+            aria-label="Edit party"
+          >
+            <Pencil className="size-4" />
+          </button>
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => {
+              if (!window.confirm(`Delete ${party.party_name || "this party"}?`))
+                return;
+              startTransition(async () => {
+                await deleteParty(party.id);
+              });
+            }}
+            className="inline-flex size-10 items-center justify-center text-red-700 disabled:opacity-50"
+            aria-label="Delete party"
+          >
+            <Trash2 className="size-4" />
+          </button>
+        </div>
       </div>
 
       <div className="mt-4">
@@ -254,6 +266,13 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
           </button>
         </div>
       </form>
+
+      <EditPartyDialog
+        open={editing}
+        onOpenChange={setEditing}
+        party={party}
+        guests={guests}
+      />
     </article>
   );
 }

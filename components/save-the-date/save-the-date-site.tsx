@@ -285,30 +285,19 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
   );
 }
 
-function getGuestFirstNames(party: PartyPayload) {
-  const fromGuests = party.guests
+function getPersonalGreeting(party: PartyPayload) {
+  const guestNames = party.guests
     .filter((guest) => !guest.is_plus_one && guest.full_name.trim())
     .map((guest) => firstName(guest.full_name));
 
-  if (fromGuests.length > 0) return fromGuests;
+  if (guestNames.length > 0) return `Hello ${formatNameList(guestNames)}`;
 
   const partyName = party.party.party_name?.trim();
-  if (!partyName) return [];
-
+  if (!partyName) return "Hello friends";
   if (/^the\s+/i.test(partyName) || partyName.includes("&")) {
-    return [partyName.replace(/^the\s+/i, "").trim()];
+    return `Hello ${partyName}`;
   }
-
-  return [firstName(partyName)];
-}
-
-function getPersonalGreeting(party: PartyPayload) {
-  const names = getGuestFirstNames(party);
-  if (names.length === 0) return "Hello friends";
-  if (names.length === 1 && /^the\s+/i.test(party.party.party_name ?? "")) {
-    return `Hello the ${names[0]}`;
-  }
-  return `Hello ${formatNameList(names)}`;
+  return `Hello ${firstName(partyName)}`;
 }
 
 function formatNameList(names: string[]) {

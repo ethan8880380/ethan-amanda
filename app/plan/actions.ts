@@ -45,7 +45,7 @@ export async function loginToPlan(formData: FormData) {
     return { success: false as const, error: "Incorrect password" };
   }
   await setPlanningSession();
-  redirect("/plan");
+  redirect("/plan/guests");
 }
 
 export async function logoutFromPlan() {
@@ -247,6 +247,75 @@ export async function setSaveTheDateSent(partyId: string, sent: boolean) {
   revalidatePlan();
 }
 
+export async function updateParty(input: {
+  id: string;
+  party_name: string;
+  contact_email?: string | null;
+  notes?: string | null;
+  address_line1?: string | null;
+  address_line2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+  guests?: Array<{
+    id: string;
+    full_name: string;
+    is_plus_one: boolean;
+  }>;
+}) {
+  const db = await requireAdmin();
+  const addressLine1 = input.address_line1?.trim() || null;
+  const hasAddress = Boolean(addressLine1);
+
+  const { data: current, error: currentError } = await db
+    .from("parties")
+    .select("address_collected_at")
+    .eq("id", input.id)
+    .single();
+  if (currentError) throw currentError;
+
+  const { error } = await db
+    .from("parties")
+    .update({
+      party_name: input.party_name.trim(),
+      contact_email: input.contact_email?.trim() || null,
+      notes: input.notes?.trim() || null,
+      address_line1: addressLine1,
+      address_line2: hasAddress ? input.address_line2?.trim() || null : null,
+      city: hasAddress ? input.city?.trim() || null : null,
+      state: hasAddress ? input.state?.trim() || null : null,
+      postal_code: hasAddress ? input.postal_code?.trim() || null : null,
+      country: hasAddress ? input.country?.trim() || "US" : null,
+      address_collected_at: hasAddress
+        ? current.address_collected_at ?? new Date().toISOString()
+        : null,
+    })
+    .eq("id", input.id);
+  if (error) throw error;
+
+  if (input.guests?.length) {
+    const results = await Promise.all(
+      input.guests.map((guest) =>
+        db
+          .from("guests")
+          .update({
+            full_name: guest.full_name.trim(),
+            is_plus_one: guest.is_plus_one,
+          })
+          .eq("id", guest.id)
+          .eq("party_id", input.id),
+      ),
+    );
+    const guestError = results.find((result) => result.error)?.error;
+    if (guestError) throw guestError;
+  }
+
+  revalidatePlan("/plan/guests");
+  revalidatePlan("/plan/mail");
+  revalidatePlan();
+}
+
 export async function addGuestToParty(input: {
   party_id: string;
   full_name: string;
@@ -260,6 +329,7 @@ export async function addGuestToParty(input: {
   });
   if (error) throw error;
   revalidatePlan("/plan/guests");
+  revalidatePlan("/plan/mail");
   revalidatePlan();
 }
 
@@ -268,6 +338,7 @@ export async function deleteGuest(guestId: string) {
   const { error } = await db.from("guests").delete().eq("id", guestId);
   if (error) throw error;
   revalidatePlan("/plan/guests");
+  revalidatePlan("/plan/mail");
   revalidatePlan();
 }
 

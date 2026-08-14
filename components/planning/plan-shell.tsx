@@ -8,15 +8,8 @@ import {
 } from "@/lib/planning-presets";
 
 const nav = [
-  { href: "/plan", label: "Overview" },
   { href: "/plan/guests", label: "Guests" },
   { href: "/plan/mail", label: "Mail" },
-  { href: "/plan/tasks", label: "Tasks" },
-  { href: "/plan/vendors", label: "Vendors" },
-  { href: "/plan/budget", label: "Budget" },
-  { href: "/plan/timeline", label: "Timeline" },
-  { href: "/plan/notes", label: "Notes" },
-  { href: "/plan/settings", label: "Settings" },
 ];
 
 export async function PlanShell({

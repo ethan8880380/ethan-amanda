@@ -3,7 +3,7 @@ import {
   listParties,
 } from "@/app/plan/actions";
 import { AddPartyForm } from "@/components/planning/add-party-form";
-import { PartyCard } from "@/components/planning/party-card";
+import { GuestList } from "@/components/planning/guest-list";
 import { PlanShell } from "@/components/planning/plan-shell";
 import { MEAL_CHOICES } from "@/lib/guests";
 
@@ -86,42 +86,7 @@ export default async function GuestsPage() {
 
       <AddPartyForm origin={origin} />
 
-      <section>
-        <div className="mb-4 border-b border-[#e4ddd4] pb-3 sm:mb-5 sm:pb-4">
-          <h2 className="font-serif text-2xl">Parties</h2>
-          <p className="mt-1 text-sm text-[#6f6258]">
-            {parties.length
-              ? `${parties.length} household${parties.length === 1 ? "" : "s"} with invite links`
-              : "Parties you create will show up here."}
-          </p>
-        </div>
-
-        <div className="space-y-4 sm:space-y-6">
-          {parties.length === 0 ? (
-            <p className="text-[#6f6258]">No parties yet.</p>
-          ) : (
-            parties.map((party) => {
-              const guests = (party.guests ?? []) as Array<{
-                id: string;
-                full_name: string;
-                is_plus_one: boolean;
-                attending: boolean | null;
-                meal_choice: string | null;
-                dietary_notes: string | null;
-              }>;
-
-              return (
-                <PartyCard
-                  key={party.id}
-                  party={party}
-                  guests={guests}
-                  link={`${origin}/r/${party.access_token}`}
-                />
-              );
-            })
-          )}
-        </div>
-      </section>
+      <GuestList parties={parties} origin={origin} />
     </PlanShell>
   );
 }
