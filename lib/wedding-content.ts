@@ -127,11 +127,29 @@ export const weddingContent = {
     eyebrow: "Registry",
     title: "Gifts",
     intro:
-      "Your presence is the best gift. If you'd like to celebrate with something more, we've registered at the places below.",
-    links: [
-      { label: "Registry One", url: "#" },
-      { label: "Registry Two", url: "#" },
-      { label: "Honeymoon fund", url: "#" },
+      "Being there is the gift. If you'd like to mark the day with something more, we registered in one place.",
+    pageIntro:
+      "We gathered everything in one registry — a honeymoon fund, things for the house, and a few experiences. Checkout happens on Zola.",
+    url: "https://www.zola.com/registry/ethanandamandajanuary23",
+    teaserCta: "See the registry",
+    cta: "Browse the full registry",
+    ctaShort: "Zola",
+    successCta: "We've registered with Zola",
+    /** Each item can set `url` to a specific Zola collection; otherwise it uses `registry.url`. */
+    featured: [
+      {
+        label: "Honeymoon",
+        detail:
+          "A contribution toward the trip — getting there, dinners, days off.",
+      },
+      {
+        label: "Home",
+        detail: "Pieces we'd use every day, from the kitchen to the table.",
+      },
+      {
+        label: "Experiences",
+        detail: "Things to do together after the wedding, not things to unwrap.",
+      },
     ],
   },
 
@@ -164,8 +182,12 @@ export const weddingContent = {
     title: "Will you be there?",
     intro: "Please let us know if you can make it. We can't wait to celebrate with you.",
     deadline: "TODO: Kindly reply by Month Day, Year.",
-    successYes: "We can't wait to see you there!",
+    thanksEyebrow: "RSVP",
+    thanksTitle: "Thank you",
+    successYes: "We can't wait to see you there.",
     successNo: "We'll miss you — thank you for letting us know.",
+    thanksRegistry:
+      "If you'd like to celebrate with a gift, we've registered with Zola.",
   },
 
   footer: {

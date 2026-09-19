@@ -4,12 +4,14 @@ import Image from "next/image";
 import { useId, useState, useTransition, type FormEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { submitWeddingRSVP } from "@/app/wedding/actions";
+import { markWeddingRsvpComplete } from "@/hooks/use-wedding-rsvp-session";
 import { weddingContent } from "@/lib/wedding-content";
 import { cn } from "@/lib/utils";
+import { Cta, ExternalArrowIcon } from "./cta";
 import { SectionHeading } from "./section-heading";
 import { weddingPhotos } from "./wedding-photos";
 
-const { rsvp, hero } = weddingContent;
+const { rsvp, hero, registry } = weddingContent;
 const photo = weddingPhotos.handOnFace;
 
 type Attendance = "yes" | "no";
@@ -56,6 +58,7 @@ export function WeddingRsvp() {
         attending,
       });
       if (result.success) {
+        markWeddingRsvpComplete();
         setStatus({ kind: "success", attending });
         form.reset();
       } else {
@@ -90,51 +93,70 @@ export function WeddingRsvp() {
 
       <div className="px-6 pb-28 pt-16 md:flex md:items-center md:px-12 md:py-24 lg:px-20">
         <div className="mx-auto w-full max-w-md md:mx-0 md:max-w-lg">
-          <SectionHeading
-            id="rsvp-heading"
-            eyebrow={rsvp.eyebrow}
-            title={rsvp.title}
-          />
-          <p className="mt-6 text-[1.0625rem] leading-[1.7] text-ink/75 md:text-lg">
-            {rsvp.intro}
-          </p>
-          <p className="mt-3 font-wedding-serif text-xl italic text-blood">
-            {rsvp.deadline}
-          </p>
+          <AnimatePresence mode="wait" initial={false}>
+            {isSuccess ? (
+              <motion.div
+                key="thanks"
+                role="status"
+                initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <SectionHeading
+                  id="rsvp-heading"
+                  eyebrow={rsvp.thanksEyebrow}
+                  title={rsvp.thanksTitle}
+                />
+                <p className="mt-6 text-[1.0625rem] leading-[1.7] text-ink/75 md:text-lg">
+                  {status.attending === "yes"
+                    ? rsvp.successYes
+                    : rsvp.successNo}
+                </p>
+                {status.attending === "yes" && (
+                  <a
+                    href="/wedding/calendar"
+                    className="mt-4 inline-flex min-h-11 items-center text-[0.8125rem] font-medium uppercase tracking-[0.18em] text-blood underline-offset-[6px] hover:underline outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+                  >
+                    Add to calendar
+                  </a>
+                )}
 
-          <div className="relative mt-12">
-            <AnimatePresence mode="wait" initial={false}>
-              {isSuccess ? (
-                <motion.div
-                  key="success"
-                  role="status"
-                  initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className="border-t border-blood pt-8"
-                >
-                  <p className="font-wedding-serif text-[2.25rem] leading-[1.05] text-ink md:text-5xl">
-                    {status.attending === "yes"
-                      ? rsvp.successYes
-                      : rsvp.successNo}
+                <div className="mt-12 border-t border-ink/15 pt-10">
+                  <p className="text-[1.0625rem] leading-[1.7] text-ink/75 md:text-lg">
+                    {rsvp.thanksRegistry}
                   </p>
-                  {status.attending === "yes" && (
-                    <a
-                      href="/wedding/calendar"
-                      className="mt-8 inline-flex min-h-12 items-center gap-3 border border-ink/80 px-6 text-[0.8125rem] font-medium uppercase tracking-[0.18em] text-ink transition-colors hover:bg-ink hover:text-paper outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
-                    >
-                      Add to calendar
-                    </a>
-                  )}
-                </motion.div>
-              ) : (
-                <motion.form
-                  key="form"
+                  <Cta
+                    href={registry.url}
+                    variant="solid"
+                    className="mt-6 min-h-14"
+                  >
+                    {registry.cta}
+                    <ExternalArrowIcon />
+                  </Cta>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="form"
+                exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
+                transition={{ duration: 0.35 }}
+              >
+                <SectionHeading
+                  id="rsvp-heading"
+                  eyebrow={rsvp.eyebrow}
+                  title={rsvp.title}
+                />
+                <p className="mt-6 text-[1.0625rem] leading-[1.7] text-ink/75 md:text-lg">
+                  {rsvp.intro}
+                </p>
+                <p className="mt-3 font-wedding-serif text-xl italic text-blood">
+                  {rsvp.deadline}
+                </p>
+
+                <form
                   onSubmit={handleSubmit}
                   noValidate
-                  exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
-                  transition={{ duration: 0.35 }}
-                  className="space-y-9"
+                  className="mt-12 space-y-9"
                   aria-busy={isPending}
                 >
                   <div className="space-y-2">
@@ -233,10 +255,10 @@ export function WeddingRsvp() {
                   >
                     {isPending ? "Sending…" : `Send ${hero.cta}`}
                   </button>
-                </motion.form>
-              )}
-            </AnimatePresence>
-          </div>
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </section>

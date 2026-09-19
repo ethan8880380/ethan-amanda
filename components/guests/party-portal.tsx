@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import {
   MEAL_CHOICES,
   type MealChoice,
   type PartyPayload,
   submitRsvp,
 } from "@/lib/guests";
+import { markWeddingRsvpComplete } from "@/hooks/use-wedding-rsvp-session";
+import { weddingContent } from "@/lib/wedding-content";
 
 interface PartyPortalProps {
   token: string;
@@ -15,15 +17,19 @@ interface PartyPortalProps {
 
 export function PartyPortal({ token, initial }: PartyPortalProps) {
   const [payload, setPayload] = useState(initial);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isFinished, setIsFinished] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const { party, guests } = payload;
+  const { rsvp, registry } = weddingContent;
+
+  useEffect(() => {
+    if (party.rsvp_status !== "pending") markWeddingRsvpComplete();
+  }, [party.rsvp_status]);
 
   function onRsvpSubmit(formData: FormData) {
     setError(null);
-    setMessage(null);
     startTransition(async () => {
       try {
         const responses = guests.map((guest) => {
@@ -40,12 +46,39 @@ export function PartyPortal({ token, initial }: PartyPortalProps) {
           };
         });
         const next = await submitRsvp(token, responses);
+        markWeddingRsvpComplete();
         setPayload(next);
-        setMessage("RSVP received — thank you!");
+        setIsFinished(true);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Could not submit RSVP");
       }
     });
+  }
+
+  if (isFinished) {
+    const isAttending = guests.some((guest) => guest.attending);
+    return (
+      <div className="mx-auto w-full max-w-xl px-6 py-16">
+        <p className="text-xs uppercase tracking-[0.22em] text-[#8a7462]">
+          {rsvp.thanksEyebrow}
+        </p>
+        <h1 className="mt-3 font-serif text-4xl tracking-tight text-[#1c1714]">
+          {rsvp.thanksTitle}
+        </h1>
+        <p className="mt-3 text-[#6f6258]">
+          {isAttending ? rsvp.successYes : rsvp.successNo}
+        </p>
+        <p className="mt-10 text-[#6f6258]">{rsvp.thanksRegistry}</p>
+        <a
+          href={registry.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 flex min-h-12 items-center justify-center bg-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] text-[#f7f3ee]"
+        >
+          {registry.cta}
+        </a>
+      </div>
+    );
   }
 
   return (
@@ -60,11 +93,6 @@ export function PartyPortal({ token, initial }: PartyPortalProps) {
         Please RSVP for everyone in your party.
       </p>
 
-      {message ? (
-        <p className="mt-6 border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-          {message}
-        </p>
-      ) : null}
       {error ? (
         <p className="mt-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
