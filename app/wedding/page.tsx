@@ -9,6 +9,7 @@ import { WeddingGallery } from "@/components/wedding/wedding-gallery";
 import { WeddingTravel } from "@/components/wedding/wedding-travel";
 import { WeddingRegistry } from "@/components/wedding/wedding-registry";
 import { WeddingFaq } from "@/components/wedding/wedding-faq";
+import { getWebsiteRsvp } from "@/app/wedding/actions";
 import { WeddingRsvp } from "@/components/wedding/wedding-rsvp";
 
 export const metadata: Metadata = {
@@ -21,7 +22,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function WeddingPage() {
+export default async function WeddingPage() {
+  const existingRsvp = await getWebsiteRsvp();
+
   return (
     <main id="main">
       <WeddingHero />
@@ -33,7 +36,7 @@ export default function WeddingPage() {
       <WeddingTravel />
       <WeddingRegistry />
       <WeddingFaq />
-      <WeddingRsvp />
+      <WeddingRsvp initialRsvp={existingRsvp} />
     </main>
   );
 }

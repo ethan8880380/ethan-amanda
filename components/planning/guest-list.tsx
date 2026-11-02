@@ -27,6 +27,7 @@ export interface GuestListParty {
   party_name: string | null;
   access_token: string;
   rsvp_status: string;
+  source?: string | null;
   address_collected_at: string | null;
   contact_email: string | null;
   contact_phone: string | null;
@@ -52,6 +53,7 @@ function addressLabel(party: GuestListParty) {
   const cityState = [party.city, party.state].filter(Boolean).join(", ");
   if (cityState) return cityState;
   if (party.address_collected_at || party.address_line1) return "Collected";
+  if (party.source === "website") return "—";
   return "Pending";
 }
 
@@ -190,6 +192,16 @@ export function GuestList({ parties, origin }: GuestListProps) {
                       </TableCell>
                       <TableCell className="px-3 py-2.5 whitespace-normal text-[#6f6258] sm:px-4">
                         {party.party_name || "Untitled"}
+                        {party.source === "website" ? (
+                          <span className="mt-0.5 block text-[10px] uppercase tracking-[0.14em] text-[#8a7462]">
+                            Website
+                          </span>
+                        ) : null}
+                        {party.source === "website" && party.contact_email ? (
+                          <span className="mt-0.5 block text-xs text-[#8a7462]">
+                            {party.contact_email}
+                          </span>
+                        ) : null}
                       </TableCell>
                       <TableCell className="px-3 py-2.5 text-[#6f6258] sm:px-4">
                         {guest.is_plus_one ? "Yes" : "—"}
@@ -203,6 +215,11 @@ export function GuestList({ parties, origin }: GuestListProps) {
                       </TableCell>
                       <TableCell className="hidden px-3 py-2.5 text-[#6f6258] md:table-cell md:px-4">
                         {rsvpLabel(guest)}
+                        {guest.dietary_notes ? (
+                          <span className="mt-0.5 block text-xs text-[#8a7462]">
+                            {guest.dietary_notes}
+                          </span>
+                        ) : null}
                       </TableCell>
                       <TableCell className="px-2 py-1.5">
                         <button

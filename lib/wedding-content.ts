@@ -180,7 +180,8 @@ export const weddingContent = {
   rsvp: {
     eyebrow: "RSVP",
     title: "Will you be there?",
-    intro: "Please let us know if you can make it. We can't wait to celebrate with you.",
+    intro:
+      "Reply for yourself, or add each person you're answering for.",
     deadline: "TODO: Kindly reply by Month Day, Year.",
     thanksEyebrow: "RSVP",
     thanksTitle: "Thank you",

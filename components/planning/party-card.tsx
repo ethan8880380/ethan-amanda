@@ -20,6 +20,7 @@ interface PartyCardProps {
     party_name: string | null;
     access_token: string;
     rsvp_status: string;
+    source?: string | null;
     address_collected_at: string | null;
     contact_email: string | null;
     contact_phone: string | null;
@@ -88,11 +89,15 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
           <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-xs text-[#6f6258] sm:text-sm">
             <span className="capitalize">RSVP: {party.rsvp_status}</span>
             <span aria-hidden>·</span>
-            <span>
-              {party.address_collected_at
-                ? "Address collected"
-                : "Address pending"}
-            </span>
+            {party.source === "website" ? (
+              <span>Website</span>
+            ) : (
+              <span>
+                {party.address_collected_at
+                  ? "Address collected"
+                  : "Address pending"}
+              </span>
+            )}
           </div>
           {(party.contact_email || party.contact_phone) && (
             <p className="mt-1 break-words text-sm text-[#6f6258]">
