@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { loginToPlan } from "@/app/plan/actions";
+import { Glyph } from "@/components/planning/glyph";
 import { isPlanningAuthenticated } from "@/lib/planning-auth";
 
 export default async function PlanLoginPage({
@@ -17,30 +18,30 @@ export default async function PlanLoginPage({
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
-      <form
-        action={loginAction}
-        className="w-full max-w-md border border-[#e4ddd4] bg-white p-8 shadow-[0_20px_60px_rgba(28,23,20,0.08)]"
-      >
-        <p className="font-serif text-3xl tracking-tight">Planning portal</p>
-        <p className="mt-2 text-sm text-[#6f6258]">
-          Ethan & Amanda — enter the shared admin password.
-        </p>
-        <label className="mt-8 block text-xs uppercase tracking-[0.18em] text-[#6f6258]">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6">
+      <Glyph className="h-8 w-16 text-white" />
+      <p className="mt-8 text-[11px] uppercase tracking-[0.32em] text-[#8e8e8e]">
+        Plan
+      </p>
+      <h1 className="mt-3 text-center text-[2rem] font-medium tracking-tight">
+        Ethan & Amanda
+      </h1>
+      <form action={loginAction} className="mt-10 w-full max-w-sm">
+        <label className="block text-sm text-[#8e8e8e]">
           Password
           <input
             type="password"
             name="password"
             required
-            className="mt-2 w-full border border-[#d9d0c5] bg-[#fbf8f4] px-3 py-3 text-base outline-none focus:border-[#1c1714]"
+            className="mt-2 w-full rounded-2xl bg-[#161616] px-4 py-4 text-base text-white outline-none ring-1 ring-transparent focus:ring-white/30"
           />
         </label>
         {params.error ? (
-          <p className="mt-3 text-sm text-red-700">Incorrect password.</p>
+          <p className="mt-3 text-sm text-[#ff453a]">Incorrect password.</p>
         ) : null}
         <button
           type="submit"
-          className="mt-6 w-full bg-[#1c1714] px-4 py-3 text-sm uppercase tracking-[0.18em] text-[#f7f3ee]"
+          className="mt-4 w-full rounded-full bg-white py-4 text-sm font-medium text-black"
         >
           Enter
         </button>

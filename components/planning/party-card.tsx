@@ -80,13 +80,13 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
   }
 
   return (
-    <article className="border border-[#e4ddd4] bg-white p-4 sm:p-6">
+    <article className="rounded-[1.75rem] bg-[#161616] p-4 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <h3 className="font-serif text-xl leading-tight sm:text-2xl">
+          <h3 className="font-medium text-xl leading-tight sm:text-2xl">
             {party.party_name || "Untitled party"}
           </h3>
-          <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-xs text-[#6f6258] sm:text-sm">
+          <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-xs text-[#8e8e8e] sm:text-sm">
             <span className="capitalize">RSVP: {party.rsvp_status}</span>
             <span aria-hidden>·</span>
             {party.source === "website" ? (
@@ -100,30 +100,30 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
             )}
           </div>
           {(party.contact_email || party.contact_phone) && (
-            <p className="mt-1 break-words text-sm text-[#6f6258]">
+            <p className="mt-1 break-words text-sm text-[#8e8e8e]">
               {[party.contact_email, party.contact_phone]
                 .filter(Boolean)
                 .join(" · ")}
             </p>
           )}
           {address ? (
-            <p className="mt-1 break-words text-sm text-[#6f6258]">{address}</p>
+            <p className="mt-1 break-words text-sm text-[#8e8e8e]">{address}</p>
           ) : null}
           {party.food_allergies ? (
-            <p className="mt-1 text-sm text-[#6f6258]">
-              <span className="text-[#8a7462]">Allergies:</span>{" "}
+            <p className="mt-1 text-sm text-[#8e8e8e]">
+              <span className="text-[#6a6a6a]">Allergies:</span>{" "}
               {party.food_allergies}
             </p>
           ) : null}
           {party.notes ? (
-            <p className="mt-1 text-sm text-[#6f6258]">{party.notes}</p>
+            <p className="mt-1 text-sm text-[#8e8e8e]">{party.notes}</p>
           ) : null}
         </div>
         <div className="flex shrink-0 items-center gap-0.5">
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="inline-flex size-10 items-center justify-center text-[#6f6258] hover:text-[#1c1714]"
+            className="inline-flex size-10 items-center justify-center text-[#8e8e8e] hover:text-white"
             aria-label="Edit party"
           >
             <Pencil className="size-4" />
@@ -138,7 +138,7 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
                 await deleteParty(party.id);
               });
             }}
-            className="inline-flex size-10 items-center justify-center text-red-700 disabled:opacity-50"
+            className="inline-flex size-10 items-center justify-center text-[#ff453a] disabled:opacity-50"
             aria-label="Delete party"
           >
             <Trash2 className="size-4" />
@@ -147,17 +147,17 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
       </div>
 
       <div className="mt-4">
-        <p className="text-xs uppercase tracking-[0.16em] text-[#6f6258]">
+        <p className="text-xs uppercase tracking-[0.16em] text-[#8e8e8e]">
           Personalized link
         </p>
-        <p className="mt-2 break-all bg-[#f7f3ee] px-3 py-2.5 text-xs leading-relaxed sm:text-sm">
+        <p className="mt-2 break-all bg-[#101010] px-3 py-2.5 text-xs leading-relaxed sm:text-sm">
           {link}
         </p>
         <div className="mt-2 grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={copyLink}
-            className="inline-flex min-h-11 items-center justify-center gap-2 border border-[#1c1714] px-3 text-xs uppercase tracking-[0.16em]"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 px-3 text-xs uppercase tracking-[0.16em]"
           >
             {copied ? (
               <>
@@ -175,7 +175,7 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
             <button
               type="button"
               onClick={shareLink}
-              className="inline-flex min-h-11 items-center justify-center gap-2 bg-[#1c1714] px-3 text-xs uppercase tracking-[0.16em] text-[#f7f3ee]"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-3 text-xs uppercase tracking-[0.16em] text-black"
             >
               <Share2 className="size-3.5" />
               Share
@@ -184,7 +184,7 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
             <button
               type="button"
               onClick={copyLink}
-              className="inline-flex min-h-11 items-center justify-center gap-2 bg-[#1c1714] px-3 text-xs uppercase tracking-[0.16em] text-[#f7f3ee]"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-3 text-xs uppercase tracking-[0.16em] text-black"
             >
               <Copy className="size-3.5" />
               Copy link
@@ -193,7 +193,7 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
         </div>
       </div>
 
-      <ul className="mt-4 space-y-3 border-t border-[#eee6dc] pt-4">
+      <ul className="mt-4 space-y-3 border-t border-white/10 pt-4">
         {guests.map((guest) => (
           <li
             key={guest.id}
@@ -203,10 +203,10 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
               <p>
                 {guest.full_name}
                 {guest.is_plus_one ? (
-                  <span className="ml-1.5 text-[#6f6258]">(+1)</span>
+                  <span className="ml-1.5 text-[#8e8e8e]">(+1)</span>
                 ) : null}
               </p>
-              <p className="mt-0.5 text-[#6f6258]">
+              <p className="mt-0.5 text-[#8e8e8e]">
                 {guest.attending == null
                   ? "No RSVP yet"
                   : guest.attending
@@ -223,7 +223,7 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
                   await deleteGuest(guest.id);
                 });
               }}
-              className="shrink-0 px-2 py-2 text-xs uppercase tracking-[0.14em] text-red-700 disabled:opacity-50"
+              className="shrink-0 px-2 py-2 text-xs uppercase tracking-[0.14em] text-[#ff453a] disabled:opacity-50"
             >
               Remove
             </button>
@@ -243,14 +243,14 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
             addGuestFormRef.current?.reset();
           });
         }}
-        className="mt-4 space-y-3 border-t border-[#eee6dc] pt-4"
+        className="mt-4 space-y-3 border-t border-white/10 pt-4"
       >
         <label className="block text-sm">
           Add guest
           <input
             name="full_name"
             required
-            className="mt-1 w-full border border-[#d9d0c5] px-3 py-3 text-base"
+            className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
           />
         </label>
         <div className="flex flex-wrap items-center gap-3">
@@ -258,14 +258,14 @@ export function PartyCard({ party, guests, link }: PartyCardProps) {
             <input
               type="checkbox"
               name="is_plus_one"
-              className="size-4 accent-[#1c1714]"
+              className="size-4 accent-white"
             />
             Plus-one slot
           </label>
           <button
             type="submit"
             disabled={isPending}
-            className="min-h-11 flex-1 border border-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] disabled:opacity-50 sm:flex-none"
+            className="min-h-11 flex-1 rounded-full border border-white/15 px-4 text-xs uppercase tracking-[0.18em] disabled:opacity-50 sm:flex-none"
           >
             Add
           </button>

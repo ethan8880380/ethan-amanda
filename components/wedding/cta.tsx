@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type CtaVariant = "solid" | "outline" | "outline-paper" | "text";
+type CtaVariant = "solid" | "ink" | "outline" | "outline-paper" | "paper" | "text";
 
 interface CtaProps extends Omit<ComponentProps<typeof Link>, "href"> {
   href: string;
@@ -13,15 +13,17 @@ interface CtaProps extends Omit<ComponentProps<typeof Link>, "href"> {
 }
 
 const baseClass =
-  "group/cta inline-flex min-h-12 items-center justify-center gap-3 px-6 text-[0.8125rem] font-medium uppercase tracking-[0.18em] transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper";
+  "group/cta inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full px-7 text-[0.9375rem] font-medium tracking-[0.01em] transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper";
 
 const variantClass: Record<CtaVariant, string> = {
   solid: "bg-blood text-paper hover:bg-blood-deep",
-  outline:
-    "border border-ink/80 text-ink hover:bg-ink hover:text-paper",
+  ink: "bg-ink text-paper hover:bg-ink/85",
+  outline: "border border-ink/20 text-ink hover:border-ink hover:bg-ink hover:text-paper",
   "outline-paper":
-    "border border-paper/70 text-paper hover:bg-paper hover:text-ink focus-visible:ring-paper focus-visible:ring-offset-ink",
-  text: "min-h-11 px-0 text-blood underline-offset-[6px] hover:underline",
+    "border border-paper/40 text-paper hover:border-paper hover:bg-paper hover:text-ink focus-visible:ring-paper focus-visible:ring-offset-ink",
+  paper:
+    "bg-paper text-ink hover:bg-linen focus-visible:ring-paper focus-visible:ring-offset-ink",
+  text: "min-h-11 rounded-none px-0 text-ink underline decoration-ink/25 underline-offset-[6px] hover:decoration-ink",
 };
 
 export function Cta({

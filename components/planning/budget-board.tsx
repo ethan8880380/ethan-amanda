@@ -32,16 +32,16 @@ const currency = new Intl.NumberFormat("en-US", {
 });
 
 const CATEGORY_TINT: Record<BudgetCategory, string> = {
-  venue: "#1c1714",
-  catering: "#3d3229",
-  photo_video: "#5a4a3c",
-  florals: "#6f6258",
-  attire: "#8a735f",
-  music: "#9a8470",
-  stationery: "#a89482",
-  travel: "#b8a090",
-  gifts: "#c4ae9a",
-  misc: "#d0c0ae",
+  venue: "#ffffff",
+  catering: "#ffffff",
+  photo_video: "#ffffff",
+  florals: "#ffffff",
+  attire: "#ffffff",
+  music: "#ffffff",
+  stationery: "#ffffff",
+  travel: "#ffffff",
+  gifts: "#ffffff",
+  misc: "#ffffff",
 };
 
 function money(value: number | string | null | undefined) {
@@ -104,18 +104,18 @@ export function BudgetBoard({ items }: BudgetBoardProps) {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <section className="border border-[#e4ddd4] bg-white p-4 sm:p-6">
+      <section className="rounded-[1.75rem] bg-[#161616] p-4 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="font-serif text-2xl">Spending</p>
-            <p className="mt-1 text-sm text-[#6f6258]">
+            <p className="font-medium text-2xl">Spending</p>
+            <p className="mt-1 text-sm text-[#8e8e8e]">
               Track what you&apos;ve paid — deposits, balances, and one-offs.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setAddOpen((open) => !open)}
-            className="inline-flex min-h-11 items-center gap-2 bg-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] text-[#f7f3ee]"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-4 text-xs uppercase tracking-[0.18em] text-black"
           >
             <Plus className="size-3.5" />
             Add item
@@ -123,19 +123,19 @@ export function BudgetBoard({ items }: BudgetBoardProps) {
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <div className="border border-[#eee6dc] bg-[#f7f3ee] px-4 py-3">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-[#6f6258] sm:text-xs">
+          <div className="rounded-2xl bg-black px-4 py-3">
+            <p className="text-[10px] uppercase tracking-[0.16em] text-[#8e8e8e] sm:text-xs">
               Total spent
             </p>
-            <p className="mt-1 font-serif text-2xl sm:text-3xl">
+            <p className="mt-1 font-medium text-2xl sm:text-3xl">
               {currency.format(spent)}
             </p>
           </div>
-          <div className="border border-[#eee6dc] bg-[#f7f3ee] px-4 py-3">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-[#6f6258] sm:text-xs">
+          <div className="rounded-2xl bg-black px-4 py-3">
+            <p className="text-[10px] uppercase tracking-[0.16em] text-[#8e8e8e] sm:text-xs">
               Line items
             </p>
-            <p className="mt-1 font-serif text-2xl sm:text-3xl">{itemCount}</p>
+            <p className="mt-1 font-medium text-2xl sm:text-3xl">{itemCount}</p>
           </div>
         </div>
 
@@ -149,8 +149,8 @@ export function BudgetBoard({ items }: BudgetBoardProps) {
       </section>
 
       {byCategory.length > 0 ? (
-        <section className="border border-[#e4ddd4] bg-white p-4 sm:p-6">
-          <p className="font-serif text-2xl">By category</p>
+        <section className="rounded-[1.75rem] bg-[#161616] p-4 sm:p-6">
+          <p className="font-medium text-2xl">By category</p>
           <ul className="mt-5 space-y-4">
             {byCategory.map((group) => {
               const width =
@@ -161,11 +161,11 @@ export function BudgetBoard({ items }: BudgetBoardProps) {
                 <li key={group.value}>
                   <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
                     <span className="font-medium">{group.label}</span>
-                    <span className="shrink-0 text-[#6f6258]">
+                    <span className="shrink-0 text-[#8e8e8e]">
                       {currency.format(group.spent)}
                     </span>
                   </div>
-                  <div className="h-2.5 bg-[#efe8df]">
+                  <div className="h-2.5 bg-white/10">
                     <div
                       className="h-full transition-all"
                       style={{
@@ -182,15 +182,15 @@ export function BudgetBoard({ items }: BudgetBoardProps) {
       ) : null}
 
       {items.length === 0 ? (
-        <section className="border border-dashed border-[#d9d0c5] bg-white p-6 text-center sm:p-8">
-          <p className="font-serif text-2xl">No line items yet</p>
-          <p className="mx-auto mt-2 max-w-md text-sm text-[#6f6258]">
+        <section className="rounded-[1.75rem] border border-dashed border-white/15 bg-[#101010] p-6 text-center sm:p-8">
+          <p className="font-medium text-2xl">No line items yet</p>
+          <p className="mx-auto mt-2 max-w-md text-sm text-[#8e8e8e]">
             Add an item, then enter amounts as you pay.
           </p>
           <button
             type="button"
             onClick={() => setAddOpen(true)}
-            className="mt-5 min-h-11 border border-[#1c1714] px-4 text-xs uppercase tracking-[0.18em]"
+            className="mt-5 min-h-11 rounded-full border border-white/15 px-4 text-xs uppercase tracking-[0.18em]"
           >
             Add item
           </button>
@@ -202,7 +202,7 @@ export function BudgetBoard({ items }: BudgetBoardProps) {
             return (
               <section
                 key={group.value}
-                className="border border-[#e4ddd4] bg-white"
+                className="rounded-[1.75rem] bg-[#161616]"
               >
                 <button
                   type="button"
@@ -215,23 +215,23 @@ export function BudgetBoard({ items }: BudgetBoardProps) {
                   className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left sm:px-5"
                 >
                   <div className="min-w-0">
-                    <p className="font-serif text-xl">{group.label}</p>
-                    <p className="mt-0.5 text-sm text-[#6f6258]">
+                    <p className="font-medium text-xl">{group.label}</p>
+                    <p className="mt-0.5 text-sm text-[#8e8e8e]">
                       {group.rows.length} item
                       {group.rows.length === 1 ? "" : "s"} ·{" "}
                       {currency.format(group.spent)}
                     </p>
                   </div>
                   <ChevronDown
-                    className={`size-5 shrink-0 text-[#6f6258] transition-transform ${
+                    className={`size-5 shrink-0 text-[#8e8e8e] transition-transform ${
                       isCollapsed ? "" : "rotate-180"
                     }`}
                   />
                 </button>
 
                 {!isCollapsed ? (
-                  <div className="border-t border-[#eee6dc]">
-                    <div className="hidden grid-cols-[1fr_7rem_2.5rem] gap-2 border-b border-[#eee6dc] px-4 py-2 text-[10px] uppercase tracking-[0.16em] text-[#6f6258] sm:grid sm:px-5">
+                  <div className="border-t border-white/10">
+                    <div className="hidden grid-cols-[1fr_7rem_2.5rem] gap-2 border-b border-white/10 px-4 py-2 text-[10px] uppercase tracking-[0.16em] text-[#8e8e8e] sm:grid sm:px-5">
                       <span>Item</span>
                       <span className="text-right">Amount</span>
                       <span />
@@ -280,7 +280,7 @@ function BudgetRow({
   onDelete: () => void;
 }) {
   return (
-    <li className="grid gap-3 border-b border-[#eee6dc] px-4 py-3 last:border-b-0 sm:grid-cols-[1fr_7rem_2.5rem] sm:items-center sm:gap-2 sm:px-5">
+    <li className="grid gap-3 border-b border-white/10 px-4 py-3 last:border-b-0 sm:grid-cols-[1fr_7rem_2.5rem] sm:items-center sm:gap-2 sm:px-5">
       <div className="min-w-0">
         <input
           defaultValue={item.label}
@@ -289,10 +289,10 @@ function BudgetRow({
             const next = e.target.value.trim();
             if (next && next !== item.label) onSave(item.id, { label: next });
           }}
-          className="w-full border border-transparent bg-transparent px-0 py-1 text-base font-medium outline-none focus:border-[#d9d0c5] focus:px-2 disabled:opacity-60"
+          className="w-full border border-transparent bg-transparent px-0 py-1 text-base font-medium outline-none focus:border-white/20 focus:px-2 disabled:opacity-60"
         />
         {item.notes ? (
-          <p className="text-xs text-[#6f6258]">{item.notes}</p>
+          <p className="text-xs text-[#8e8e8e]">{item.notes}</p>
         ) : null}
         <div className="mt-2 sm:hidden">
           <MoneyField
@@ -321,7 +321,7 @@ function BudgetRow({
           if (!window.confirm(`Delete “${item.label}”?`)) return;
           onDelete();
         }}
-        className="inline-flex size-10 items-center justify-center justify-self-end text-red-700 disabled:opacity-50 sm:justify-self-center"
+        className="inline-flex size-10 items-center justify-center justify-self-end text-[#ff453a] disabled:opacity-50 sm:justify-self-center"
         aria-label={`Delete ${item.label}`}
       >
         <Trash2 className="size-4" />
@@ -344,7 +344,7 @@ function MoneyField({
   onCommit: (value: number | null) => void;
 }) {
   return (
-    <label className="block text-xs text-[#6f6258]">
+    <label className="block text-xs text-[#8e8e8e]">
       {hideLabel ? <span className="sr-only">{label}</span> : label}
       <input
         type="number"
@@ -365,7 +365,7 @@ function MoneyField({
           if (Number.isNaN(next)) return;
           onCommit(next);
         }}
-        className="mt-1 w-full border border-[#d9d0c5] bg-white px-2 py-2 text-right text-base text-[#1c1714] outline-none focus:border-[#1c1714] disabled:opacity-60"
+        className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-2 py-2 text-right text-base text-white outline-none focus:border-white/40 disabled:opacity-60"
       />
     </label>
   );
@@ -382,7 +382,7 @@ function AddItemForm({
 }) {
   return (
     <form
-      className="mt-5 grid gap-3 border-t border-[#eee6dc] pt-5 sm:grid-cols-2"
+      className="mt-5 grid gap-3 border-t border-white/10 pt-5 sm:grid-cols-2"
       action={(formData) => {
         startTransition(async () => {
           await createBudgetItem({
@@ -399,21 +399,21 @@ function AddItemForm({
         });
       }}
     >
-      <p className="font-serif text-xl sm:col-span-2">New line item</p>
+      <p className="font-medium text-xl sm:col-span-2">New line item</p>
       <label className="text-sm sm:col-span-2">
         Label
         <input
           name="label"
           required
           placeholder="e.g. Photographer deposit"
-          className="mt-1 w-full border border-[#d9d0c5] px-3 py-3 text-base"
+          className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
         />
       </label>
       <label className="text-sm">
         Category
         <select
           name="category"
-          className="mt-1 w-full border border-[#d9d0c5] px-3 py-3 text-base"
+          className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
           defaultValue="misc"
         >
           {BUDGET_CATEGORIES.map((category) => (
@@ -425,7 +425,7 @@ function AddItemForm({
       </label>
       <label className="text-sm">
         Amount{" "}
-        <span className="text-[#6f6258]">(optional)</span>
+        <span className="text-[#8e8e8e]">(optional)</span>
         <input
           name="actual_amount"
           type="number"
@@ -433,30 +433,30 @@ function AddItemForm({
           step="0.01"
           min="0"
           placeholder="0"
-          className="mt-1 w-full border border-[#d9d0c5] px-3 py-3 text-base"
+          className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
         />
       </label>
       <label className="text-sm sm:col-span-2">
         Notes{" "}
-        <span className="text-[#6f6258]">(optional)</span>
+        <span className="text-[#8e8e8e]">(optional)</span>
         <input
           name="notes"
           placeholder="Vendor, due date…"
-          className="mt-1 w-full border border-[#d9d0c5] px-3 py-3 text-base"
+          className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
         />
       </label>
       <div className="flex flex-wrap gap-2 sm:col-span-2">
         <button
           type="submit"
           disabled={isPending}
-          className="min-h-11 bg-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] text-[#f7f3ee] disabled:opacity-60"
+          className="min-h-11 rounded-full bg-white px-4 text-xs uppercase tracking-[0.18em] text-black disabled:opacity-60"
         >
           Save item
         </button>
         <button
           type="button"
           onClick={onDone}
-          className="min-h-11 px-4 text-xs uppercase tracking-[0.18em] text-[#6f6258]"
+          className="min-h-11 px-4 text-xs uppercase tracking-[0.18em] text-[#8e8e8e]"
         >
           Cancel
         </button>

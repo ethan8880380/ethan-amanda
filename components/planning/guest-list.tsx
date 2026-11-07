@@ -1,17 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGrid, Pencil, Rows3 } from "lucide-react";
-import { EditPartyDialog } from "@/components/planning/edit-party-dialog";
+import { GroupEditor } from "@/components/planning/group-editor";
 import { PartyCard } from "@/components/planning/party-card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 interface GuestRow {
   id: string;
@@ -20,6 +11,7 @@ interface GuestRow {
   attending: boolean | null;
   meal_choice: string | null;
   dietary_notes: string | null;
+  sort_order?: number | null;
 }
 
 export interface GuestListParty {
@@ -47,100 +39,73 @@ interface GuestListProps {
   origin: string;
 }
 
-type View = "table" | "cards";
+type View = "groups" | "cards";
 
-function addressLabel(party: GuestListParty) {
-  const cityState = [party.city, party.state].filter(Boolean).join(", ");
-  if (cityState) return cityState;
-  if (party.address_collected_at || party.address_line1) return "Collected";
-  if (party.source === "website") return "—";
-  return "Pending";
-}
-
-function rsvpLabel(guest: GuestRow) {
-  if (guest.attending == null) return "—";
-  if (!guest.attending) return "No";
-  return guest.meal_choice ? `Yes · ${guest.meal_choice}` : "Yes";
+function partyMatches(party: GuestListParty, needle: string) {
+  if (!needle) return true;
+  const haystack = [
+    party.party_name,
+    party.contact_email,
+    ...(party.guests ?? []).map((guest) => guest.full_name),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return haystack.includes(needle);
 }
 
 export function GuestList({ parties, origin }: GuestListProps) {
-  const [view, setView] = useState<View>("table");
+  const [view, setView] = useState<View>("groups");
   const [query, setQuery] = useState("");
-  const [editingPartyId, setEditingPartyId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
 
-  const editingParty = parties.find((party) => party.id === editingPartyId);
-
-  const rows = useMemo(() => {
+  const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return parties
-      .flatMap((party) =>
-        (party.guests ?? []).map((guest) => ({ party, guest })),
-      )
-      .filter(({ party, guest }) => {
-        if (!needle) return true;
-        return (
-          guest.full_name.toLowerCase().includes(needle) ||
-          (party.party_name ?? "").toLowerCase().includes(needle)
-        );
-      })
-      .sort((a, b) => {
-        const partyCmp = (a.party.party_name ?? "").localeCompare(
-          b.party.party_name ?? "",
-        );
-        if (partyCmp !== 0) return partyCmp;
-        if (a.guest.is_plus_one !== b.guest.is_plus_one) {
-          return a.guest.is_plus_one ? 1 : -1;
-        }
-        return a.guest.full_name.localeCompare(b.guest.full_name);
-      });
+      .filter((party) => partyMatches(party, needle))
+      .sort((a, b) =>
+        (a.party_name ?? "").localeCompare(b.party_name ?? ""),
+      );
   }, [parties, query]);
+
+  const guestCount = filtered.reduce(
+    (count, party) => count + (party.guests?.length ?? 0),
+    0,
+  );
 
   return (
     <section>
-      <div className="mb-4 flex flex-col gap-3 border-b border-[#e4ddd4] pb-3 sm:mb-5 sm:flex-row sm:items-end sm:justify-between sm:pb-4">
-        <div>
-          <h2 className="font-serif text-2xl">
-            {view === "table" ? "Guests" : "Parties"}
-          </h2>
-          <p className="mt-1 text-sm text-[#6f6258]">
-            {parties.length
-              ? `${rows.length} guest${rows.length === 1 ? "" : "s"} · ${parties.length} household${parties.length === 1 ? "" : "s"}`
-              : "Parties you create will show up here."}
-          </p>
-        </div>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-[#8e8e8e]">
+          {parties.length
+            ? `${filtered.length} group${filtered.length === 1 ? "" : "s"} · ${guestCount} guest${guestCount === 1 ? "" : "s"}`
+            : "Groups you create will show up here."}
+        </p>
         <div className="flex flex-wrap items-center gap-2">
-          {view === "table" ? (
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search guests"
-              className="min-h-10 min-w-[12rem] flex-1 border border-[#d9d0c5] bg-white px-3 text-sm sm:flex-none"
-            />
-          ) : null}
-          <div className="flex border border-[#1c1714]">
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search"
+            className="min-h-11 min-w-[10rem] flex-1 rounded-full bg-[#161616] px-4 text-sm outline-none sm:flex-none"
+          />
+          <div className="flex rounded-full bg-[#161616] p-1">
             <button
               type="button"
-              onClick={() => setView("table")}
-              className={`inline-flex min-h-10 items-center gap-1.5 px-3 text-xs uppercase tracking-[0.16em] ${
-                view === "table"
-                  ? "bg-[#1c1714] text-[#f7f3ee]"
-                  : "bg-white text-[#1c1714]"
+              onClick={() => setView("groups")}
+              className={`min-h-9 rounded-full px-4 text-sm ${
+                view === "groups" ? "bg-white text-black" : "text-[#8e8e8e]"
               }`}
             >
-              <Rows3 className="size-3.5" />
-              Table
+              Groups
             </button>
             <button
               type="button"
               onClick={() => setView("cards")}
-              className={`inline-flex min-h-10 items-center gap-1.5 px-3 text-xs uppercase tracking-[0.16em] ${
-                view === "cards"
-                  ? "bg-[#1c1714] text-[#f7f3ee]"
-                  : "bg-white text-[#1c1714]"
+              className={`min-h-9 rounded-full px-4 text-sm ${
+                view === "cards" ? "bg-white text-black" : "text-[#8e8e8e]"
               }`}
             >
-              <LayoutGrid className="size-3.5" />
               Cards
             </button>
           </div>
@@ -148,99 +113,28 @@ export function GuestList({ parties, origin }: GuestListProps) {
       </div>
 
       {parties.length === 0 ? (
-        <p className="text-[#6f6258]">No parties yet.</p>
-      ) : view === "table" ? (
-        <div className="border border-[#e4ddd4] bg-white">
-          {rows.length === 0 ? (
-            <p className="px-4 py-6 text-sm text-[#6f6258]">
-              No guests match “{query.trim()}”.
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-[#eee6dc] hover:bg-transparent">
-                  <TableHead className="h-10 px-3 text-[10px] uppercase tracking-[0.16em] text-[#6f6258] sm:px-4">
-                    Guest
-                  </TableHead>
-                  <TableHead className="h-10 px-3 text-[10px] uppercase tracking-[0.16em] text-[#6f6258] sm:px-4">
-                    Party
-                  </TableHead>
-                  <TableHead className="h-10 px-3 text-[10px] uppercase tracking-[0.16em] text-[#6f6258] sm:px-4">
-                    +1
-                  </TableHead>
-                  <TableHead className="hidden h-10 px-3 text-[10px] uppercase tracking-[0.16em] text-[#6f6258] sm:table-cell sm:px-4">
-                    Address
-                  </TableHead>
-                  <TableHead className="hidden h-10 px-3 text-[10px] uppercase tracking-[0.16em] text-[#6f6258] md:table-cell md:px-4">
-                    RSVP
-                  </TableHead>
-                  <TableHead className="h-10 w-10 px-2 text-[10px] uppercase tracking-[0.16em] text-[#6f6258]">
-                    <span className="sr-only">Edit</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map(({ party, guest }) => {
-                  const pendingAddress = !party.address_collected_at && !party.address_line1;
-                  return (
-                    <TableRow
-                      key={guest.id}
-                      className="border-[#eee6dc] hover:bg-[#f7f3ee]"
-                    >
-                      <TableCell className="px-3 py-2.5 font-medium whitespace-normal sm:px-4">
-                        {guest.full_name}
-                      </TableCell>
-                      <TableCell className="px-3 py-2.5 whitespace-normal text-[#6f6258] sm:px-4">
-                        {party.party_name || "Untitled"}
-                        {party.source === "website" ? (
-                          <span className="mt-0.5 block text-[10px] uppercase tracking-[0.14em] text-[#8a7462]">
-                            Website
-                          </span>
-                        ) : null}
-                        {party.source === "website" && party.contact_email ? (
-                          <span className="mt-0.5 block text-xs text-[#8a7462]">
-                            {party.contact_email}
-                          </span>
-                        ) : null}
-                      </TableCell>
-                      <TableCell className="px-3 py-2.5 text-[#6f6258] sm:px-4">
-                        {guest.is_plus_one ? "Yes" : "—"}
-                      </TableCell>
-                      <TableCell
-                        className={`hidden px-3 py-2.5 sm:table-cell sm:px-4 ${
-                          pendingAddress ? "text-[#8a7462]" : "text-[#6f6258]"
-                        }`}
-                      >
-                        {addressLabel(party)}
-                      </TableCell>
-                      <TableCell className="hidden px-3 py-2.5 text-[#6f6258] md:table-cell md:px-4">
-                        {rsvpLabel(guest)}
-                        {guest.dietary_notes ? (
-                          <span className="mt-0.5 block text-xs text-[#8a7462]">
-                            {guest.dietary_notes}
-                          </span>
-                        ) : null}
-                      </TableCell>
-                      <TableCell className="px-2 py-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setEditingPartyId(party.id)}
-                          className="inline-flex size-9 items-center justify-center text-[#6f6258] hover:text-[#1c1714]"
-                          aria-label={`Edit ${party.party_name || "party"}`}
-                        >
-                          <Pencil className="size-3.5" />
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
+        <p className="text-[#8e8e8e]">No groups yet.</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-sm text-[#8e8e8e]">
+          No groups match “{query.trim()}”.
+        </p>
+      ) : view === "groups" ? (
+        <div className="space-y-3">
+          {filtered.map((party) => (
+            <GroupEditor
+              key={party.id}
+              party={party}
+              link={`${origin}/r/${party.access_token}`}
+              expanded={openId === party.id}
+              onToggle={() =>
+                setOpenId((current) => (current === party.id ? null : party.id))
+              }
+            />
+          ))}
         </div>
       ) : (
         <div className="space-y-4 sm:space-y-6">
-          {parties.map((party) => (
+          {filtered.map((party) => (
             <PartyCard
               key={party.id}
               party={party}
@@ -250,17 +144,6 @@ export function GuestList({ parties, origin }: GuestListProps) {
           ))}
         </div>
       )}
-
-      {editingParty ? (
-        <EditPartyDialog
-          open
-          onOpenChange={(open) => {
-            if (!open) setEditingPartyId(null);
-          }}
-          party={editingParty}
-          guests={editingParty.guests ?? []}
-        />
-      ) : null}
     </section>
   );
 }

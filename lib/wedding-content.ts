@@ -14,23 +14,26 @@ export const weddingContent = {
     display: "Saturday, January 23, 2027",
     short: "January 23, 2027",
     iso: "2027-01-23",
-    time: "Exact time TBD",
+    time: "Ceremony at 1:00 PM",
   },
 
   venue: {
     ceremony: {
       name: "Cross and Crown Church",
-      address: "",
+      address: "4554 12th Ave NE",
       city: "Seattle, WA",
-      mapUrl: "https://maps.google.com",
-      notes: "Ceremony begins promptly — please arrive 15 minutes early.",
+      mapUrl:
+        "https://www.google.com/maps/search/?api=1&query=4554+12th+Ave+NE+Seattle+WA+98105",
+      notes:
+        "Arrive 15 minutes before 1:00. A parking garage is across the street.",
     },
     reception: {
       name: "Rosehill Community Center",
-      address: "",
+      address: "304 Lincoln Ave",
       city: "Mukilteo, WA",
-      mapUrl: "https://maps.google.com",
-      notes: "Dinner, dancing, and drinks to follow.",
+      mapUrl:
+        "https://www.google.com/maps/search/?api=1&query=304+Lincoln+Ave+Mukilteo+WA+98275",
+      notes: "Plenty of parking on site.",
     },
     sameLocation: false,
   },
@@ -76,29 +79,25 @@ export const weddingContent = {
     title: "Celebration timeline",
     items: [
       {
-        time: "3:30 PM",
-        title: "Guest arrival",
-        description: "TODO: Where guests should gather before the ceremony.",
+        time: "1:00 PM",
+        title: "Ceremony",
+        description: "The ceremony begins promptly at 1:00.",
+      },
+      {
+        time: "After",
+        title: "Cocktail hour",
+        description: "Head to the reception when the ceremony ends.",
       },
       {
         time: "4:00 PM",
-        title: "Ceremony",
-        description: "TODO: Brief note about the ceremony.",
+        title: "Dinner",
+        description: "A buffet around 4:00–4:30.",
       },
       {
-        time: "5:00 PM",
-        title: "Cocktail hour",
-        description: "TODO: Drinks, photos, mingling.",
-      },
-      {
-        time: "6:30 PM",
-        title: "Dinner & toasts",
-        description: "TODO: Meal style, speeches, etc.",
-      },
-      {
-        time: "8:00 PM",
-        title: "Dancing",
-        description: "TODO: Party details — open bar, playlist vibes, etc.",
+        time: "Later",
+        title: "Toasts & dancing",
+        description:
+          "Toasts and dancing follow dinner. The evening ends around 10:00 or 11:00.",
       },
     ],
   },
@@ -107,20 +106,16 @@ export const weddingContent = {
     eyebrow: "Travel & stay",
     title: "Getting there",
     intro:
-      "TODO: A short note for out-of-town guests — nearest airport, driving tips, etc.",
+      "About a half hour north from the ceremony to the reception. Sea-Tac is the larger airport. Paine Field, in Everett, is the closer option.",
     hotels: [
       {
-        name: "Hotel Name",
-        detail: "TODO: Room block code, rate, cutoff date",
-        url: "#",
-      },
-      {
-        name: "Second Hotel",
-        detail: "TODO: Alternate option nearby",
-        url: "#",
+        name: "Silver Cloud Hotel — Mukilteo Waterfront",
+        detail:
+          "On the waterfront, a short distance from the reception. Book directly with the hotel.",
+        url: "https://www.silvercloud.com/mukilteo/",
       },
     ],
-    parking: "TODO: Parking details for the venue.",
+    parking: "",
   },
 
   registry: {
@@ -135,6 +130,12 @@ export const weddingContent = {
     cta: "Browse the full registry",
     ctaShort: "Zola",
     successCta: "We've registered with Zola",
+    rsvpPrompt: {
+      title: "Have you RSVP'd yet?",
+      body: "Before you head to the registry, let us know if you can make it. It only takes a minute.",
+      rsvpCta: "RSVP first",
+      continueCta: "Continue to the registry",
+    },
     /** Each item can set `url` to a specific Zola collection; otherwise it uses `registry.url`. */
     featured: [
       {
@@ -159,20 +160,33 @@ export const weddingContent = {
     items: [
       {
         question: "What should I wear?",
-        answer: "TODO: Dress code — e.g. cocktail attire, garden formal, etc.",
+        answer: "Formal.",
+        images: [
+          {
+            src: "/wedding/attire-men.jpg",
+            alt: "A man in a dark formal suit, seen from behind.",
+            label: "Men",
+          },
+          {
+            src: "/wedding/attire-women.jpg",
+            alt: "A woman in a floor-length formal dress, seen from behind.",
+            label: "Women",
+          },
+        ],
       },
       {
         question: "Can I bring a plus one?",
         answer:
-          "TODO: Plus-one policy — usually based on the invitation.",
+          "If your invitation includes a plus one, they'll be listed with your group.",
       },
       {
         question: "Are kids welcome?",
-        answer: "TODO: Kids policy.",
+        answer:
+          "Kids will not be at the reception. If you need an exception, let us know.",
       },
       {
         question: "When should I RSVP by?",
-        answer: "TODO: RSVP deadline — e.g. Month Day, Year.",
+        answer: "Please reply by December 15, 2026.",
       },
     ],
   },
@@ -181,8 +195,12 @@ export const weddingContent = {
     eyebrow: "RSVP",
     title: "Will you be there?",
     intro:
+      "Start typing your name, then choose your group and reply for each person.",
+    groupIntro:
+      "Reply for each person below.",
+    openIntro:
       "Reply for yourself, or add each person you're answering for.",
-    deadline: "TODO: Kindly reply by Month Day, Year.",
+    deadline: "Kindly reply by December 15, 2026.",
     thanksEyebrow: "RSVP",
     thanksTitle: "Thank you",
     successYes: "We can't wait to see you there.",

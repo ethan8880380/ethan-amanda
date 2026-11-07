@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { weddingContent } from "@/lib/wedding-content";
 import { useHasWeddingRsvp } from "@/hooks/use-wedding-rsvp-session";
 import { cn } from "@/lib/utils";
+import { RegistryRsvpGate } from "./registry-rsvp-gate";
 
 interface NavSection {
   id: string;
@@ -16,7 +17,6 @@ interface NavSection {
 }
 
 const sections: NavSection[] = [
-  { id: "story", label: "Story", isPrimary: true },
   { id: "day", label: "The Day", shortLabel: "Day", isPrimary: true },
   { id: "travel", label: "Travel", isPrimary: true },
   { id: "registry", label: "Registry", isPrimary: true },
@@ -51,22 +51,30 @@ export function WeddingNav() {
   return (
     <>
       {/* Desktop masthead */}
-      <header className="wedding-hairline fixed inset-x-0 top-0 z-40 hidden h-16 border-b bg-paper/92 backdrop-blur-md md:block">
-        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-8 lg:px-12">
+      <header
+        className={cn(
+          "fixed inset-x-0 top-0 z-40 hidden h-20 border-b px-10 transition-colors duration-500 md:block",
+          isPastHero
+            ? "border-ink/[0.07] bg-paper/[0.97] backdrop-blur-xl"
+            : "border-transparent bg-paper"
+        )}
+      >
+        <div className="mx-auto flex h-full max-w-6xl items-center justify-between">
           <a
             href={pathname === "/wedding" ? "#top" : "/wedding"}
-            className="font-wedding-serif text-xl leading-none tracking-tight text-ink outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-4 focus-visible:ring-offset-paper"
+            className="font-wedding-serif text-[1.625rem] leading-none text-ink outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-4 focus-visible:ring-offset-paper"
           >
             {weddingContent.couple.partnerOne}{" "}
             <span className="italic text-blood">&amp;</span>{" "}
             {weddingContent.couple.partnerTwo}
           </a>
 
+          <div className="flex items-center gap-6">
           <nav aria-label="Primary" className="flex items-center gap-1">
             {sections.map((section) => {
               const href = sectionHref(section.id, pathname);
               const isExternal = href.startsWith("http");
-              return (
+              const link = (
                 <a
                   key={section.id}
                   href={href}
@@ -79,7 +87,7 @@ export function WeddingNav() {
                       : undefined
                   }
                   className={cn(
-                    "group relative flex h-10 items-center px-3.5 text-[0.75rem] font-medium uppercase tracking-[0.18em] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blood",
+                    "group relative flex h-10 items-center rounded-full px-4 text-[0.9375rem] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blood",
                     !isExternal && activeId === section.id
                       ? "text-ink"
                       : "text-ink/55 hover:text-ink"
@@ -89,7 +97,7 @@ export function WeddingNav() {
                   <span
                     aria-hidden
                     className={cn(
-                      "absolute inset-x-3.5 bottom-1.5 h-px origin-left bg-blood transition-transform duration-300",
+                      "absolute inset-x-4 bottom-1.5 h-px origin-center bg-current transition-transform duration-300",
                       !isExternal && activeId === section.id
                         ? "scale-x-100"
                         : "scale-x-0 group-hover:scale-x-100"
@@ -97,6 +105,7 @@ export function WeddingNav() {
                   />
                 </a>
               );
+              return withRegistryGate(section.id, link);
             })}
           </nav>
 
@@ -105,10 +114,11 @@ export function WeddingNav() {
             {...(cta.external
               ? { target: "_blank", rel: "noopener noreferrer" }
               : {})}
-            className="inline-flex h-10 items-center bg-blood px-5 text-[0.75rem] font-medium uppercase tracking-[0.18em] text-paper transition-colors hover:bg-blood-deep outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+            className="inline-flex h-11 items-center rounded-full bg-ink px-7 text-[0.9375rem] font-medium text-paper transition-colors hover:bg-blood outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
           >
             {cta.label}
           </a>
+          </div>
         </div>
       </header>
 
@@ -121,15 +131,15 @@ export function WeddingNav() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: shouldReduceMotion ? 0 : 72, opacity: 0 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="wedding-hairline fixed inset-x-0 bottom-0 z-40 border-t bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
+            className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 rounded-full border border-ink/[0.07] bg-paper/90 p-1.5 shadow-[0_12px_40px_-12px_rgb(24_20_21/0.35)] backdrop-blur-xl md:hidden"
           >
-            <div className="flex h-14 items-stretch">
+            <div className="flex h-12 items-stretch">
               {sections
                 .filter((section) => section.isPrimary)
                 .map((section) => {
                   const href = sectionHref(section.id, pathname);
                   const isExternal = href.startsWith("http");
-                  return (
+                  const link = (
                     <a
                       key={section.id}
                       href={href}
@@ -142,7 +152,7 @@ export function WeddingNav() {
                           : undefined
                       }
                       className={cn(
-                        "relative flex flex-1 items-center justify-center text-[0.6875rem] font-medium uppercase tracking-[0.16em] transition-colors outline-none focus-visible:bg-blood/10",
+                        "relative flex flex-1 items-center justify-center rounded-full text-sm transition-colors outline-none focus-visible:bg-ink/5",
                         !isExternal && activeId === section.id
                           ? "text-ink"
                           : "text-ink/55 active:text-ink"
@@ -153,7 +163,7 @@ export function WeddingNav() {
                         <motion.span
                           layoutId="wedding-nav-dot"
                           aria-hidden
-                          className="absolute bottom-2 size-1 rounded-full bg-blood"
+                          className="absolute bottom-1 size-1 rounded-full bg-blood"
                           transition={{
                             duration: 0.35,
                             ease: [0.22, 1, 0.36, 1],
@@ -162,13 +172,14 @@ export function WeddingNav() {
                       )}
                     </a>
                   );
+                  return withRegistryGate(section.id, link);
                 })}
               <a
                 href={cta.href}
                 {...(cta.external
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
-                className="flex min-w-[5.25rem] items-center justify-center bg-blood px-5 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-paper transition-colors active:bg-blood-deep outline-none focus-visible:bg-blood-deep"
+                className="flex min-w-[5.5rem] items-center justify-center rounded-full bg-ink px-5 text-sm font-medium text-paper transition-colors active:bg-blood outline-none focus-visible:bg-blood"
               >
                 {cta.label}
               </a>
@@ -178,6 +189,11 @@ export function WeddingNav() {
       </AnimatePresence>
     </>
   );
+}
+
+function withRegistryGate(id: string, link: ReactElement) {
+  if (id !== "registry") return link;
+  return <RegistryRsvpGate key={id}>{link}</RegistryRsvpGate>;
 }
 
 function getPersistentCta({

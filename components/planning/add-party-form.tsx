@@ -41,7 +41,7 @@ interface AddPartyFormProps {
 }
 
 const fieldClass =
-  "mt-1 w-full border border-[#d9d0c5] bg-white px-3 py-3 text-base";
+  "mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base";
 
 export function AddPartyForm({ origin }: AddPartyFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -165,7 +165,7 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
       <button
         type="button"
         onClick={() => shareLink(created)}
-        className="flex min-h-12 w-full items-center justify-center gap-2 bg-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] text-[#f7f3ee]"
+        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-4 text-xs uppercase tracking-[0.18em] text-black"
       >
         <Share2 className="size-4" />
         Share invite link
@@ -174,7 +174,7 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
       <button
         type="button"
         onClick={() => copyLink(created.link)}
-        className="flex min-h-12 w-full items-center justify-center gap-2 bg-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] text-[#f7f3ee]"
+        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-4 text-xs uppercase tracking-[0.18em] text-black"
       >
         {copied ? (
           <>
@@ -196,7 +196,7 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
       <button
         type="button"
         onClick={() => copyLink(created.link)}
-        className="flex min-h-11 w-full items-center justify-center gap-2 border border-[#1c1714] px-4 text-xs uppercase tracking-[0.18em]"
+        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-white/15 px-4 text-xs uppercase tracking-[0.18em]"
       >
         {copied ? (
           <>
@@ -213,21 +213,21 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
     ) : null;
 
   return (
-    <section className="mb-8 border border-[#e4ddd4] bg-white p-4 sm:mb-12 sm:p-6">
+    <section className="mb-8 rounded-[1.75rem] bg-[#161616] p-4 sm:mb-12 sm:p-6">
       <form
         ref={formRef}
         action={onSubmit}
         className="grid gap-4 md:grid-cols-2"
       >
         <div className="md:col-span-2">
-          <p className="font-serif text-2xl">Add party</p>
-          <p className="mt-1 text-sm text-[#6f6258]">
+          <p className="font-medium text-2xl">Add party</p>
+          <p className="mt-1 text-sm text-[#8e8e8e]">
             Create a household and get their invite link.
           </p>
         </div>
 
         {error ? (
-          <p className="border-l-2 border-red-700 bg-red-50 px-3 py-2 text-sm text-red-800 md:col-span-2">
+          <p className="border-l-2 border-[#ff453a] bg-[#2c1515] px-3 py-2 text-sm text-[#ffb4ab] md:col-span-2">
             {error}
           </p>
         ) : null}
@@ -244,7 +244,7 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
         </label>
         <label className="text-sm">
           Email{" "}
-          <span className="text-[#6f6258]">(optional)</span>
+          <span className="text-[#8e8e8e]">(optional)</span>
           <input
             name="contact_email"
             type="email"
@@ -255,7 +255,7 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
         </label>
         <label className="text-sm">
           Plus-one slot{" "}
-          <span className="text-[#6f6258]">(optional)</span>
+          <span className="text-[#8e8e8e]">(optional)</span>
           <input
             name="plus_one_name"
             className={fieldClass}
@@ -264,7 +264,7 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
         </label>
         <label className="text-sm md:col-span-2">
           Guest names{" "}
-          <span className="text-[#6f6258]">(one per line)</span>
+          <span className="text-[#8e8e8e]">(one per line)</span>
           <textarea
             name="guest_names"
             required
@@ -281,24 +281,24 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
         <Collapsible
           open={addressOpen}
           onOpenChange={setAddressOpen}
-          className="md:col-span-2 border-t border-[#eee6dc] pt-3"
+          className="md:col-span-2 border-t border-white/10 pt-3"
         >
           <CollapsibleTrigger className="flex min-h-12 w-full items-center justify-between gap-3 py-1 text-left">
             <div>
-              <p className="font-serif text-lg sm:text-xl">
+              <p className="font-medium text-lg sm:text-xl">
                 Mailing address{" "}
-                <span className="text-sm font-sans text-[#6f6258]">
+                <span className="text-sm font-sans text-[#8e8e8e]">
                   (optional)
                 </span>
               </p>
-              <p className="mt-0.5 text-sm text-[#6f6258]">
+              <p className="mt-0.5 text-sm text-[#8e8e8e]">
                 {addressOpen
                   ? "Leave blank to collect via save-the-date."
                   : "Tap to add an address you already have."}
               </p>
             </div>
             <ChevronDown
-              className={`size-5 shrink-0 text-[#6f6258] transition-transform ${
+              className={`size-5 shrink-0 text-[#8e8e8e] transition-transform ${
                 addressOpen ? "rotate-180" : ""
               }`}
             />
@@ -360,7 +360,7 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
         <button
           type="submit"
           disabled={isPending}
-          className="min-h-12 w-full bg-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] text-[#f7f3ee] disabled:opacity-60 md:col-span-2 md:w-fit"
+          className="min-h-12 w-full rounded-full bg-white px-4 text-xs uppercase tracking-[0.18em] text-black disabled:opacity-60 md:col-span-2 md:w-fit"
         >
           {isPending ? "Creating…" : "Create party + invite link"}
         </button>
@@ -373,26 +373,26 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
             if (!open) closeCreated();
           }}
         >
-          <DrawerContent className="gap-0 border-0 bg-[#f7f3ee] p-0 text-[#1c1714] before:inset-0 before:rounded-t-2xl before:bg-[#f7f3ee] data-[vaul-drawer-direction=bottom]:max-h-[90vh]">
-            <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-[#d9d0c5]" />
+          <DrawerContent className="plan scheme-dark gap-0 border-0 bg-[#101010] p-0 text-white before:inset-0 before:rounded-t-2xl before:bg-[#101010] data-[vaul-drawer-direction=bottom]:max-h-[90vh]">
+            <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-white/20" />
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-3 pt-2">
               <DrawerHeader className="gap-1 px-0 pb-3 pt-2 text-left">
-                <DrawerTitle className="font-serif text-2xl font-normal">
+                <DrawerTitle className="font-medium text-2xl font-normal">
                   Party created
                 </DrawerTitle>
-                <DrawerDescription className="text-[#6f6258]">
+                <DrawerDescription className="text-[#8e8e8e]">
                   Share or copy their personalized link.
                 </DrawerDescription>
               </DrawerHeader>
               {successBody}
             </div>
-            <DrawerFooter className="gap-2 border-t border-[#e4ddd4] bg-white px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+            <DrawerFooter className="gap-2 border-t border-white/10 bg-[#161616] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
               {primaryAction}
               {secondaryCopy}
               <DrawerClose asChild>
                 <button
                   type="button"
-                  className="min-h-11 w-full text-xs uppercase tracking-[0.18em] text-[#6f6258]"
+                  className="min-h-11 w-full text-xs uppercase tracking-[0.18em] text-[#8e8e8e]"
                 >
                   Done
                 </button>
@@ -407,12 +407,12 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
             if (!open) closeCreated();
           }}
         >
-          <DialogContent className="max-w-md rounded-none border border-[#e4ddd4] bg-[#f7f3ee] text-[#1c1714] ring-0">
+          <DialogContent className="plan scheme-dark max-w-md rounded-[1.75rem] border border-white/10 bg-[#101010] text-white ring-0">
             <DialogHeader>
-              <DialogTitle className="font-serif text-2xl font-normal">
+              <DialogTitle className="font-medium text-2xl font-normal">
                 Party created
               </DialogTitle>
-              <DialogDescription className="text-[#6f6258]">
+              <DialogDescription className="text-[#8e8e8e]">
                 Share or copy their personalized link.
               </DialogDescription>
             </DialogHeader>
@@ -423,7 +423,7 @@ export function AddPartyForm({ origin }: AddPartyFormProps) {
               <button
                 type="button"
                 onClick={closeCreated}
-                className="min-h-11 w-full text-xs uppercase tracking-[0.18em] text-[#6f6258]"
+                className="min-h-11 w-full text-xs uppercase tracking-[0.18em] text-[#8e8e8e]"
               >
                 Done
               </button>
@@ -452,37 +452,37 @@ function CreatedPartyBody({
   return (
     <div className="space-y-4 text-left">
       <div>
-        <p className="font-serif text-xl">{created.partyName}</p>
+        <p className="font-medium text-xl">{created.partyName}</p>
         {guests.length ? (
-          <p className="mt-1 text-sm leading-relaxed text-[#6f6258]">
+          <p className="mt-1 text-sm leading-relaxed text-[#8e8e8e]">
             {guests.join(" · ")}
           </p>
         ) : null}
         {created.contactEmail ? (
-          <p className="mt-1 break-words text-sm text-[#6f6258]">
+          <p className="mt-1 break-words text-sm text-[#8e8e8e]">
             {created.contactEmail}
           </p>
         ) : null}
         {created.address ? (
-          <p className="mt-1 break-words text-sm text-[#6f6258]">
+          <p className="mt-1 break-words text-sm text-[#8e8e8e]">
             {created.address}
           </p>
         ) : null}
       </div>
 
       <div>
-        <p className="mb-2 flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-[#6f6258]">
+        <p className="mb-2 flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-[#8e8e8e]">
           <Link2 className="size-3.5" />
           Personalized link
         </p>
         <button
           type="button"
           onClick={onCopy}
-          className="w-full break-all bg-white px-3 py-3 text-left text-sm leading-relaxed ring-1 ring-[#e4ddd4]"
+          className="w-full break-all bg-[#161616] px-3 py-3 text-left text-sm leading-relaxed ring-1 ring-white/10"
         >
           {created.link}
         </button>
-        <p className="mt-2 text-xs text-[#6f6258]">
+        <p className="mt-2 text-xs text-[#8e8e8e]">
           {copied ? "Link copied to clipboard." : "Tap the link to copy."}
         </p>
       </div>

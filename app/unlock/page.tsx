@@ -1,25 +1,10 @@
-import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { unlockSite } from "@/app/unlock/actions";
 import { SITE_GATE_COOKIE, expectedGateToken, safeNextPath } from "@/lib/site-gate";
 import { weddingContent } from "@/lib/wedding-content";
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-wedding-serif",
-  display: "swap",
-});
-
-const instrumentSans = Instrument_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-wedding-sans",
-  display: "swap",
-});
+import { weddingFontVariables } from "@/lib/wedding-fonts";
 
 export const metadata: Metadata = {
   title: "Ethan & Amanda",
@@ -43,7 +28,7 @@ export default async function UnlockPage({
 
   return (
     <main
-      className={`${instrumentSerif.variable} ${instrumentSans.variable} flex min-h-svh flex-col justify-center bg-paper px-6 py-16 text-ink font-wedding-sans`}
+      className={`${weddingFontVariables} flex min-h-svh flex-col justify-center bg-paper px-6 py-16 text-ink font-wedding-sans`}
     >
       <form action={unlockSite} className="mx-auto w-full max-w-md">
         <p className="wedding-eyebrow flex items-center gap-3 text-blood">

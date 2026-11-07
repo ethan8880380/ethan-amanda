@@ -23,7 +23,6 @@ export function WeddingStory() {
           <Reveal>
             <SectionHeading
               id="story-heading"
-              eyebrow={story.eyebrow}
               title={story.title}
             />
           </Reveal>

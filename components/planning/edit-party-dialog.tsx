@@ -30,6 +30,7 @@ interface EditGuest {
 interface EditPartyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  showGuests?: boolean;
   party: {
     id: string;
     party_name: string | null;
@@ -46,13 +47,14 @@ interface EditPartyDialogProps {
 }
 
 const fieldClass =
-  "mt-1 w-full border border-[#d9d0c5] bg-white px-3 py-3 text-base";
+  "mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base";
 
 export function EditPartyDialog({
   open,
   onOpenChange,
   party,
   guests,
+  showGuests = true,
 }: EditPartyDialogProps) {
   const isMobile = useIsMobile();
   const [isPending, startTransition] = useTransition();
@@ -60,13 +62,15 @@ export function EditPartyDialog({
 
   function onSubmit(formData: FormData) {
     setError(null);
-    const nextGuests = guests.map((guest) => ({
-      id: guest.id,
-      full_name: String(formData.get(`guest_name_${guest.id}`) ?? "").trim(),
-      is_plus_one: formData.get(`guest_plus_${guest.id}`) === "on",
-    }));
+    const nextGuests = showGuests
+      ? guests.map((guest) => ({
+          id: guest.id,
+          full_name: String(formData.get(`guest_name_${guest.id}`) ?? "").trim(),
+          is_plus_one: formData.get(`guest_plus_${guest.id}`) === "on",
+        }))
+      : undefined;
 
-    if (nextGuests.some((guest) => !guest.full_name)) {
+    if (nextGuests?.some((guest) => !guest.full_name)) {
       setError("Every guest needs a name.");
       return;
     }
@@ -84,7 +88,7 @@ export function EditPartyDialog({
           state: String(formData.get("state") ?? "") || null,
           postal_code: String(formData.get("postal_code") ?? "") || null,
           country: String(formData.get("country") ?? "") || null,
-          guests: nextGuests,
+          ...(nextGuests ? { guests: nextGuests } : {}),
         });
         onOpenChange(false);
       } catch (err) {
@@ -101,7 +105,7 @@ export function EditPartyDialog({
       className="grid gap-4"
     >
       {error ? (
-        <p className="border-l-2 border-red-700 bg-red-50 px-3 py-2 text-sm text-red-800">
+        <p className="border-l-2 border-[#ff453a] bg-[#2c1515] px-3 py-2 text-sm text-[#ffb4ab]">
           {error}
         </p>
       ) : null}
@@ -116,7 +120,7 @@ export function EditPartyDialog({
         />
       </label>
       <label className="text-sm">
-        Email <span className="text-[#6f6258]">(optional)</span>
+        Email <span className="text-[#8e8e8e]">(optional)</span>
         <input
           name="contact_email"
           type="email"
@@ -135,9 +139,9 @@ export function EditPartyDialog({
         />
       </label>
 
-      {guests.length ? (
-        <div className="border-t border-[#eee6dc] pt-3">
-          <p className="font-serif text-lg">Guests</p>
+      {showGuests && guests.length ? (
+        <div className="border-t border-white/10 pt-3">
+          <p className="font-medium text-lg">Guests</p>
           <ul className="mt-3 space-y-3">
             {guests.map((guest) => (
               <li key={guest.id} className="grid gap-2 sm:grid-cols-[1fr_auto]">
@@ -145,14 +149,14 @@ export function EditPartyDialog({
                   name={`guest_name_${guest.id}`}
                   required
                   defaultValue={guest.full_name}
-                  className="w-full border border-[#d9d0c5] bg-white px-3 py-3 text-base"
+                  className="w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
                 />
                 <label className="flex min-h-11 items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     name={`guest_plus_${guest.id}`}
                     defaultChecked={guest.is_plus_one}
-                    className="size-4 accent-[#1c1714]"
+                    className="size-4 accent-white"
                   />
                   Plus-one
                 </label>
@@ -162,8 +166,8 @@ export function EditPartyDialog({
         </div>
       ) : null}
 
-      <div className="grid gap-4 border-t border-[#eee6dc] pt-3 md:grid-cols-2">
-        <p className="font-serif text-lg md:col-span-2">Mailing address</p>
+      <div className="grid gap-4 border-t border-white/10 pt-3 md:grid-cols-2">
+        <p className="font-medium text-lg md:col-span-2">Mailing address</p>
         <label className="text-sm md:col-span-2">
           Address line 1
           <input
@@ -228,7 +232,7 @@ export function EditPartyDialog({
       type="submit"
       form={`edit-party-${party.id}`}
       disabled={isPending}
-      className="flex min-h-12 w-full items-center justify-center bg-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] text-[#f7f3ee] disabled:opacity-60"
+      className="flex min-h-12 w-full items-center justify-center rounded-full bg-white px-4 text-xs uppercase tracking-[0.18em] text-black disabled:opacity-60"
     >
       {isPending ? "Saving…" : "Save changes"}
     </button>
@@ -237,25 +241,25 @@ export function EditPartyDialog({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="gap-0 border-0 bg-[#f7f3ee] p-0 text-[#1c1714] before:inset-0 before:rounded-t-2xl before:bg-[#f7f3ee] data-[vaul-drawer-direction=bottom]:max-h-[90vh]">
-          <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-[#d9d0c5]" />
+        <DrawerContent className="plan scheme-dark gap-0 border-0 bg-[#101010] p-0 text-white before:inset-0 before:rounded-t-2xl before:bg-[#101010] data-[vaul-drawer-direction=bottom]:max-h-[90vh]">
+          <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-white/20" />
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-3 pt-2">
             <DrawerHeader className="gap-1 px-0 pb-3 pt-2 text-left">
-              <DrawerTitle className="font-serif text-2xl font-normal">
+              <DrawerTitle className="font-medium text-2xl font-normal">
                 Edit party
               </DrawerTitle>
-              <DrawerDescription className="text-[#6f6258]">
+              <DrawerDescription className="text-[#8e8e8e]">
                 Fix names, plus-ones, or the mailing address.
               </DrawerDescription>
             </DrawerHeader>
             {form}
           </div>
-          <DrawerFooter className="gap-2 border-t border-[#e4ddd4] bg-white px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+          <DrawerFooter className="gap-2 border-t border-white/10 bg-[#161616] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
             {saveButton}
             <DrawerClose asChild>
               <button
                 type="button"
-                className="min-h-11 w-full text-xs uppercase tracking-[0.18em] text-[#6f6258]"
+                className="min-h-11 w-full text-xs uppercase tracking-[0.18em] text-[#8e8e8e]"
               >
                 Cancel
               </button>
@@ -268,12 +272,12 @@ export function EditPartyDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-none border border-[#e4ddd4] bg-[#f7f3ee] text-[#1c1714] ring-0">
+      <DialogContent className="plan scheme-dark max-h-[90vh] max-w-lg overflow-y-auto rounded-[1.75rem] border border-white/10 bg-[#101010] text-white ring-0">
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl font-normal">
+          <DialogTitle className="font-medium text-2xl font-normal">
             Edit party
           </DialogTitle>
-          <DialogDescription className="text-[#6f6258]">
+          <DialogDescription className="text-[#8e8e8e]">
             Fix names, plus-ones, or the mailing address.
           </DialogDescription>
         </DialogHeader>
@@ -283,7 +287,7 @@ export function EditPartyDialog({
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="min-h-11 w-full text-xs uppercase tracking-[0.18em] text-[#6f6258]"
+            className="min-h-11 w-full text-xs uppercase tracking-[0.18em] text-[#8e8e8e]"
           >
             Cancel
           </button>

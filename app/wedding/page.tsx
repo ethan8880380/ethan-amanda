@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { weddingContent } from "@/lib/wedding-content";
 import { WeddingHero } from "@/components/wedding/wedding-hero";
-import { WeddingInvitation } from "@/components/wedding/wedding-invitation";
-import { WeddingStory } from "@/components/wedding/wedding-story";
 import { WeddingSchedule } from "@/components/wedding/wedding-schedule";
 import { WeddingVenues } from "@/components/wedding/wedding-venues";
 import { WeddingGallery } from "@/components/wedding/wedding-gallery";
@@ -28,10 +26,8 @@ export default async function WeddingPage() {
   return (
     <main id="main">
       <WeddingHero />
-      <WeddingInvitation />
-      <WeddingStory />
-      <WeddingSchedule />
       <WeddingVenues />
+      <WeddingSchedule />
       <WeddingGallery />
       <WeddingTravel />
       <WeddingRegistry />

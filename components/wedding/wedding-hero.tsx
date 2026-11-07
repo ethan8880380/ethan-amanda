@@ -2,7 +2,7 @@ import Image from "next/image";
 import { weddingContent } from "@/lib/wedding-content";
 import { weddingPhotos } from "./wedding-photos";
 
-const { couple, date, hero, saveTheDate } = weddingContent;
+const { couple, date, hero } = weddingContent;
 const photo = weddingPhotos.embrace;
 
 function riseDelay(ms: number) {
@@ -14,72 +14,61 @@ export function WeddingHero() {
     <section
       id="top"
       aria-label="Welcome"
-      className="relative isolate min-h-[100svh] bg-ink md:grid md:h-[100svh] md:min-h-0 md:grid-cols-2 md:bg-paper md:pt-16"
+      className="relative isolate min-h-[100svh] bg-ink md:grid md:h-[100svh] md:min-h-[44rem] md:grid-cols-[minmax(0,36rem)_minmax(0,36rem)] md:items-center md:justify-center md:bg-paper md:px-10 md:pt-20"
     >
-      {/* Photograph — full-bleed on mobile, right panel on desktop */}
-      <div className="absolute inset-0 overflow-hidden md:relative md:col-start-2 md:row-start-1 md:inset-auto">
-        <Image
-          src={photo.src}
-          alt={photo.alt}
-          fill
-          priority
-          fetchPriority="high"
-          quality={72}
-          sizes="(min-width: 768px) 50vw, 100vw"
-          style={{ objectPosition: photo.focal }}
-          className="animate-wedding-settle object-cover"
-        />
-        {/* Mobile legibility scrim */}
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/30 to-ink/15 md:hidden"
-        />
+      {/* Photograph — full-bleed on mobile, arched portrait on desktop */}
+      <div className="absolute inset-0 md:relative md:inset-auto md:col-start-2 md:row-start-1 md:flex md:h-full md:items-center md:justify-end md:py-12">
+        <div className="relative size-full overflow-hidden md:aspect-[4/5] md:max-h-[52rem] md:w-auto md:max-w-full md:rounded-t-full">
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            fill
+            priority
+            fetchPriority="high"
+            quality={75}
+            sizes="(min-width: 768px) 45vw, 100vw"
+            style={{ objectPosition: photo.focal }}
+            className="animate-wedding-settle object-cover"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/10 md:hidden"
+          />
+        </div>
       </div>
 
       {/* Copy */}
-      <div className="relative z-10 flex min-h-[100svh] flex-col justify-end px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-24 text-paper md:col-start-1 md:row-start-1 md:min-h-0 md:justify-center md:px-12 md:pb-16 md:pt-8 md:text-ink lg:px-20">
-        <p
-          className="wedding-eyebrow animate-wedding-rise flex items-center gap-3 text-paper/75 md:text-blood"
-          style={riseDelay(150)}
-        >
-          <span aria-hidden className="h-px w-6 bg-blood md:bg-blood" />
-          {hero.eyebrow}
-        </p>
-
+      <div className="relative z-10 flex min-h-[100svh] flex-col items-center justify-end px-6 pb-[calc(env(safe-area-inset-bottom)+3rem)] pt-24 text-center text-paper md:col-start-1 md:row-start-1 md:min-h-0 md:justify-center md:p-0 md:text-ink">
         <h1
-          className="animate-wedding-rise mt-6 font-wedding-serif text-[clamp(3.75rem,20vw,6.5rem)] leading-[0.88] tracking-[-0.02em] md:text-[clamp(4.5rem,8.2vw,9.5rem)]"
-          style={riseDelay(300)}
+          className="animate-wedding-rise wedding-display text-[clamp(3.75rem,17vw,5.5rem)] font-light leading-[0.92] md:text-[clamp(4.5rem,7.5vw,8rem)]"
+          style={riseDelay(150)}
         >
           <span className="block">{couple.partnerOne}</span>
           <span className="block">
-            <span className="italic text-paper/80 md:text-blood">&amp;</span>{" "}
+            <span className="italic text-paper/70 md:text-blood">&amp;</span>{" "}
             {couple.partnerTwo}
           </span>
         </h1>
 
         <p
-          className="animate-wedding-rise mt-7 max-w-[22rem] font-wedding-serif text-xl italic leading-snug text-paper/85 md:mt-9 md:max-w-md md:text-2xl md:text-ink/75 lg:text-[1.75rem]"
+          className="animate-wedding-rise mt-6 max-w-xs text-base leading-relaxed text-paper/75 md:mt-8 md:max-w-sm md:text-[1.0625rem] md:text-ink/60"
           style={riseDelay(450)}
         >
-          {hero.subhead}
+          {`${hero.eyebrow} ${hero.subhead.charAt(0).toLowerCase()}${hero.subhead.slice(1)}`}
         </p>
 
         <div
-          className="animate-wedding-rise mt-9 flex items-end justify-between gap-6 border-t border-paper/25 pt-5 md:mt-12 md:border-ink/15 md:pt-6"
+          className="animate-wedding-rise mt-8 flex flex-col items-center gap-6 md:mt-10"
           style={riseDelay(600)}
         >
-          <dl className="text-[0.8125rem] leading-relaxed tracking-wide md:text-sm">
-            <dt className="sr-only">Date</dt>
-            <dd className="font-medium">{date.display}</dd>
-            <dt className="sr-only">Location</dt>
-            <dd className="text-paper/65 md:text-ink/55">
-              {saveTheDate.cityHint}, Washington
-            </dd>
-          </dl>
-
+          <p className="flex items-center gap-4 text-sm tracking-[0.04em] text-paper/90 md:text-[0.9375rem] md:text-ink/80">
+            <span aria-hidden className="h-px w-8 bg-current opacity-40" />
+            {date.display}
+            <span aria-hidden className="h-px w-8 bg-current opacity-40" />
+          </p>
           <a
             href="#rsvp"
-            className="inline-flex h-12 shrink-0 items-center bg-blood px-6 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-paper transition-colors hover:bg-blood-deep outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink md:h-12 md:focus-visible:ring-blood md:focus-visible:ring-offset-paper"
+            className="inline-flex h-12 items-center rounded-full bg-paper px-9 text-[0.9375rem] font-medium tracking-[0.01em] text-ink transition-colors hover:bg-linen outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink md:bg-blood md:text-paper md:hover:bg-blood-deep md:focus-visible:ring-blood md:focus-visible:ring-offset-paper"
           >
             {hero.cta}
           </a>

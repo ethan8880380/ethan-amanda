@@ -22,9 +22,9 @@ export default async function TasksPage() {
 
   return (
     <PlanShell title="Tasks" active="/plan/tasks">
-      <div className="mb-6 border border-[#e4ddd4] bg-white px-5 py-4">
-        <p className="font-serif text-2xl">Checklist</p>
-        <p className="mt-1 text-sm text-[#6f6258]">
+      <div className="mb-6 rounded-[1.75rem] bg-[#161616] px-5 py-4">
+        <p className="font-medium text-2xl">Checklist</p>
+        <p className="mt-1 text-sm text-[#8e8e8e]">
           {done.length}/{tasks.length} done
           {overdue.length ? ` · ${overdue.length} overdue` : ""}
         </p>
@@ -35,12 +35,12 @@ export default async function TasksPage() {
           {byCategory.map((row) => (
             <div
               key={row.category}
-              className="border border-[#e4ddd4] bg-white px-4 py-3"
+              className="rounded-[1.75rem] bg-[#161616] px-4 py-3"
             >
-              <p className="text-xs uppercase tracking-[0.16em] text-[#6f6258]">
+              <p className="text-xs uppercase tracking-[0.16em] text-[#8e8e8e]">
                 {row.category}
               </p>
-              <p className="mt-1 font-serif text-2xl">
+              <p className="mt-1 font-medium text-2xl">
                 {row.done}/{row.total}
               </p>
             </div>
@@ -59,16 +59,16 @@ export default async function TasksPage() {
             assignee: String(formData.get("assignee") ?? "") || undefined,
           });
         }}
-        className="mb-8 grid gap-3 border border-[#e4ddd4] bg-white p-6 md:grid-cols-2"
+        className="mb-8 grid gap-3 rounded-[1.75rem] bg-[#161616] p-6 md:grid-cols-2"
       >
-        <p className="font-serif text-2xl md:col-span-2">Add task</p>
+        <p className="font-medium text-2xl md:col-span-2">Add task</p>
         <input
           name="title"
           required
           placeholder="Title"
-          className="border border-[#d9d0c5] px-3 py-2 md:col-span-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2 md:col-span-2"
         />
-        <select name="category" className="border border-[#d9d0c5] px-3 py-2">
+        <select name="category" className="rounded-2xl border border-white/10 bg-black px-3 py-2">
           <option value="">Category</option>
           {TASK_CATEGORIES.map((category) => (
             <option key={category} value={category}>
@@ -79,22 +79,22 @@ export default async function TasksPage() {
         <input
           name="assignee"
           placeholder="Assignee"
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         />
         <input
           name="due_date"
           type="date"
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         />
         <textarea
           name="description"
           placeholder="Notes"
           rows={2}
-          className="border border-[#d9d0c5] px-3 py-2 md:col-span-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2 md:col-span-2"
         />
         <button
           type="submit"
-          className="bg-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em] text-[#f7f3ee] md:w-fit"
+          className="rounded-full bg-white px-4 py-3 text-xs uppercase tracking-[0.18em] text-black md:w-fit"
         >
           Add task
         </button>
@@ -102,7 +102,7 @@ export default async function TasksPage() {
 
       <div className="space-y-3">
         {tasks.length === 0 ? (
-          <p className="text-[#6f6258]">No tasks yet — add one above.</p>
+          <p className="text-[#8e8e8e]">No tasks yet — add one above.</p>
         ) : null}
         {tasks.map((task) => {
           const isOverdue =
@@ -111,16 +111,16 @@ export default async function TasksPage() {
           return (
             <div
               key={task.id}
-              className="flex flex-wrap items-center justify-between gap-4 border border-[#e4ddd4] bg-white px-5 py-4"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-[1.75rem] bg-[#161616] px-5 py-4"
             >
               <div className="min-w-0 flex-1">
                 <p className="font-medium">{task.title}</p>
                 {task.description ? (
-                  <p className="mt-1 text-sm text-[#6f6258]">
+                  <p className="mt-1 text-sm text-[#8e8e8e]">
                     {task.description}
                   </p>
                 ) : null}
-                <p className="mt-1 text-sm text-[#6f6258]">
+                <p className="mt-1 text-sm text-[#8e8e8e]">
                   {[
                     task.category,
                     task.assignee,
@@ -147,8 +147,8 @@ export default async function TasksPage() {
                       type="submit"
                       className={`px-2 py-1 text-xs uppercase tracking-[0.14em] ${
                         task.status === status
-                          ? "bg-[#1c1714] text-white"
-                          : "border border-[#d9d0c5]"
+                          ? "rounded-full bg-white text-black"
+                          : "rounded-2xl border border-white/10 bg-black"
                       }`}
                     >
                       {status}
@@ -163,7 +163,7 @@ export default async function TasksPage() {
                 >
                   <button
                     type="submit"
-                    className="text-xs uppercase tracking-[0.18em] text-red-700"
+                    className="text-xs uppercase tracking-[0.18em] text-[#ff453a]"
                   >
                     Delete
                   </button>

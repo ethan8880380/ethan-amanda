@@ -135,9 +135,9 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
 
   return (
     <div className="space-y-6">
-      <section className="border border-[#e4ddd4] bg-white p-4 sm:p-6">
-        <p className="font-serif text-2xl">Save the date mail</p>
-        <p className="mt-1 text-sm text-[#6f6258]">
+      <section className="rounded-[1.75rem] bg-[#161616] p-4 sm:p-6">
+        <p className="font-medium text-2xl">Save the date mail</p>
+        <p className="mt-1 text-sm text-[#8e8e8e]">
           Copy each household link, send it, then mark as sent. Opens update
           when they visit their link.
         </p>
@@ -164,8 +164,8 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
               onClick={() => setFilter(item.id)}
               className={`shrink-0 px-3 py-2 text-xs uppercase tracking-[0.16em] ${
                 active
-                  ? "bg-[#1c1714] text-[#f7f3ee]"
-                  : "border border-[#e4ddd4] bg-white text-[#6f6258]"
+                  ? "rounded-full bg-white text-black"
+                  : "rounded-full bg-[#161616] text-[#8e8e8e]"
               }`}
             >
               {item.label} · {item.count}
@@ -175,7 +175,7 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="border border-dashed border-[#d9d0c5] bg-white px-5 py-8 text-center text-[#6f6258]">
+        <p className="rounded-[1.75rem] border border-dashed border-white/15 bg-[#101010] px-5 py-8 text-center text-[#8e8e8e]">
           {parties.length === 0
             ? "No parties yet — add households on the Guests page."
             : "Nothing in this filter."}
@@ -194,45 +194,45 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
             return (
               <li
                 key={party.id}
-                className={`border bg-white p-4 sm:p-5 ${
-                  sent ? "border-[#e4ddd4] opacity-80" : "border-[#e4ddd4]"
+                className={`rounded-[1.75rem] bg-[#161616] p-4 sm:p-5 ${
+                  sent ? "border-white/10 opacity-80" : "border-white/10"
                 }`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-serif text-xl sm:text-2xl">
+                      <h2 className="font-medium text-xl sm:text-2xl">
                         {party.party_name || "Untitled party"}
                       </h2>
                       {sent ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.16em] text-[#6f6258]">
+                        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.16em] text-[#8e8e8e]">
                           <Mail className="size-3" />
                           Sent
                         </span>
                       ) : null}
                       {opened ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.16em] text-[#6f6258]">
+                        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.16em] text-[#8e8e8e]">
                           <Eye className="size-3" />
                           Opened
                         </span>
                       ) : (
-                        <span className="text-[10px] uppercase tracking-[0.16em] text-[#a89482]">
+                        <span className="text-[10px] uppercase tracking-[0.16em] text-[#6a6a6a]">
                           Not opened
                         </span>
                       )}
                     </div>
                     {party.guest_names.length ? (
-                      <p className="mt-1 text-sm text-[#6f6258]">
+                      <p className="mt-1 text-sm text-[#8e8e8e]">
                         {party.guest_names.join(" · ")}
                       </p>
                     ) : null}
                     {party.contact_email ? (
-                      <p className="mt-1 break-all text-sm text-[#6f6258]">
+                      <p className="mt-1 break-all text-sm text-[#8e8e8e]">
                         {party.contact_email}
                       </p>
                     ) : null}
                     {opened ? (
-                      <p className="mt-1 text-xs text-[#6f6258]">
+                      <p className="mt-1 text-xs text-[#8e8e8e]">
                         First open {firstOpen}
                         {lastOpen && lastOpen !== firstOpen
                           ? ` · last ${lastOpen}`
@@ -244,7 +244,7 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
                     ) : null}
                   </div>
 
-                  <label className="flex min-h-11 cursor-pointer items-center gap-2 border border-[#d9d0c5] px-3 text-sm">
+                  <label className="flex min-h-11 cursor-pointer items-center gap-2 rounded-2xl border border-white/10 bg-black px-3 text-sm">
                     <input
                       type="checkbox"
                       checked={sent}
@@ -255,21 +255,21 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
                           await setSaveTheDateSent(party.id, next);
                         });
                       }}
-                      className="size-4 accent-[#1c1714]"
+                      className="size-4 accent-white"
                     />
                     Mark sent
                   </label>
                 </div>
 
-                <div className="mt-3 whitespace-pre-line text-sm text-[#6f6258]">
+                <div className="mt-3 whitespace-pre-line text-sm text-[#8e8e8e]">
                   {address || (
-                    <span className="text-[#a89482]">
+                    <span className="text-[#6a6a6a]">
                       No mailing address yet
                     </span>
                   )}
                 </div>
 
-                <div className="mt-3 break-all bg-[#f7f3ee] px-3 py-2.5 text-xs sm:text-sm">
+                <div className="mt-3 break-all bg-[#101010] px-3 py-2.5 text-xs sm:text-sm">
                   {link}
                 </div>
 
@@ -277,7 +277,7 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
                   <button
                     type="button"
                     onClick={() => copyLink(party.id, link)}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 border border-[#1c1714] px-3 text-xs uppercase tracking-[0.16em]"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 px-3 text-xs uppercase tracking-[0.16em]"
                   >
                     {copied ? (
                       <>
@@ -294,7 +294,7 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
                   <button
                     type="button"
                     onClick={() => shareLink(party, link)}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 bg-[#1c1714] px-3 text-xs uppercase tracking-[0.16em] text-[#f7f3ee]"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-3 text-xs uppercase tracking-[0.16em] text-black"
                   >
                     <Share2 className="size-3.5" />
                     Share
@@ -311,11 +311,9 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-[#eee6dc] bg-[#f7f3ee] px-3 py-3">
-      <p className="text-[10px] uppercase tracking-[0.16em] text-[#6f6258]">
-        {label}
-      </p>
-      <p className="mt-1 font-serif text-2xl">{value}</p>
+    <div className="rounded-2xl bg-black px-3 py-3">
+      <p className="text-sm text-[#8e8e8e]">{label}</p>
+      <p className="mt-1 text-2xl font-medium tracking-tight">{value}</p>
     </div>
   );
 }

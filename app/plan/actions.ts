@@ -316,6 +316,128 @@ export async function updateParty(input: {
   revalidatePlan();
 }
 
+export async function savePartyGroup(input: {
+  id: string;
+  party_name: string;
+  contact_email?: string | null;
+  guests: Array<{
+    id?: string | null;
+    full_name: string;
+    is_plus_one: boolean;
+  }>;
+}) {
+  const db = await requireAdmin();
+  const partyName = input.party_name.trim();
+  if (!partyName) throw new Error("The group needs a name.");
+
+  const guests = input.guests.map((guest, index) => ({
+    id: guest.id?.trim() || null,
+    full_name: guest.full_name.trim().replace(/\s+/g, " "),
+    is_plus_one: Boolean(guest.is_plus_one),
+    sort_order: index,
+  }));
+
+  if (!guests.length) throw new Error("Add at least one person.");
+  if (guests.length > 10) throw new Error("A group can have up to 10 people.");
+  if (guests.some((guest) => !guest.full_name)) {
+    throw new Error("Every person needs a name.");
+  }
+  if (guests.some((guest) => guest.full_name.length > 80)) {
+    throw new Error("Names need to be 80 characters or fewer.");
+  }
+
+  const email = input.contact_email?.trim() || null;
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error("Enter a valid email, or leave it blank.");
+  }
+
+  const { data: existing, error: existingError } = await db
+    .from("guests")
+    .select("id")
+    .eq("party_id", input.id);
+  if (existingError) throw existingError;
+
+  const existingIds = new Set((existing ?? []).map((guest) => guest.id));
+  if (guests.some((guest) => guest.id && !existingIds.has(guest.id))) {
+    throw new Error("That group changed. Refresh and try again.");
+  }
+
+  const { error: partyError } = await db
+    .from("parties")
+    .update({
+      party_name: partyName,
+      contact_email: email,
+    })
+    .eq("id", input.id);
+  if (partyError) throw partyError;
+
+  const updates = guests.flatMap((guest) =>
+    guest.id ? [{ ...guest, id: guest.id }] : [],
+  );
+  if (updates.length) {
+    const results = await Promise.all(
+      updates.map((guest) =>
+        db
+          .from("guests")
+          .update({
+            full_name: guest.full_name,
+            is_plus_one: guest.is_plus_one,
+            sort_order: guest.sort_order,
+          })
+          .eq("id", guest.id)
+          .eq("party_id", input.id),
+      ),
+    );
+    const updateError = results.find((result) => result.error)?.error;
+    if (updateError) throw updateError;
+  }
+
+  const creates = guests.filter((guest) => !guest.id);
+  if (creates.length) {
+    const { error: insertError } = await db.from("guests").insert(
+      creates.map((guest) => ({
+        party_id: input.id,
+        full_name: guest.full_name,
+        is_plus_one: guest.is_plus_one,
+        sort_order: guest.sort_order,
+      })),
+    );
+    if (insertError) throw insertError;
+  }
+
+  const keepIds = new Set(updates.map((guest) => guest.id));
+  const removeIds = [...existingIds].filter((id) => !keepIds.has(id));
+  if (removeIds.length) {
+    const { error: deleteError } = await db
+      .from("guests")
+      .delete()
+      .in("id", removeIds)
+      .eq("party_id", input.id);
+    if (deleteError) throw deleteError;
+  }
+
+  const { data: savedGuests, error: savedError } = await db
+    .from("guests")
+    .select("id, full_name, is_plus_one, sort_order")
+    .eq("party_id", input.id)
+    .order("sort_order", { ascending: true });
+  if (savedError) throw savedError;
+
+  revalidatePlan("/plan/guests");
+  revalidatePlan("/plan/mail");
+  revalidatePlan();
+
+  return {
+    party_name: partyName,
+    contact_email: email,
+    guests: (savedGuests ?? []).map((guest) => ({
+      id: guest.id,
+      full_name: guest.full_name,
+      is_plus_one: guest.is_plus_one,
+    })),
+  };
+}
+
 export async function addGuestToParty(input: {
   party_id: string;
   full_name: string;

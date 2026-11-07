@@ -10,78 +10,60 @@ export function WeddingTravel() {
     <section
       id="travel"
       aria-labelledby="travel-heading"
-      className="wedding-hairline scroll-mt-16 border-t px-6 py-24 md:py-32"
+      className="scroll-mt-20 bg-linen px-6 py-24 md:px-10 md:py-32"
     >
-      <div className="mx-auto max-w-6xl lg:grid lg:grid-cols-12 lg:gap-x-16">
-        <div className="lg:col-span-5">
-          <Reveal>
-            <SectionHeading
-              id="travel-heading"
-              eyebrow={travel.eyebrow}
-              title={travel.title}
-            />
-            <p className="mt-7 max-w-md text-[1.0625rem] leading-[1.7] text-ink/75 md:text-lg">
-              {travel.intro}
-            </p>
-          </Reveal>
-        </div>
+      <div className="mx-auto max-w-3xl">
+        <Reveal>
+          <SectionHeading
+            id="travel-heading"
+            title={travel.title}
+            lead={travel.intro}
+            align="center"
+          />
+        </Reveal>
 
-        <div className="mt-12 lg:col-span-7 lg:mt-0">
-          <Reveal delay={0.1}>
-            <ul className="wedding-hairline divide-y border-y divide-ink/14">
-              {travel.hotels.map((hotel, index) => (
-                <li key={hotel.name}>
-                  <a
-                    href={hotel.url}
-                    target={hotel.url.startsWith("http") ? "_blank" : undefined}
-                    rel={
-                      hotel.url.startsWith("http")
-                        ? "noopener noreferrer"
-                        : undefined
-                    }
-                    className="group/cta -mx-3 flex items-start gap-5 px-3 py-6 transition-colors hover:bg-ink/[0.03] outline-none focus-visible:bg-ink/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blood md:gap-8 md:py-7"
-                  >
-                    <span
-                      aria-hidden
-                      className="wedding-eyebrow mt-2 w-6 shrink-0 text-blood"
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="flex min-w-0 flex-1 flex-col gap-1.5">
-                      <span className="font-wedding-serif text-2xl leading-tight text-ink md:text-3xl">
-                        {hotel.name}
-                      </span>
-                      <span className="text-[0.9375rem] leading-relaxed text-ink/60 md:text-base">
-                        {hotel.detail}
-                      </span>
-                    </span>
-                    <span className="mt-1.5 flex size-11 shrink-0 items-center justify-center border border-ink/20 text-ink transition-colors group-hover/cta:border-ink group-hover/cta:bg-ink group-hover/cta:text-paper">
-                      <ExternalArrowIcon className="size-4" />
-                      <span className="sr-only">Open {hotel.name} website</span>
-                    </span>
-                  </a>
-                </li>
-              ))}
-
-              <li className="flex items-start gap-5 py-6 md:gap-8 md:py-7">
-                <span
-                  aria-hidden
-                  className="wedding-eyebrow mt-2 w-6 shrink-0 text-blood"
+        <Reveal delay={0.1} className="mt-12 md:mt-16">
+          <ul className="grid gap-4">
+            {travel.hotels.map((hotel) => (
+              <li key={hotel.name}>
+                <a
+                  href={hotel.url}
+                  target={hotel.url.startsWith("http") ? "_blank" : undefined}
+                  rel={
+                    hotel.url.startsWith("http")
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
+                  className="group/cta flex items-center gap-6 rounded-[1.25rem] bg-paper p-7 shadow-[0_1px_2px_rgb(24_20_21/0.04),0_12px_32px_-12px_rgb(24_20_21/0.12)] transition-shadow duration-500 hover:shadow-[0_1px_2px_rgb(24_20_21/0.05),0_24px_48px_-16px_rgb(24_20_21/0.2)] outline-none focus-visible:ring-2 focus-visible:ring-blood md:p-10"
                 >
-                  {String(travel.hotels.length + 1).padStart(2, "0")}
-                </span>
-                <div className="flex flex-col gap-1.5">
-                  <h3 className="font-wedding-serif text-2xl leading-tight text-ink md:text-3xl">
-                    Parking
-                  </h3>
-                  <p className="text-[0.9375rem] leading-relaxed text-ink/60 md:text-base">
-                    {travel.parking}
-                  </p>
-                </div>
+                  <span className="flex min-w-0 flex-1 flex-col gap-2">
+                    <span className="wedding-display text-[1.75rem] leading-tight text-ink md:text-[2.125rem]">
+                      {hotel.name}
+                    </span>
+                    <span className="text-[0.9375rem] leading-relaxed text-ink/60 md:text-base">
+                      {hotel.detail}
+                    </span>
+                  </span>
+                  <span className="flex size-12 shrink-0 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors duration-300 group-hover/cta:border-ink group-hover/cta:bg-ink group-hover/cta:text-paper">
+                    <ExternalArrowIcon className="size-4" />
+                    <span className="sr-only">Open {hotel.name} website</span>
+                  </span>
+                </a>
               </li>
-            </ul>
-          </Reveal>
-        </div>
+            ))}
+
+            {travel.parking ? (
+              <li className="rounded-[1.25rem] bg-paper p-7 md:p-10">
+                <h3 className="wedding-display text-[1.75rem] leading-tight text-ink md:text-[2.125rem]">
+                  Parking
+                </h3>
+                <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink/60 md:text-base">
+                  {travel.parking}
+                </p>
+              </li>
+            ) : null}
+          </ul>
+        </Reveal>
       </div>
     </section>
   );

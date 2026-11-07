@@ -47,13 +47,14 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  /* Wedding editorial palette — blood red, paper white, ink */
+  /* Wedding palette — ivory paper, warm linen, ink, a single blood-red accent */
   --color-blood: #8f0e1f;
   --color-blood-deep: #5c0813;
-  --color-paper: #fdfcfb;
-  --color-ink: #141112;
-  --font-wedding-serif: var(--font-wedding-serif), "Iowan Old Style", Georgia, serif;
-  --font-wedding-sans: var(--font-wedding-sans), ui-sans-serif, system-ui, sans-serif;
+  --color-paper: #faf8f4;
+  --color-linen: #f1ece4;
+  --color-ink: #181415;
+  --font-wedding-serif: var(--font-geist-serif), "Iowan Old Style", Georgia, serif;
+  --font-wedding-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -166,6 +167,13 @@
   font-weight: 500;
 }
 
+@utility wedding-display {
+  font-family: var(--font-geist-serif), "Iowan Old Style", Georgia, serif;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -224,4 +232,18 @@
 }
 .wedding-details > summary::-webkit-details-marker {
   display: none;
+}
+
+.plan button {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.plan input::placeholder,
+.plan textarea::placeholder {
+  color: #5c5c5c;
+}
+
+.plan [data-slot="dialog-close"] {
+  color: #fff;
 }

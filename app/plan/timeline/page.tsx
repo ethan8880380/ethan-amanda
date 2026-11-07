@@ -13,10 +13,10 @@ export default async function TimelinePage() {
 
   return (
     <PlanShell title="Timeline" active="/plan/timeline">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border border-[#e4ddd4] bg-white px-5 py-4">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 rounded-[1.75rem] bg-[#161616] px-5 py-4">
         <div>
-          <p className="font-serif text-2xl">Day-of run sheet</p>
-          <p className="mt-1 max-w-xl text-sm text-[#6f6258]">
+          <p className="font-medium text-2xl">Day-of run sheet</p>
+          <p className="mt-1 max-w-xl text-sm text-[#8e8e8e]">
             Sync pulls schedule items from the wedding site for{" "}
             {formatWeddingDateLabel()}, using ceremony (
             {weddingContent.venue.ceremony.name}) and reception (
@@ -32,7 +32,7 @@ export default async function TimelinePage() {
         >
           <button
             type="submit"
-            className="border border-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em]"
+            className="rounded-full border border-white/15 px-4 py-3 text-xs uppercase tracking-[0.18em]"
           >
             Sync from site
           </button>
@@ -50,21 +50,21 @@ export default async function TimelinePage() {
             notes: String(formData.get("notes") ?? "") || undefined,
           });
         }}
-        className="mb-8 grid gap-3 border border-[#e4ddd4] bg-white p-6 md:grid-cols-2"
+        className="mb-8 grid gap-3 rounded-[1.75rem] bg-[#161616] p-6 md:grid-cols-2"
       >
-        <p className="font-serif text-2xl md:col-span-2">Add event</p>
+        <p className="font-medium text-2xl md:col-span-2">Add event</p>
         <input
           name="title"
           required
           placeholder="Title"
-          className="border border-[#d9d0c5] px-3 py-2 md:col-span-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2 md:col-span-2"
         />
         <label className="text-sm">
           Starts
           <input
             name="starts_at"
             type="datetime-local"
-            className="mt-1 w-full border border-[#d9d0c5] px-3 py-2"
+            className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-2"
           />
         </label>
         <label className="text-sm">
@@ -72,23 +72,23 @@ export default async function TimelinePage() {
           <input
             name="ends_at"
             type="datetime-local"
-            className="mt-1 w-full border border-[#d9d0c5] px-3 py-2"
+            className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-2"
           />
         </label>
         <input
           name="location"
           placeholder="Location"
-          className="border border-[#d9d0c5] px-3 py-2 md:col-span-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2 md:col-span-2"
         />
         <textarea
           name="notes"
           placeholder="Notes"
           rows={2}
-          className="border border-[#d9d0c5] px-3 py-2 md:col-span-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2 md:col-span-2"
         />
         <button
           type="submit"
-          className="bg-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em] text-[#f7f3ee] md:w-fit"
+          className="rounded-full bg-white px-4 py-3 text-xs uppercase tracking-[0.18em] text-black md:w-fit"
         >
           Add event
         </button>
@@ -96,18 +96,18 @@ export default async function TimelinePage() {
 
       <div className="space-y-3">
         {events.length === 0 ? (
-          <p className="text-[#6f6258]">
+          <p className="text-[#8e8e8e]">
             No events yet — sync from the wedding site schedule.
           </p>
         ) : null}
         {events.map((event) => (
           <div
             key={event.id}
-            className="flex flex-wrap items-start justify-between gap-3 border border-[#e4ddd4] bg-white px-5 py-4"
+            className="flex flex-wrap items-start justify-between gap-3 rounded-[1.75rem] bg-[#161616] px-5 py-4"
           >
             <div>
-              <p className="font-serif text-xl">{event.title}</p>
-              <p className="text-sm text-[#6f6258]">
+              <p className="font-medium text-xl">{event.title}</p>
+              <p className="text-sm text-[#8e8e8e]">
                 {[
                   event.starts_at
                     ? new Date(event.starts_at).toLocaleString([], {
@@ -130,7 +130,7 @@ export default async function TimelinePage() {
                   .join(" · ") || "Unscheduled"}
               </p>
               {event.notes ? (
-                <p className="mt-2 text-sm text-[#6f6258]">{event.notes}</p>
+                <p className="mt-2 text-sm text-[#8e8e8e]">{event.notes}</p>
               ) : null}
             </div>
             <form
@@ -141,7 +141,7 @@ export default async function TimelinePage() {
             >
               <button
                 type="submit"
-                className="text-xs uppercase tracking-[0.18em] text-red-700"
+                className="text-xs uppercase tracking-[0.18em] text-[#ff453a]"
               >
                 Delete
               </button>

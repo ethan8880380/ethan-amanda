@@ -149,10 +149,11 @@ export function PartyPortal({ token, initial }: PartyPortalProps) {
               </select>
             </label>
             <label className="mt-4 block text-sm">
-              Dietary notes
+              Notes
               <input
                 name={`dietary_${guest.id}`}
                 defaultValue={guest.dietary_notes ?? ""}
+                placeholder="Allergies, dietary needs, light sensitivity..."
                 className="mt-1 w-full border border-[#d9d0c5] bg-white px-3 py-2"
               />
             </label>

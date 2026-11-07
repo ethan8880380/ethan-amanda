@@ -28,9 +28,9 @@ export default async function VendorsPage() {
 
   return (
     <PlanShell title="Vendors" active="/plan/vendors">
-      <div className="mb-6 border border-[#e4ddd4] bg-white px-5 py-4">
-        <p className="font-serif text-2xl">Vendor tracker</p>
-        <p className="mt-1 text-sm text-[#6f6258]">
+      <div className="mb-6 rounded-[1.75rem] bg-[#161616] px-5 py-4">
+        <p className="font-medium text-2xl">Vendor tracker</p>
+        <p className="mt-1 text-sm text-[#8e8e8e]">
           {booked}/{vendors.length} booked or paid
         </p>
       </div>
@@ -53,19 +53,19 @@ export default async function VendorsPage() {
             deposit_amount: deposit ? Number(deposit) : undefined,
           });
         }}
-        className="mb-8 grid gap-3 border border-[#e4ddd4] bg-white p-6 md:grid-cols-2"
+        className="mb-8 grid gap-3 rounded-[1.75rem] bg-[#161616] p-6 md:grid-cols-2"
       >
-        <p className="font-serif text-2xl md:col-span-2">Add vendor</p>
+        <p className="font-medium text-2xl md:col-span-2">Add vendor</p>
         <input
           name="name"
           required
           placeholder="Name"
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         />
         <select
           name="category"
           required
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         >
           {VENDOR_CATEGORIES.map((category) => (
             <option key={category} value={category}>
@@ -76,47 +76,47 @@ export default async function VendorsPage() {
         <input
           name="contact_name"
           placeholder="Contact"
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         />
         <input
           name="email"
           type="email"
           placeholder="Email"
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         />
         <input
           name="phone"
           placeholder="Phone"
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         />
         <input
           name="website"
           placeholder="Website"
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         />
         <input
           name="quoted_amount"
           type="number"
           step="0.01"
           placeholder="Quoted amount"
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         />
         <input
           name="deposit_amount"
           type="number"
           step="0.01"
           placeholder="Deposit paid"
-          className="border border-[#d9d0c5] px-3 py-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2"
         />
         <textarea
           name="notes"
           placeholder="Notes"
           rows={2}
-          className="border border-[#d9d0c5] px-3 py-2 md:col-span-2"
+          className="rounded-2xl border border-white/10 bg-black px-3 py-2 md:col-span-2"
         />
         <button
           type="submit"
-          className="bg-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em] text-[#f7f3ee] md:w-fit"
+          className="rounded-full bg-white px-4 py-3 text-xs uppercase tracking-[0.18em] text-black md:w-fit"
         >
           Add vendor
         </button>
@@ -124,24 +124,24 @@ export default async function VendorsPage() {
 
       <div className="space-y-3">
         {vendors.length === 0 ? (
-          <p className="text-[#6f6258]">No vendors yet — add one above.</p>
+          <p className="text-[#8e8e8e]">No vendors yet — add one above.</p>
         ) : null}
         {vendors.map((vendor) => (
           <div
             key={vendor.id}
-            className="border border-[#e4ddd4] bg-white px-5 py-4"
+            className="rounded-[1.75rem] bg-[#161616] px-5 py-4"
           >
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="font-medium">{vendor.name}</p>
-                <p className="text-sm text-[#6f6258]">
+                <p className="text-sm text-[#8e8e8e]">
                   {vendor.category}
                   {vendor.contact_name ? ` · ${vendor.contact_name}` : ""}
                   {vendor.email ? ` · ${vendor.email}` : ""}
                   {vendor.phone ? ` · ${vendor.phone}` : ""}
                 </p>
                 {vendor.notes ? (
-                  <p className="mt-2 text-sm text-[#6f6258]">{vendor.notes}</p>
+                  <p className="mt-2 text-sm text-[#8e8e8e]">{vendor.notes}</p>
                 ) : null}
                 {vendor.website ? (
                   <a
@@ -162,7 +162,7 @@ export default async function VendorsPage() {
               >
                 <button
                   type="submit"
-                  className="text-xs uppercase tracking-[0.18em] text-red-700"
+                  className="text-xs uppercase tracking-[0.18em] text-[#ff453a]"
                 >
                   Delete
                 </button>
@@ -182,8 +182,8 @@ export default async function VendorsPage() {
                     type="submit"
                     className={`px-2 py-1 text-xs uppercase tracking-[0.14em] ${
                       vendor.status === status
-                        ? "bg-[#1c1714] text-white"
-                        : "border border-[#d9d0c5]"
+                        ? "rounded-full bg-white text-black"
+                        : "rounded-2xl border border-white/10 bg-black"
                     }`}
                   >
                     {status}
@@ -205,7 +205,7 @@ export default async function VendorsPage() {
               }}
               className="mt-4 flex flex-wrap items-end gap-3"
             >
-              <label className="text-xs uppercase tracking-[0.14em] text-[#6f6258]">
+              <label className="text-xs uppercase tracking-[0.14em] text-[#8e8e8e]">
                 Quoted
                 <input
                   name="quoted_amount"
@@ -217,10 +217,10 @@ export default async function VendorsPage() {
                       : ""
                   }
                   placeholder="0"
-                  className="mt-1 block w-32 border border-[#d9d0c5] px-3 py-2 text-sm normal-case tracking-normal"
+                  className="mt-1 block w-32 rounded-2xl border border-white/10 bg-black px-3 py-2 text-sm normal-case tracking-normal"
                 />
               </label>
-              <label className="text-xs uppercase tracking-[0.14em] text-[#6f6258]">
+              <label className="text-xs uppercase tracking-[0.14em] text-[#8e8e8e]">
                 Deposit
                 <input
                   name="deposit_amount"
@@ -232,16 +232,16 @@ export default async function VendorsPage() {
                       : ""
                   }
                   placeholder="0"
-                  className="mt-1 block w-32 border border-[#d9d0c5] px-3 py-2 text-sm normal-case tracking-normal"
+                  className="mt-1 block w-32 rounded-2xl border border-white/10 bg-black px-3 py-2 text-sm normal-case tracking-normal"
                 />
               </label>
               <button
                 type="submit"
-                className="border border-[#1c1714] px-3 py-2 text-xs uppercase tracking-[0.14em]"
+                className="rounded-full border border-white/15 px-3 py-2 text-xs uppercase tracking-[0.14em]"
               >
                 Save money
               </button>
-              <p className="text-sm text-[#6f6258]">
+              <p className="text-sm text-[#8e8e8e]">
                 {vendor.quoted_amount != null
                   ? `Quote ${currency.format(Number(vendor.quoted_amount))}`
                   : "No quote"}

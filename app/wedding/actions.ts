@@ -5,8 +5,11 @@ import { cookies } from "next/headers";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
+  buildPartyName,
+  validateGroupRsvp,
   validateWebsiteRsvp,
   type ValidWebsiteRsvp,
+  type WebsiteRsvpGuest,
   type WebsiteRsvpSnapshot,
 } from "@/lib/website-rsvp";
 
@@ -16,6 +19,13 @@ const RSVP_COOKIE = "wedding_rsvp";
 export interface WeddingRSVPResult {
   success: boolean;
   error?: string;
+}
+
+export interface GroupSearchResult {
+  success: boolean;
+  error?: string;
+  groups?: WebsiteRsvpSnapshot[];
+  truncated?: boolean;
 }
 
 function rsvpCookieOptions() {
@@ -28,6 +38,51 @@ function rsvpCookieOptions() {
   };
 }
 
+function isPartySource(source: string): source is "manual" | "website" {
+  return source === "manual" || source === "website";
+}
+
+interface SnapshotGuestDraft extends WebsiteRsvpGuest {
+  sortOrder: number;
+  createdAt: string;
+}
+
+function toSnapshotGuest(guest: {
+  id: string;
+  full_name: string;
+  is_plus_one: boolean;
+  attending: boolean | null;
+  dietary_notes: string | null;
+  sort_order?: number | null;
+  created_at?: string | null;
+}): SnapshotGuestDraft {
+  return {
+    id: guest.id,
+    name: guest.full_name,
+    isPlusOne: guest.is_plus_one,
+    attending: guest.attending,
+    dietaryNotes: guest.dietary_notes ?? "",
+    sortOrder: guest.sort_order ?? 0,
+    createdAt: guest.created_at ?? "",
+  };
+}
+
+function sortSnapshotGuests(guests: SnapshotGuestDraft[]): WebsiteRsvpGuest[] {
+  return [...guests]
+    .sort((a, b) => {
+      if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+      if (a.isPlusOne !== b.isPlusOne) return a.isPlusOne ? 1 : -1;
+      return a.createdAt.localeCompare(b.createdAt) || a.name.localeCompare(b.name);
+    })
+    .map(({ id, name, isPlusOne, attending, dietaryNotes }) => ({
+      id,
+      name,
+      isPlusOne,
+      attending,
+      dietaryNotes,
+    }));
+}
+
 export async function getWebsiteRsvp(): Promise<WebsiteRsvpSnapshot | null> {
   try {
     const jar = await cookies();
@@ -37,27 +92,31 @@ export async function getWebsiteRsvp(): Promise<WebsiteRsvpSnapshot | null> {
     const db = getSupabaseAdmin();
     const { data: party, error } = await db
       .from("parties")
-      .select("id, contact_email, source")
+      .select("id, party_name, contact_email, source")
       .eq("access_token", token)
       .maybeSingle();
 
-    if (error || !party || party.source !== "website") return null;
+    if (error || !party || !isPartySource(party.source)) return null;
 
     const { data: guests, error: guestError } = await db
       .from("guests")
-      .select("full_name, attending, dietary_notes, sort_order")
+      .select(
+        "id, full_name, is_plus_one, attending, dietary_notes, sort_order, created_at",
+      )
       .eq("party_id", party.id)
       .order("sort_order", { ascending: true });
 
     if (guestError || !guests?.length) return null;
 
+    const snapshotGuests = sortSnapshotGuests(guests.map(toSnapshotGuest));
     return {
+      partyId: party.id,
+      partyName:
+        party.party_name?.trim() ||
+        buildPartyName(snapshotGuests.map((guest) => guest.name)),
+      source: party.source,
       email: party.contact_email ?? "",
-      guests: guests.map((guest) => ({
-        name: guest.full_name,
-        attending: guest.attending,
-        dietaryNotes: guest.dietary_notes ?? "",
-      })),
+      guests: snapshotGuests,
     };
   } catch (error) {
     console.error("Failed to load website RSVP:", error);
@@ -122,6 +181,280 @@ export async function submitWeddingRSVP(input: {
   }
 }
 
+export async function listWeddingGroups(): Promise<GroupSearchResult> {
+  try {
+    const db = getSupabaseAdmin();
+    const { data, error } = await db
+      .from("guests")
+      .select(
+        "id, full_name, is_plus_one, attending, dietary_notes, sort_order, created_at, party_id, parties!inner(id, party_name, source)",
+      )
+      .order("sort_order", { ascending: true });
+
+    if (error) {
+      console.error("Failed to load groups:", error);
+      return { success: false, error: "Couldn't load groups. Try again." };
+    }
+
+    return {
+      success: true,
+      groups: groupSearchRows((data ?? []) as GuestSearchRow[]),
+    };
+  } catch (error) {
+    console.error("Failed to load groups:", error);
+    return { success: false, error: "Couldn't load groups. Try again." };
+  }
+}
+
+export async function submitGroupRsvp(input: {
+  partyId: string;
+  email: string;
+  guests: Array<{
+    id: string | null;
+    name: string;
+    attending: "yes" | "no" | null;
+    dietaryNotes: string;
+  }>;
+}): Promise<WeddingRSVPResult> {
+  const validated = validateGroupRsvp(input);
+  if (!validated.ok) return { success: false, error: validated.error };
+
+  try {
+    const db = getSupabaseAdmin();
+    const { value } = validated;
+    const { data: party, error: partyError } = await db
+      .from("parties")
+      .select("id, access_token, party_name, contact_email, source")
+      .eq("id", value.partyId)
+      .maybeSingle();
+
+    if (partyError || !party || !isPartySource(party.source)) {
+      return { success: false, error: "Search for your group again." };
+    }
+
+    const { data: existing, error: guestError } = await db
+      .from("guests")
+      .select("id, full_name, is_plus_one, sort_order")
+      .eq("party_id", party.id);
+
+    if (guestError || !existing) {
+      return {
+        success: false,
+        error: "Failed to submit RSVP. Please try again.",
+      };
+    }
+
+    const incomingIds = new Set(
+      value.guests.flatMap((guest) => (guest.id ? [guest.id] : [])),
+    );
+    const existingById = new Map(existing.map((guest) => [guest.id, guest]));
+
+    if (value.guests.some((guest) => guest.id && !existingById.has(guest.id))) {
+      return { success: false, error: "Search for your group again." };
+    }
+
+    if (
+      party.source === "manual" &&
+      existing.some((guest) => !guest.is_plus_one && !incomingIds.has(guest.id))
+    ) {
+      return {
+        success: false,
+        error: "Reply for each person in your group.",
+      };
+    }
+
+    const updates = value.guests.flatMap((guest) => {
+      if (!guest.id) return [];
+      const row = existingById.get(guest.id);
+      if (!row) return [];
+      const keepName = party.source === "manual" && !row.is_plus_one;
+      return [
+        {
+          id: guest.id,
+          full_name: keepName ? row.full_name : guest.name,
+          attending: guest.attending === "yes",
+          dietary_notes:
+            guest.attending === "yes" && guest.dietaryNotes
+              ? guest.dietaryNotes
+              : null,
+        },
+      ];
+    });
+
+    if (updates.length) {
+      const updateResults = await Promise.all(
+        updates.map((guest) =>
+          db
+            .from("guests")
+            .update({
+              full_name: guest.full_name,
+              attending: guest.attending,
+              dietary_notes: guest.dietary_notes,
+            })
+            .eq("id", guest.id)
+            .eq("party_id", party.id),
+        ),
+      );
+      if (updateResults.some((result) => result.error)) {
+        console.error(
+          "Failed to update group RSVP:",
+          updateResults.find((result) => result.error)?.error,
+        );
+        return {
+          success: false,
+          error: "Failed to submit RSVP. Please try again.",
+        };
+      }
+    }
+
+    const creates = value.guests.filter((guest) => !guest.id);
+    if (creates.length) {
+      return {
+        success: false,
+        error: "Reply for the people already listed in your group.",
+      };
+    }
+
+    const removeIds =
+      party.source === "website"
+        ? existing
+            .filter((guest) => !incomingIds.has(guest.id))
+            .map((guest) => guest.id)
+        : [];
+
+    if (removeIds.length) {
+      const { error: deleteError } = await db
+        .from("guests")
+        .delete()
+        .in("id", removeIds)
+        .eq("party_id", party.id);
+      if (deleteError) {
+        console.error("Failed to update plus ones:", deleteError);
+        return {
+          success: false,
+          error: "Failed to submit RSVP. Please try again.",
+        };
+      }
+    }
+
+    const anyAttending = value.guests.some((guest) => guest.attending === "yes");
+    const { error: partyUpdateError } = await db
+      .from("parties")
+      .update({
+        contact_email: value.email || party.contact_email,
+        rsvp_status: anyAttending ? "attending" : "declined",
+        rsvp_submitted_at: new Date().toISOString(),
+      })
+      .eq("id", party.id);
+
+    if (partyUpdateError) {
+      console.error("Failed to update group RSVP status:", partyUpdateError);
+      return {
+        success: false,
+        error: "Failed to submit RSVP. Please try again.",
+      };
+    }
+
+    const jar = await cookies();
+    jar.set(RSVP_COOKIE, party.access_token, rsvpCookieOptions());
+
+    const partyName =
+      party.party_name?.trim() ||
+      buildPartyName(value.guests.map((guest) => guest.name));
+
+    try {
+      await sendRsvpEmail({
+        partyName,
+        email: value.email || party.contact_email || "",
+        guests: value.guests.map((guest) => {
+          const saved = guest.id ? existingById.get(guest.id) : undefined;
+          const keepName =
+            saved && party.source === "manual" && !saved.is_plus_one;
+          return {
+            name: keepName ? saved.full_name : guest.name,
+            attending: guest.attending,
+            dietaryNotes: guest.dietaryNotes,
+            isPlusOne: saved ? saved.is_plus_one : true,
+          };
+        }),
+      });
+    } catch (emailError) {
+      console.error("Failed to send wedding RSVP email:", emailError);
+    }
+
+    revalidatePath("/plan/guests");
+    revalidatePath("/plan");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to submit group RSVP:", error);
+    return {
+      success: false,
+      error: "Failed to submit RSVP. Please try again.",
+    };
+  }
+}
+
+interface GuestSearchRow {
+  id: string;
+  full_name: string;
+  is_plus_one: boolean;
+  attending: boolean | null;
+  dietary_notes: string | null;
+  sort_order: number | null;
+  created_at: string | null;
+  party_id: string;
+  parties:
+    | {
+        id: string;
+        party_name: string | null;
+        source: string;
+      }
+    | Array<{
+        id: string;
+        party_name: string | null;
+        source: string;
+      }>
+    | null;
+}
+
+function partyFromRow(row: GuestSearchRow) {
+  if (Array.isArray(row.parties)) return row.parties[0] ?? null;
+  return row.parties;
+}
+
+function groupSearchRows(rows: GuestSearchRow[]): WebsiteRsvpSnapshot[] {
+  const parties = new Map<
+    string,
+    Omit<WebsiteRsvpSnapshot, "guests"> & { guests: SnapshotGuestDraft[] }
+  >();
+
+  for (const row of rows) {
+    const party = partyFromRow(row);
+    if (!party || !isPartySource(party.source)) continue;
+
+    const snapshot = parties.get(party.id) ?? {
+      partyId: party.id,
+      partyName: party.party_name?.trim() || "",
+      source: party.source,
+      email: "",
+      guests: [],
+    };
+    snapshot.guests.push(toSnapshotGuest(row));
+    parties.set(party.id, snapshot);
+  }
+
+  return [...parties.values()].map((party) => {
+    const guests = sortSnapshotGuests(party.guests);
+    return {
+      partyId: party.partyId,
+      partyName: party.partyName || buildPartyName(guests.map((guest) => guest.name)),
+      source: party.source,
+      email: "",
+      guests,
+    };
+  });
+}
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -130,7 +463,13 @@ function escapeHtml(value: string) {
     .replaceAll('"', "&quot;");
 }
 
-async function sendRsvpEmail(value: ValidWebsiteRsvp) {
+async function sendRsvpEmail(value: {
+  partyName: string;
+  email: string;
+  guests: Array<
+    ValidWebsiteRsvp["guests"][number] & { isPlusOne?: boolean }
+  >;
+}) {
   const coming = value.guests.filter((guest) => guest.attending === "yes");
   const status =
     coming.length === 0
@@ -146,7 +485,8 @@ async function sendRsvpEmail(value: ValidWebsiteRsvp) {
           ? ` — ${escapeHtml(guest.dietaryNotes)}`
           : "";
       const label = guest.attending === "yes" ? "Attending" : "Not attending";
-      return `<li><strong>${escapeHtml(guest.name)}</strong>: ${label}${dietary}</li>`;
+      const plusOne = guest.isPlusOne ? " (plus one)" : "";
+      return `<li><strong>${escapeHtml(guest.name)}</strong>${plusOne}: ${label}${dietary}</li>`;
     })
     .join("");
 
