@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistSerif } from "geist/font/serif";
 import { Manrope, Syne } from "next/font/google";
 import "./globals.css";
 
@@ -32,7 +34,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${syne.variable} ${manrope.variable}`}>
+    <html
+      lang="en"
+      className={`${syne.variable} ${manrope.variable} ${GeistSans.variable} ${GeistSerif.variable}`}
+    >
       <body className="antialiased font-sans">
         {children}
       </body>

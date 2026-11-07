@@ -19,7 +19,7 @@ export default async function PlanLoginPage({
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
-      <Glyph className="h-8 w-16 text-white" />
+      <Glyph className="h-8 w-16 text-[#141414]" />
       <p className="mt-8 text-[11px] uppercase tracking-[0.32em] text-[#8e8e8e]">
         Plan
       </p>

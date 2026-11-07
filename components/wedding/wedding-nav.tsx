@@ -18,6 +18,7 @@ interface NavSection {
 
 const sections: NavSection[] = [
   { id: "day", label: "The Day", shortLabel: "Day", isPrimary: true },
+  { id: "menu", label: "Menu", isPrimary: false },
   { id: "travel", label: "Travel", isPrimary: true },
   { id: "registry", label: "Registry", isPrimary: true },
   { id: "faq", label: "Q&A", isPrimary: false },

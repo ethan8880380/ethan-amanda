@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { weddingContent } from "@/lib/wedding-content";
 import { WeddingHero } from "@/components/wedding/wedding-hero";
 import { WeddingSchedule } from "@/components/wedding/wedding-schedule";
+import { WeddingMenu } from "@/components/wedding/wedding-menu";
 import { WeddingVenues } from "@/components/wedding/wedding-venues";
 import { WeddingGallery } from "@/components/wedding/wedding-gallery";
 import { WeddingTravel } from "@/components/wedding/wedding-travel";
@@ -28,6 +29,7 @@ export default async function WeddingPage() {
       <WeddingHero />
       <WeddingVenues />
       <WeddingSchedule />
+      <WeddingMenu />
       <WeddingGallery />
       <WeddingTravel />
       <WeddingRegistry />

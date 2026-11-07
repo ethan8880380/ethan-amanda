@@ -32,16 +32,16 @@ const currency = new Intl.NumberFormat("en-US", {
 });
 
 const CATEGORY_TINT: Record<BudgetCategory, string> = {
-  venue: "#ffffff",
-  catering: "#ffffff",
-  photo_video: "#ffffff",
-  florals: "#ffffff",
-  attire: "#ffffff",
-  music: "#ffffff",
-  stationery: "#ffffff",
-  travel: "#ffffff",
-  gifts: "#ffffff",
-  misc: "#ffffff",
+  venue: "#141414",
+  catering: "#141414",
+  photo_video: "#141414",
+  florals: "#141414",
+  attire: "#141414",
+  music: "#141414",
+  stationery: "#141414",
+  travel: "#141414",
+  gifts: "#141414",
+  misc: "#141414",
 };
 
 function money(value: number | string | null | undefined) {

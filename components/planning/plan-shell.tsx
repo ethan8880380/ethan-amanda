@@ -28,8 +28,8 @@ export async function PlanShell({
     days > 0 ? `${days} days` : days === 0 ? "Today" : `${Math.abs(days)} days ago`;
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <header className="sticky top-0 z-30 bg-black/80 backdrop-blur-xl">
+    <div className="min-h-screen bg-[#f3f3f3] text-[#141414]">
+      <header className="sticky top-0 z-30 border-b border-[#e4e4e4] bg-[#f3f3f3]/95 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-5">
           <div className="flex items-center gap-3">
             <Glyph className="h-5 w-11" />
@@ -55,7 +55,7 @@ export async function PlanShell({
         <div className="mt-8">{children}</div>
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/90 backdrop-blur-xl">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e4e4e4] bg-white/95 backdrop-blur-xl">
         <div className="mx-auto grid max-w-md grid-cols-2 pb-[env(safe-area-inset-bottom)]">
           {nav.map((item) => {
             const isActive = active === item.href;
@@ -65,7 +65,7 @@ export async function PlanShell({
                 key={item.href}
                 href={item.href}
                 className={`flex flex-col items-center gap-1 py-3 text-[11px] ${
-                  isActive ? "text-white" : "text-[#5e5e5e]"
+                  isActive ? "text-[#141414]" : "text-[#737373]"
                 }`}
               >
                 <Icon className="size-5" strokeWidth={1.75} />

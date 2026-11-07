@@ -4,6 +4,6 @@ export default function PlanLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="plan scheme-dark min-h-screen bg-black text-white">{children}</div>
+    <div className="plan scheme-light min-h-screen bg-[#f3f3f3] text-[#141414]">{children}</div>
   );
 }

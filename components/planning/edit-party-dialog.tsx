@@ -241,7 +241,7 @@ export function EditPartyDialog({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="plan scheme-dark gap-0 border-0 bg-[#101010] p-0 text-white before:inset-0 before:rounded-t-2xl before:bg-[#101010] data-[vaul-drawer-direction=bottom]:max-h-[90vh]">
+        <DrawerContent className="plan scheme-light gap-0 border-0 bg-[#101010] p-0 text-white before:inset-0 before:rounded-t-2xl before:bg-[#101010] data-[vaul-drawer-direction=bottom]:max-h-[90vh]">
           <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-white/20" />
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-3 pt-2">
             <DrawerHeader className="gap-1 px-0 pb-3 pt-2 text-left">
@@ -272,7 +272,7 @@ export function EditPartyDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="plan scheme-dark max-h-[90vh] max-w-lg overflow-y-auto rounded-[1.75rem] border border-white/10 bg-[#101010] text-white ring-0">
+      <DialogContent className="plan scheme-light max-h-[90vh] max-w-lg overflow-y-auto rounded-[1.75rem] border border-white/10 bg-[#101010] text-white ring-0">
         <DialogHeader>
           <DialogTitle className="font-medium text-2xl font-normal">
             Edit party

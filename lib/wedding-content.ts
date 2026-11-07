@@ -39,7 +39,7 @@ export const weddingContent = {
   },
 
   hero: {
-    eyebrow: "We're getting married",
+    eyebrow: "We're getting married,",
     headline: "Ethan & Amanda",
     subhead: "Join us as we celebrate a lifetime together.",
     cta: "RSVP",
@@ -81,23 +81,89 @@ export const weddingContent = {
       {
         time: "1:00 PM",
         title: "Ceremony",
-        description: "The ceremony begins promptly at 1:00.",
+        description: "The ceremony begins promptly at 1:00 and will finish around 2:15.",
       },
       {
-        time: "After",
+        time: "3:00 PM",
         title: "Cocktail hour",
         description: "Head to the reception when the ceremony ends.",
       },
       {
         time: "4:00 PM",
-        title: "Dinner",
-        description: "A buffet around 4:00–4:30.",
+        title: "First Dance",
+        description: "Amanda and Ethan will dance",
       },
       {
-        time: "Later",
-        title: "Toasts & dancing",
-        description:
-          "Toasts and dancing follow dinner. The evening ends around 10:00 or 11:00.",
+        time: "4:15 PM",
+        title: "Dinner & Toasts",
+        description: "A buffet starting at 4:15, scroll down to see the menu.",
+      },
+      {
+        time: "6:00 PM",
+        title: "Dancing",
+        description: "The Parent dances will kick off the dancing.",
+      },
+      {
+        time: "11:00 PM",
+        title: "End of the night",
+        description: "The evening ends around 11:00.",
+      },
+    ],
+  },
+
+  menu: {
+    title: "The menu",
+    lead: "Appetizers, then a buffet at the reception.",
+    courses: [
+      {
+        title: "Appetizers",
+        items: [
+          {
+            name: "Cucumber cups with 3 Sisters salad",
+            detail: "Lemon vinaigrette",
+            note: "Vegan, gluten-free",
+          },
+          {
+            name: "Roasted venison skewers",
+            detail: "Rosemary demi-glace",
+            note: "Gluten-free",
+          },
+          {
+            name: "Smoky salmon cakes",
+            detail: "Lemon dill aioli",
+            note: "Contains gluten and dairy",
+          },
+        ],
+      },
+      {
+        title: "Dinner buffet",
+        items: [
+          {
+            name: "Seared and roasted Northwest tribal-caught salmon filet",
+            note: "Gluten-free, dairy-free",
+          },
+          {
+            name: "Pot-roast style braised bison",
+            note: "Gluten-free, dairy-free",
+          },
+          {
+            name: "Cracked Yukon Gold potatoes with nettle pesto and forest herbs, wintertime",
+            note: "Gluten-free, dairy-free",
+          },
+          {
+            name: "3 Sisters with butternut squash, lacinato kale, Ojibwe wild rice, kidney beans, and fresh roasted corn",
+            note: "Vegan, gluten-free",
+          },
+          {
+            name: "Fresh baked honey corn muffins",
+            detail: "Butter on the side",
+            note: "Contains gluten and dairy",
+          },
+          {
+            name: "Mixed baby lettuces with cedar cider dressing and toasted pepitas",
+            note: "Vegan, gluten-free",
+          },
+        ],
       },
     ],
   },
@@ -160,19 +226,24 @@ export const weddingContent = {
     items: [
       {
         question: "What should I wear?",
-        answer: "Formal.",
+        answer:
+          "Formal. A suit or a floor-length dress, in whatever color you like.",
         images: [
           {
-            src: "/wedding/attire-men.jpg",
-            alt: "A man in a dark formal suit, seen from behind.",
-            label: "Men",
+            src: "/wedding/attire-men.png",
+            alt: "Formal suit ideas in navy, gray, green, burgundy, and black, with ties and bow ties.",
+            label: "Suits",
           },
           {
-            src: "/wedding/attire-women.jpg",
-            alt: "A woman in a floor-length formal dress, seen from behind.",
-            label: "Women",
+            src: "/wedding/attire-women.png",
+            alt: "Floor-length formal dress ideas in jewel tones, pastels, and black.",
+            label: "Dresses",
           },
         ],
+      },
+      {
+        question: "Can I wear white?",
+        answer: "Only if you are Amanda.",
       },
       {
         question: "Can I bring a plus one?",
@@ -182,7 +253,15 @@ export const weddingContent = {
       {
         question: "Are kids welcome?",
         answer:
-          "Kids will not be at the reception. If you need an exception, let us know.",
+          "Kids will be allowed at the ceremony but not be at the reception. If you need an exception, let us know.",
+      },
+      {
+        question: "Can I bring alcohol?",
+        answer: "No outside alcohol.",
+      },
+      {
+        question: "Can I bring a firearm?",
+        answer: "No. Both locations are firearm-free.",
       },
       {
         question: "When should I RSVP by?",

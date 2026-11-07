@@ -43,22 +43,25 @@ export function WeddingFaq() {
                     {item.answer}
                   </p>
                   {"images" in item ? (
-                    <ul className="mt-6 grid max-w-md grid-cols-2 gap-4">
+                    <ul className="mt-8 grid gap-10">
                       {item.images.map((image) => (
                         <li key={image.src}>
                           <figure>
-                            <div className="relative aspect-[3/4] overflow-hidden bg-ink/5">
+                            <figcaption className="text-sm tracking-[0.04em] text-ink/55">
+                              {image.label}
+                            </figcaption>
+                            <div className="-ml-6 -mr-20 mt-3 md:mx-0">
                               <Image
                                 src={image.src}
                                 alt={image.alt}
-                                fill
-                                sizes="(min-width: 768px) 20rem, 45vw"
-                                className="object-cover"
+                                width={1024}
+                                height={682}
+                                // The image optimizer fetches without the site-gate cookie.
+                                unoptimized
+                                sizes="(min-width: 768px) 42rem, 100vw"
+                                className="h-auto w-full"
                               />
                             </div>
-                            <figcaption className="mt-3 text-sm text-ink/55">
-                              {image.label}
-                            </figcaption>
                           </figure>
                         </li>
                       ))}

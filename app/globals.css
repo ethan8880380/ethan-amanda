@@ -234,16 +234,113 @@
   display: none;
 }
 
+.plan {
+  --plan-radius: 12px;
+  background-color: #f3f3f3;
+  color: #141414;
+  color-scheme: light;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.plan :is(h1, h2, h3),
+.plan .text-lg,
+.plan .text-xl,
+.plan .text-2xl,
+.plan .text-3xl,
+.plan [class~="text-[2rem]"] {
+  font-family: var(--font-geist-serif), "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
 .plan button {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   letter-spacing: 0;
   text-transform: none;
 }
 
-.plan input::placeholder,
-.plan textarea::placeholder {
+.plan input,
+.plan textarea,
+.plan select {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.plan .rounded-\[1\.75rem\],
+.plan .rounded-2xl,
+.plan .rounded-3xl,
+.plan .rounded-full,
+.plan .before\:rounded-t-2xl::before {
+  border-radius: var(--plan-radius);
+}
+
+.plan .bg-\[\#161616\]:not(:is(input, textarea, select)) {
+  background-color: #fff;
+  box-shadow: 0 0 0 1px #e4e4e4;
+}
+
+.plan .bg-black,
+.plan .bg-\[\#101010\] {
+  background-color: #f3f3f3;
+  color: #141414;
+}
+
+.plan .bg-black\/80,
+.plan .bg-black\/90 {
+  background-color: rgb(243 243 243 / 0.94);
+}
+
+.plan .text-white,
+.plan .hover\:text-white:hover {
+  color: #141414;
+}
+
+.plan .text-\[\#8e8e8e\],
+.plan .text-\[\#6a6a6a\],
+.plan .text-\[\#5e5e5e\] {
   color: #5c5c5c;
 }
 
-.plan [data-slot="dialog-close"] {
+.plan .border-white\/10,
+.plan .border-white\/15 {
+  border-color: #d9d9d9;
+}
+
+.plan .bg-white\/10,
+.plan .bg-white\/20 {
+  background-color: #e4e4e4;
+}
+
+.plan .ring-white\/10 {
+  --tw-ring-color: #d9d9d9;
+}
+
+.plan .bg-white {
+  background-color: #141414;
   color: #fff;
+}
+
+.plan input:not([type="checkbox"]):not([type="radio"]),
+.plan textarea,
+.plan select {
+  border-radius: var(--plan-radius);
+  border: 1px solid #c8c8c8;
+  background-color: #fff;
+  color: #141414;
+}
+
+.plan input::placeholder,
+.plan textarea::placeholder {
+  color: #8a8a8a;
+}
+
+.plan input[type="checkbox"] {
+  accent-color: #141414;
+}
+
+.plan .before\:bg-\[\#101010\]::before {
+  background-color: #fff;
+}
+
+.plan [data-slot="dialog-close"] {
+  color: #141414;
 }
