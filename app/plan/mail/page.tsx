@@ -8,7 +8,6 @@ import { PlanShell } from "@/components/planning/plan-shell";
 interface PartyRow {
   id: string;
   party_name: string | null;
-  access_token: string;
   contact_email: string | null;
   address_line1: string | null;
   address_line2: string | null;
@@ -26,9 +25,6 @@ interface PartyRow {
 
 export default async function MailPage() {
   const parties = (await listParties()) as PartyRow[];
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "http://localhost:3000";
 
   const rows: MailPartyRow[] = parties.map((party) => {
     const guests = party.guests ?? [];
@@ -36,7 +32,6 @@ export default async function MailPage() {
     return {
       id: party.id,
       party_name: party.party_name,
-      access_token: party.access_token,
       contact_email: party.contact_email,
       address_line1: party.address_line1,
       address_line2: party.address_line2,
@@ -57,7 +52,7 @@ export default async function MailPage() {
 
   return (
     <PlanShell title="Mail" active="/plan/mail">
-      <SaveTheDateMail parties={rows} origin={origin} />
+      <SaveTheDateMail parties={rows} />
     </PlanShell>
   );
 }

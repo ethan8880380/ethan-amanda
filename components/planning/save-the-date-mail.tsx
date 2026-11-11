@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { Check, Copy, Eye, Mail, Share2 } from "lucide-react";
-import { setSaveTheDateSent } from "@/app/plan/actions";
+import { Eye, Mail } from "lucide-react";
+import { resetMailTracking, savePartyAddress, setSaveTheDateSent } from "@/app/plan/actions";
 
 export interface MailPartyRow {
   id: string;
   party_name: string | null;
-  access_token: string;
   contact_email: string | null;
   address_line1: string | null;
   address_line2: string | null;
@@ -33,7 +32,6 @@ type Filter =
 
 interface SaveTheDateMailProps {
   parties: MailPartyRow[];
-  origin: string;
 }
 
 function formatAddress(party: MailPartyRow) {
@@ -60,9 +58,11 @@ function formatWhen(value: string | null) {
   });
 }
 
-export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
+export function SaveTheDateMail({ parties }: SaveTheDateMailProps) {
   const [filter, setFilter] = useState<Filter>("unsent");
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [isResetting, setIsResetting] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const stats = useMemo(() => {
@@ -98,32 +98,6 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
     });
   }, [parties, filter]);
 
-  async function copyLink(partyId: string, link: string) {
-    try {
-      await navigator.clipboard.writeText(link);
-      setCopiedId(partyId);
-      window.setTimeout(() => setCopiedId(null), 2000);
-    } catch {
-      // ignore
-    }
-  }
-
-  async function shareLink(party: MailPartyRow, link: string) {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: party.party_name || "Save the date",
-          text: `Save the date for ${party.party_name || "our wedding"}`,
-          url: link,
-        });
-        return;
-      }
-    } catch {
-      // fall through to copy
-    }
-    await copyLink(party.id, link);
-  }
-
   const filters: { id: Filter; label: string; count: number }[] = [
     { id: "unsent", label: "Unsent", count: stats.unsent },
     { id: "sent", label: "Sent", count: stats.sent },
@@ -136,11 +110,41 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
   return (
     <div className="space-y-6">
       <section className="rounded-[1.75rem] bg-[#161616] p-4 sm:p-6">
-        <p className="font-medium text-2xl">Save the date mail</p>
-        <p className="mt-1 text-sm text-[#8e8e8e]">
-          Copy each household link, send it, then mark as sent. Opens update
-          when they visit their link.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="font-medium text-2xl">Invitations</p>
+            <p className="mt-1 max-w-xl text-sm text-[#8e8e8e]">
+              Add a mailing address, send the invitation, then mark it sent.
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={isPending || parties.length === 0}
+            onClick={() => {
+              const ok = window.confirm(
+                "Reset every household to unsent and clear open history? Addresses stay.",
+              );
+              if (!ok) return;
+              setResetError(null);
+              setIsResetting(true);
+              startTransition(async () => {
+                try {
+                  await resetMailTracking();
+                } catch {
+                  setResetError("Couldn’t reset. Try again.");
+                } finally {
+                  setIsResetting(false);
+                }
+              });
+            }}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-white/15 px-4 text-xs uppercase tracking-[0.16em] disabled:opacity-40"
+          >
+            {isResetting ? "Resetting…" : "Reset all"}
+          </button>
+        </div>
+        {resetError ? (
+          <p className="mt-3 text-sm text-[#8e8e8e]">{resetError}</p>
+        ) : null}
 
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           <Stat label="Households" value={String(stats.total)} />
@@ -183,11 +187,10 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
       ) : (
         <ul className="space-y-3">
           {filtered.map((party) => {
-            const link = `${origin}/r/${party.access_token}`;
             const sent = Boolean(party.save_the_date_sent_at);
             const opened = Boolean(party.link_opened_at);
             const address = formatAddress(party);
-            const copied = copiedId === party.id;
+            const editing = editingId === party.id;
             const firstOpen = formatWhen(party.link_opened_at);
             const lastOpen = formatWhen(party.link_last_opened_at);
 
@@ -261,44 +264,35 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
                   </label>
                 </div>
 
-                <div className="mt-3 whitespace-pre-line text-sm text-[#8e8e8e]">
-                  {address || (
-                    <span className="text-[#6a6a6a]">
-                      No mailing address yet
-                    </span>
+                <div className="mt-3">
+                  {editing ? (
+                    <AddressForm
+                      party={party}
+                      onCancel={() => setEditingId(null)}
+                      onSaved={() => setEditingId(null)}
+                    />
+                  ) : address ? (
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="whitespace-pre-line text-sm text-[#8e8e8e]">
+                        {address}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setEditingId(party.id)}
+                        className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-white/15 px-4 text-xs uppercase tracking-[0.16em]"
+                      >
+                        Edit address
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setEditingId(party.id)}
+                      className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-4 text-xs uppercase tracking-[0.16em] text-black"
+                    >
+                      Add address
+                    </button>
                   )}
-                </div>
-
-                <div className="mt-3 break-all bg-[#101010] px-3 py-2.5 text-xs sm:text-sm">
-                  {link}
-                </div>
-
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => copyLink(party.id, link)}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 px-3 text-xs uppercase tracking-[0.16em]"
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="size-3.5" />
-                        Copied
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="size-3.5" />
-                        Copy link
-                      </>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => shareLink(party, link)}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-3 text-xs uppercase tracking-[0.16em] text-black"
-                  >
-                    <Share2 className="size-3.5" />
-                    Share
-                  </button>
                 </div>
               </li>
             );
@@ -306,6 +300,124 @@ export function SaveTheDateMail({ parties, origin }: SaveTheDateMailProps) {
         </ul>
       )}
     </div>
+  );
+}
+
+function AddressForm({
+  party,
+  onCancel,
+  onSaved,
+}: {
+  party: MailPartyRow;
+  onCancel: () => void;
+  onSaved: () => void;
+}) {
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function onSubmit(formData: FormData) {
+    setError(null);
+    startTransition(async () => {
+      try {
+        await savePartyAddress({
+          id: party.id,
+          address_line1: String(formData.get("address_line1") ?? ""),
+          address_line2: String(formData.get("address_line2") ?? ""),
+          city: String(formData.get("city") ?? ""),
+          state: String(formData.get("state") ?? ""),
+          postal_code: String(formData.get("postal_code") ?? ""),
+          country: String(formData.get("country") ?? ""),
+        });
+        onSaved();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Couldn’t save the address.");
+      }
+    });
+  }
+
+  return (
+    <form action={onSubmit} className="grid gap-3">
+      {error ? (
+        <p className="border-l-2 border-[#ff453a] bg-[#2c1515] px-3 py-2 text-sm text-[#ffb4ab]">
+          {error}
+        </p>
+      ) : null}
+      <label className="text-sm">
+        Street
+        <input
+          name="address_line1"
+          required
+          autoFocus
+          defaultValue={party.address_line1 ?? ""}
+          autoComplete="address-line1"
+          className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
+        />
+      </label>
+      <label className="text-sm">
+        Apt, suite <span className="text-[#8e8e8e]">(optional)</span>
+        <input
+          name="address_line2"
+          defaultValue={party.address_line2 ?? ""}
+          autoComplete="address-line2"
+          className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
+        />
+      </label>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <label className="text-sm sm:col-span-1">
+          City
+          <input
+            name="city"
+            defaultValue={party.city ?? ""}
+            autoComplete="address-level2"
+            className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
+          />
+        </label>
+        <label className="text-sm">
+          State
+          <input
+            name="state"
+            defaultValue={party.state ?? ""}
+            autoComplete="address-level1"
+            className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
+          />
+        </label>
+        <label className="text-sm">
+          Postal code
+          <input
+            name="postal_code"
+            defaultValue={party.postal_code ?? ""}
+            autoComplete="postal-code"
+            className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
+          />
+        </label>
+      </div>
+      <label className="text-sm">
+        Country
+        <input
+          name="country"
+          defaultValue={party.country ?? "US"}
+          autoComplete="country"
+          className="mt-1 w-full rounded-2xl border border-white/10 bg-black px-3 py-3 text-base"
+        />
+      </label>
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isPending}
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 px-3 text-xs uppercase tracking-[0.16em] disabled:opacity-40"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-3 text-xs uppercase tracking-[0.16em] text-black disabled:opacity-40"
+        >
+          {isPending ? "Saving…" : "Save address"}
+        </button>
+      </div>
+    </form>
   );
 }
 

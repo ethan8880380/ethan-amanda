@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { GuestPhase } from "@/lib/guests";
+import type { PrintTable } from "@/lib/print-plan";
 import {
   buildTimelinePresets,
   type BudgetCategory,
@@ -247,6 +248,23 @@ export async function setSaveTheDateSent(partyId: string, sent: boolean) {
   revalidatePlan();
 }
 
+export async function resetMailTracking() {
+  const db = await requireAdmin();
+  const { error } = await db
+    .from("parties")
+    .update({
+      save_the_date_sent_at: null,
+      link_opened_at: null,
+      link_last_opened_at: null,
+      link_open_count: 0,
+    })
+    .neq("id", "00000000-0000-0000-0000-000000000000");
+  if (error) throw error;
+  revalidatePlan("/plan/mail");
+  revalidatePlan("/plan/guests");
+  revalidatePlan();
+}
+
 export async function updateParty(input: {
   id: string;
   party_name: string;
@@ -310,6 +328,46 @@ export async function updateParty(input: {
     const guestError = results.find((result) => result.error)?.error;
     if (guestError) throw guestError;
   }
+
+  revalidatePlan("/plan/guests");
+  revalidatePlan("/plan/mail");
+  revalidatePlan();
+}
+
+export async function savePartyAddress(input: {
+  id: string;
+  address_line1?: string | null;
+  address_line2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+}) {
+  const db = await requireAdmin();
+  const addressLine1 = input.address_line1?.trim() || null;
+  if (!addressLine1) throw new Error("Add a street address.");
+
+  const { data: current, error: currentError } = await db
+    .from("parties")
+    .select("address_collected_at")
+    .eq("id", input.id)
+    .single();
+  if (currentError) throw currentError;
+
+  const { error } = await db
+    .from("parties")
+    .update({
+      address_line1: addressLine1,
+      address_line2: input.address_line2?.trim() || null,
+      city: input.city?.trim() || null,
+      state: input.state?.trim() || null,
+      postal_code: input.postal_code?.trim() || null,
+      country: input.country?.trim() || "US",
+      address_collected_at:
+        current.address_collected_at ?? new Date().toISOString(),
+    })
+    .eq("id", input.id);
+  if (error) throw error;
 
   revalidatePlan("/plan/guests");
   revalidatePlan("/plan/mail");
@@ -787,5 +845,128 @@ export async function deleteNote(id: string) {
   const { error } = await db.from("planning_notes").delete().eq("id", id);
   if (error) throw error;
   revalidatePlan("/plan/notes");
+}
+
+function isMissingSeatingSchema(error: { code?: string; message?: string }) {
+  const code = error.code ?? "";
+  if (code === "42P01" || code === "42703" || code === "PGRST204" || code === "PGRST205") {
+    return true;
+  }
+  return /reception_tables|table_id/i.test(error.message ?? "");
+}
+
+const seatingUuid =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export async function loadSeating(): Promise<
+  { ok: true; tables: PrintTable[] } | { ok: false; localOnly: true }
+> {
+  const db = await requireAdmin();
+  const tablesResult = await db
+    .from("reception_tables")
+    .select("id, label, sort_order")
+    .order("sort_order", { ascending: true });
+
+  if (tablesResult.error) {
+    if (isMissingSeatingSchema(tablesResult.error)) {
+      return { ok: false, localOnly: true };
+    }
+    throw tablesResult.error;
+  }
+
+  const guestsResult = await db.from("guests").select("id, table_id");
+  if (guestsResult.error) {
+    if (isMissingSeatingSchema(guestsResult.error)) {
+      return { ok: false, localOnly: true };
+    }
+    throw guestsResult.error;
+  }
+
+  const byTable = new Map<string, string[]>();
+  for (const guest of guestsResult.data ?? []) {
+    if (!guest.table_id) continue;
+    const list = byTable.get(guest.table_id) ?? [];
+    list.push(guest.id);
+    byTable.set(guest.table_id, list);
+  }
+
+  return {
+    ok: true,
+    tables: (tablesResult.data ?? []).map((table) => ({
+      id: table.id,
+      label: table.label,
+      guestIds: byTable.get(table.id) ?? [],
+    })),
+  };
+}
+
+export async function saveSeating(
+  tables: PrintTable[],
+): Promise<{ ok: true } | { ok: false; localOnly: true } | { ok: false; error: string }> {
+  const db = await requireAdmin();
+  const existing = await db.from("reception_tables").select("id");
+  if (existing.error) {
+    if (isMissingSeatingSchema(existing.error)) return { ok: false, localOnly: true };
+    return { ok: false, error: existing.error.message };
+  }
+
+  const clean = tables
+    .filter((table) => seatingUuid.test(table.id))
+    .map((table, index) => ({
+      id: table.id,
+      label: table.label.trim().slice(0, 40) || String(index + 1),
+      sort_order: index,
+      guestIds: table.guestIds.filter((id) => seatingUuid.test(id)),
+    }));
+
+  const keep = new Set(clean.map((table) => table.id));
+  const remove = (existing.data ?? [])
+    .map((row) => row.id as string)
+    .filter((id) => !keep.has(id));
+
+  if (remove.length) {
+    const { error } = await db.from("reception_tables").delete().in("id", remove);
+    if (error) {
+      if (isMissingSeatingSchema(error)) return { ok: false, localOnly: true };
+      return { ok: false, error: error.message };
+    }
+  }
+
+  if (clean.length) {
+    const { error } = await db.from("reception_tables").upsert(
+      clean.map((table) => ({
+        id: table.id,
+        label: table.label,
+        sort_order: table.sort_order,
+      })),
+    );
+    if (error) {
+      if (isMissingSeatingSchema(error)) return { ok: false, localOnly: true };
+      return { ok: false, error: error.message };
+    }
+  }
+
+  const cleared = await db
+    .from("guests")
+    .update({ table_id: null })
+    .not("table_id", "is", null);
+  if (cleared.error) {
+    if (isMissingSeatingSchema(cleared.error)) return { ok: false, localOnly: true };
+    return { ok: false, error: cleared.error.message };
+  }
+
+  for (const table of clean) {
+    if (!table.guestIds.length) continue;
+    const { error } = await db
+      .from("guests")
+      .update({ table_id: table.id })
+      .in("id", table.guestIds);
+    if (error) {
+      if (isMissingSeatingSchema(error)) return { ok: false, localOnly: true };
+      return { ok: false, error: error.message };
+    }
+  }
+
+  return { ok: true };
 }
 

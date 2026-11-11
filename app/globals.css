@@ -344,3 +344,39 @@
 .plan [data-slot="dialog-close"] {
   color: #141414;
 }
+
+.print-only {
+  display: none;
+}
+
+.print-sheet {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .plan,
+  body {
+    background: #fff !important;
+  }
+
+  .print-sheet {
+    margin: 0 !important;
+    box-shadow: none !important;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .print-sheet:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+}
