@@ -24,7 +24,7 @@ export function WeddingFooter() {
           <p className="font-wedding-serif text-base italic">{footer.year}</p>
           <Link
             href="/engagement-party"
-            className="group/cta inline-flex min-h-11 items-center gap-2 text-paper/80 underline decoration-paper/25 underline-offset-[6px] transition-colors hover:text-paper hover:decoration-paper outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            className="group/cta inline-flex min-h-11 items-center gap-2 text-paper/80 underline decoration-paper/25 underline-offset-[6px] transition-colors md:hover:text-paper md:hover:decoration-paper outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
           >
             Engagement party
             <ArrowIcon />

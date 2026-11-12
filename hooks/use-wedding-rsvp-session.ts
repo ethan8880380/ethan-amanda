@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  createContext,
+  createElement,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 
 const STORAGE_KEY = "wedding-rsvp-complete";
 const EVENT_NAME = "wedding-rsvp-complete";
@@ -9,6 +16,27 @@ export function markWeddingRsvpComplete() {
   if (typeof window === "undefined") return;
   window.sessionStorage.setItem(STORAGE_KEY, "1");
   window.dispatchEvent(new Event(EVENT_NAME));
+}
+
+const WeddingRsvpCookieContext = createContext(false);
+
+/** Server-read `wedding_rsvp` cookie. */
+export function WeddingRsvpCookieProvider({
+  hasRsvp,
+  children,
+}: {
+  hasRsvp: boolean;
+  children: ReactNode;
+}) {
+  return createElement(
+    WeddingRsvpCookieContext.Provider,
+    { value: hasRsvp },
+    children,
+  );
+}
+
+export function useWeddingRsvpCookie() {
+  return useContext(WeddingRsvpCookieContext);
 }
 
 export function useHasWeddingRsvp() {

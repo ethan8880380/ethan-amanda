@@ -16,14 +16,14 @@ const baseClass =
   "group/cta inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full px-7 text-[0.9375rem] font-medium tracking-[0.01em] transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper";
 
 const variantClass: Record<CtaVariant, string> = {
-  solid: "bg-blood text-paper hover:bg-blood-deep",
-  ink: "bg-ink text-paper hover:bg-ink/85",
-  outline: "border border-ink/20 text-ink hover:border-ink hover:bg-ink hover:text-paper",
+  solid: "bg-blood text-paper md:hover:bg-blood-deep",
+  ink: "bg-ink text-paper md:hover:bg-ink/85",
+  outline: "border border-ink/20 text-ink md:hover:border-ink md:hover:bg-ink md:hover:text-paper",
   "outline-paper":
-    "border border-paper/40 text-paper hover:border-paper hover:bg-paper hover:text-ink focus-visible:ring-paper focus-visible:ring-offset-ink",
+    "border border-paper/40 text-paper md:hover:border-paper md:hover:bg-paper md:hover:text-ink focus-visible:ring-paper focus-visible:ring-offset-ink",
   paper:
-    "bg-paper text-ink hover:bg-linen focus-visible:ring-paper focus-visible:ring-offset-ink",
-  text: "min-h-11 rounded-none px-0 text-ink underline decoration-ink/25 underline-offset-[6px] hover:decoration-ink",
+    "bg-paper text-ink md:hover:bg-linen focus-visible:ring-paper focus-visible:ring-offset-ink",
+  text: "min-h-11 rounded-none px-0 text-ink underline decoration-ink/25 underline-offset-[6px] md:hover:decoration-ink",
 };
 
 export function Cta({
@@ -72,7 +72,7 @@ export function ArrowIcon({ className }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn(
-        "size-3.5 transition-transform duration-300 group-hover/cta:translate-x-0.5",
+        "size-3.5 transition-transform duration-300 md:group-hover/cta:translate-x-0.5",
         className
       )}
     >
@@ -92,7 +92,7 @@ export function ExternalArrowIcon({ className }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn(
-        "size-3.5 transition-transform duration-300 group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5",
+        "size-3.5 transition-transform duration-300 md:group-hover/cta:-translate-y-0.5 md:group-hover/cta:translate-x-0.5",
         className
       )}
     >

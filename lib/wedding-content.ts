@@ -197,10 +197,10 @@ export const weddingContent = {
     ctaShort: "Zola",
     successCta: "We've registered with Zola",
     rsvpPrompt: {
-      title: "Have you RSVP'd yet?",
-      body: "Before you head to the registry, let us know if you can make it. It only takes a minute.",
+      title: "Zola has the gifts",
+      body: "We have the RSVP. Their site opens in a new tab, and this page stays right here.",
       rsvpCta: "RSVP first",
-      continueCta: "Continue to the registry",
+      continueCta: "Show me Zola",
     },
     /** Each item can set `url` to a specific Zola collection; otherwise it uses `registry.url`. */
     featured: [
@@ -274,15 +274,18 @@ export const weddingContent = {
     eyebrow: "RSVP",
     title: "Will you be there?",
     intro:
-      "Start typing your name, then choose your group and reply for each person.",
+      "Find the name on your invitation, then reply for each person.",
+    searchTitle: "Whose invitation is it?",
+    searchHint: "Type a first or last name and we'll find your group.",
     groupIntro:
       "Reply for each person below.",
     openIntro:
       "Reply for yourself, or add each person you're answering for.",
-    deadline: "Kindly reply by December 15, 2026.",
+    deadline: "Please RSVP by December 15, 2026.",
+    repliedNoTitle: "We'll miss you",
     thanksEyebrow: "RSVP",
+    thanksReady: "You're all set",
     thanksTitle: "Thank you",
-    successYes: "We can't wait to see you there.",
     successNo: "We'll miss you — thank you for letting us know.",
     thanksRegistry:
       "If you'd like to celebrate with a gift, we've registered with Zola.",
@@ -303,5 +306,11 @@ export const weddingContent = {
     "/wedding/wedding-07.png",
   ],
 } as const;
+
+export function comingLine(count: number) {
+  if (count >= 3) return "We can't wait to see you all";
+  if (count === 2) return "We can't wait to see you both";
+  return "We can't wait to see you";
+}
 
 export type WeddingContent = typeof weddingContent;

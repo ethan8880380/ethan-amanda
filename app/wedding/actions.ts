@@ -3,9 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { Resend } from "resend";
+import {
+  renderRsvpConfirmationEmail,
+  rsvpConfirmationSubject,
+} from "@/lib/rsvp-confirmation-email";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
   buildPartyName,
+  householdNotes,
   validateGroupRsvp,
   validateWebsiteRsvp,
   type ValidWebsiteRsvp,
@@ -15,6 +20,9 @@ import {
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const RSVP_COOKIE = "wedding_rsvp";
+const RSVP_FROM =
+  process.env.RSVP_FROM_EMAIL ?? "Ethan & Amanda <rsvp@ethanandamanda.com>";
+const COUPLE_RSVP_TO = "ethan0380@gmail.com";
 
 export interface WeddingRSVPResult {
   success: boolean;
@@ -26,6 +34,11 @@ export interface GroupSearchResult {
   error?: string;
   groups?: WebsiteRsvpSnapshot[];
   truncated?: boolean;
+}
+
+export async function hasWeddingRsvpCookie() {
+  const jar = await cookies();
+  return Boolean(jar.get(RSVP_COOKIE)?.value);
 }
 
 function rsvpCookieOptions() {
@@ -92,7 +105,7 @@ export async function getWebsiteRsvp(): Promise<WebsiteRsvpSnapshot | null> {
     const db = getSupabaseAdmin();
     const { data: party, error } = await db
       .from("parties")
-      .select("id, party_name, contact_email, source")
+      .select("id, party_name, contact_email, food_allergies, source")
       .eq("access_token", token)
       .maybeSingle();
 
@@ -116,6 +129,7 @@ export async function getWebsiteRsvp(): Promise<WebsiteRsvpSnapshot | null> {
         buildPartyName(snapshotGuests.map((guest) => guest.name)),
       source: party.source,
       email: party.contact_email ?? "",
+      notes: householdNotes(party.food_allergies, snapshotGuests),
       guests: snapshotGuests,
     };
   } catch (error) {
@@ -126,10 +140,10 @@ export async function getWebsiteRsvp(): Promise<WebsiteRsvpSnapshot | null> {
 
 export async function submitWeddingRSVP(input: {
   email: string;
+  notes: string;
   guests: Array<{
     name: string;
     attending: "yes" | "no" | null;
-    dietaryNotes: string;
   }>;
 }): Promise<WeddingRSVPResult> {
   const validated = validateWebsiteRsvp(input);
@@ -148,7 +162,7 @@ export async function submitWeddingRSVP(input: {
       p_guests: value.guests.map((guest) => ({
         full_name: guest.name,
         attending: guest.attending === "yes",
-        dietary_notes: guest.dietaryNotes,
+        dietary_notes: "",
       })),
     });
 
@@ -162,6 +176,19 @@ export async function submitWeddingRSVP(input: {
     }
 
     jar.set(RSVP_COOKIE, saved.access_token, rsvpCookieOptions());
+
+    const { error: notesError } = await db
+      .from("parties")
+      .update({ food_allergies: value.notes || null })
+      .eq("access_token", saved.access_token);
+
+    if (notesError) {
+      console.error("Failed to save RSVP notes:", notesError);
+      return {
+        success: false,
+        error: "Failed to submit RSVP. Please try again.",
+      };
+    }
 
     try {
       await sendRsvpEmail(value);
@@ -187,7 +214,7 @@ export async function listWeddingGroups(): Promise<GroupSearchResult> {
     const { data, error } = await db
       .from("guests")
       .select(
-        "id, full_name, is_plus_one, attending, dietary_notes, sort_order, created_at, party_id, parties!inner(id, party_name, source)",
+        "id, full_name, is_plus_one, attending, dietary_notes, sort_order, created_at, party_id, parties!inner(id, party_name, source, contact_email, food_allergies)",
       )
       .order("sort_order", { ascending: true });
 
@@ -209,11 +236,11 @@ export async function listWeddingGroups(): Promise<GroupSearchResult> {
 export async function submitGroupRsvp(input: {
   partyId: string;
   email: string;
+  notes: string;
   guests: Array<{
     id: string | null;
     name: string;
     attending: "yes" | "no" | null;
-    dietaryNotes: string;
   }>;
 }): Promise<WeddingRSVPResult> {
   const validated = validateGroupRsvp(input);
@@ -273,10 +300,7 @@ export async function submitGroupRsvp(input: {
           id: guest.id,
           full_name: keepName ? row.full_name : guest.name,
           attending: guest.attending === "yes",
-          dietary_notes:
-            guest.attending === "yes" && guest.dietaryNotes
-              ? guest.dietaryNotes
-              : null,
+          dietary_notes: null,
         },
       ];
     });
@@ -342,6 +366,7 @@ export async function submitGroupRsvp(input: {
       .from("parties")
       .update({
         contact_email: value.email || party.contact_email,
+        food_allergies: value.notes || null,
         rsvp_status: anyAttending ? "attending" : "declined",
         rsvp_submitted_at: new Date().toISOString(),
       })
@@ -366,6 +391,7 @@ export async function submitGroupRsvp(input: {
       await sendRsvpEmail({
         partyName,
         email: value.email || party.contact_email || "",
+        notes: value.notes,
         guests: value.guests.map((guest) => {
           const saved = guest.id ? existingById.get(guest.id) : undefined;
           const keepName =
@@ -373,7 +399,6 @@ export async function submitGroupRsvp(input: {
           return {
             name: keepName ? saved.full_name : guest.name,
             attending: guest.attending,
-            dietaryNotes: guest.dietaryNotes,
             isPlusOne: saved ? saved.is_plus_one : true,
           };
         }),
@@ -408,11 +433,15 @@ interface GuestSearchRow {
         id: string;
         party_name: string | null;
         source: string;
+        contact_email: string | null;
+        food_allergies: string | null;
       }
     | Array<{
         id: string;
         party_name: string | null;
         source: string;
+        contact_email: string | null;
+        food_allergies: string | null;
       }>
     | null;
 }
@@ -436,7 +465,8 @@ function groupSearchRows(rows: GuestSearchRow[]): WebsiteRsvpSnapshot[] {
       partyId: party.id,
       partyName: party.party_name?.trim() || "",
       source: party.source,
-      email: "",
+      email: party.contact_email?.trim() || "",
+      notes: party.food_allergies?.trim() || "",
       guests: [],
     };
     snapshot.guests.push(toSnapshotGuest(row));
@@ -449,7 +479,8 @@ function groupSearchRows(rows: GuestSearchRow[]): WebsiteRsvpSnapshot[] {
       partyId: party.partyId,
       partyName: party.partyName || buildPartyName(guests.map((guest) => guest.name)),
       source: party.source,
-      email: "",
+      email: party.email,
+      notes: party.notes || householdNotes(null, guests),
       guests,
     };
   });
@@ -466,6 +497,7 @@ function escapeHtml(value: string) {
 async function sendRsvpEmail(value: {
   partyName: string;
   email: string;
+  notes: string;
   guests: Array<
     ValidWebsiteRsvp["guests"][number] & { isPlusOne?: boolean }
   >;
@@ -480,23 +512,23 @@ async function sendRsvpEmail(value: {
 
   const guestLines = value.guests
     .map((guest) => {
-      const dietary =
-        guest.attending === "yes" && guest.dietaryNotes
-          ? ` — ${escapeHtml(guest.dietaryNotes)}`
-          : "";
       const label = guest.attending === "yes" ? "Attending" : "Not attending";
       const plusOne = guest.isPlusOne ? " (plus one)" : "";
-      return `<li><strong>${escapeHtml(guest.name)}</strong>${plusOne}: ${label}${dietary}</li>`;
+      return `<li><strong>${escapeHtml(guest.name)}</strong>${plusOne}: ${label}</li>`;
     })
     .join("");
+
+  const notesLine = value.notes
+    ? `<p><strong>Notes:</strong> ${escapeHtml(value.notes)}</p>`
+    : "";
 
   const emailLine = value.email
     ? `<p><strong>Email:</strong> ${escapeHtml(value.email)}</p>`
     : "";
 
-  await resend.emails.send({
-    from: "RSVP <onboarding@resend.dev>",
-    to: "ethan0380@gmail.com",
+  const coupleNotice = resend.emails.send({
+    from: RSVP_FROM,
+    to: COUPLE_RSVP_TO,
     subject: `Wedding RSVP: ${value.partyName} — ${status}`,
     html: `
       <div style="font-family: sans-serif; max-width: 520px;">
@@ -505,10 +537,53 @@ async function sendRsvpEmail(value: {
         <p><strong>Party:</strong> ${escapeHtml(value.partyName)}</p>
         <p><strong>Status:</strong> ${status}</p>
         ${emailLine}
+        ${notesLine}
         <ul>${guestLines}</ul>
         <hr style="border: none; border-top: 1px solid #eee; margin: 12px 0;" />
         <p style="color: #999; font-size: 12px;">Wedding RSVP</p>
       </div>
     `,
+  });
+
+  const guestConfirmation = value.email
+    ? sendGuestRsvpConfirmation(value)
+    : Promise.resolve();
+
+  const [coupleResult, guestResult] = await Promise.allSettled([
+    coupleNotice,
+    guestConfirmation,
+  ]);
+
+  if (coupleResult.status === "rejected") {
+    console.error("Failed to send couple RSVP notice:", coupleResult.reason);
+  }
+  if (guestResult.status === "rejected") {
+    console.error("Failed to send guest RSVP confirmation:", guestResult.reason);
+  }
+}
+
+function sendGuestRsvpConfirmation(value: {
+  partyName: string;
+  email: string;
+  notes: string;
+  guests: Array<{
+    name: string;
+    attending: "yes" | "no";
+    isPlusOne?: boolean;
+  }>;
+}) {
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+  return resend.emails.send({
+    from: RSVP_FROM,
+    to: value.email,
+    replyTo: COUPLE_RSVP_TO,
+    subject: rsvpConfirmationSubject(),
+    html: renderRsvpConfirmationEmail({
+      partyName: value.partyName,
+      notes: value.notes,
+      guests: value.guests,
+      siteUrl: site,
+    }),
   });
 }

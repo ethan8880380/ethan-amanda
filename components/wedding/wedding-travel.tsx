@@ -34,7 +34,7 @@ export function WeddingTravel() {
                       ? "noopener noreferrer"
                       : undefined
                   }
-                  className="group/cta flex items-center gap-6 rounded-[1.25rem] bg-paper p-7 shadow-[0_1px_2px_rgb(24_20_21/0.04),0_12px_32px_-12px_rgb(24_20_21/0.12)] transition-shadow duration-500 hover:shadow-[0_1px_2px_rgb(24_20_21/0.05),0_24px_48px_-16px_rgb(24_20_21/0.2)] outline-none focus-visible:ring-2 focus-visible:ring-blood md:p-10"
+                  className="group/cta flex items-center gap-6 rounded-[1.25rem] bg-paper p-7 shadow-[0_1px_2px_rgb(24_20_21/0.04),0_12px_32px_-12px_rgb(24_20_21/0.12)] transition-shadow duration-500 md:hover:shadow-[0_1px_2px_rgb(24_20_21/0.05),0_24px_48px_-16px_rgb(24_20_21/0.2)] outline-none focus-visible:ring-2 focus-visible:ring-blood md:p-10"
                 >
                   <span className="flex min-w-0 flex-1 flex-col gap-2">
                     <span className="wedding-display text-[1.75rem] leading-tight text-ink md:text-[2.125rem]">
@@ -44,7 +44,7 @@ export function WeddingTravel() {
                       {hotel.detail}
                     </span>
                   </span>
-                  <span className="flex size-12 shrink-0 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors duration-300 group-hover/cta:border-ink group-hover/cta:bg-ink group-hover/cta:text-paper">
+                  <span className="flex size-12 shrink-0 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors duration-300 md:group-hover/cta:border-ink md:group-hover/cta:bg-ink md:group-hover/cta:text-paper">
                     <ExternalArrowIcon className="size-4" />
                     <span className="sr-only">Open {hotel.name} website</span>
                   </span>

@@ -35,7 +35,7 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
   const [addressOpen, setAddressOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#f7f6f3] text-[#171512]">
+    <div className="min-h-screen bg-[#ffffff] text-[#171512]">
       {/* Hero: photo plane + light type plane — same structure, new look */}
       <section className="flex min-h-[100svh] flex-col">
         <div className="relative h-[46svh] min-h-[16rem] w-full overflow-hidden sm:h-[52svh]">
@@ -63,7 +63,7 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
             transition={{ duration: 0.6, delay: 0.1, ease }}
             className="flex items-baseline justify-between gap-3"
           >
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[#7a736a]">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[#8a8a8a]">
               {c.couple.partnerTwo}{" "}
               <span className="text-[#e11d2e]">&</span>{" "}
               {c.couple.partnerOne}
@@ -71,16 +71,16 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
             {!isGuest ? (
               <Link
                 href="/wedding"
-                className="text-[11px] uppercase tracking-[0.18em] text-[#7a736a] transition hover:text-[#171512]"
+                className="text-[11px] uppercase tracking-[0.18em] text-[#8a8a8a] transition md:hover:text-[#171512]"
               >
                 Wedding site
               </Link>
             ) : partyName ? (
-              <p className="max-w-[50%] truncate text-right text-[11px] uppercase tracking-[0.16em] text-[#7a736a]">
+              <p className="max-w-[50%] truncate text-right text-[11px] uppercase tracking-[0.16em] text-[#8a8a8a]">
                 {partyName}
               </p>
             ) : (
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#7a736a]">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#8a8a8a]">
                 {c.saveTheDate.eyebrow}
               </p>
             )}
@@ -134,7 +134,7 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
               initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.5, ease }}
-              className="mt-8 grid grid-cols-2 gap-6 border-t border-[#d8d2c8] pt-6 sm:max-w-md"
+              className="mt-8 grid grid-cols-2 gap-6 border-t border-[#e8e8e8] pt-6 sm:max-w-md"
             >
               <div>
                 <p className="text-[11px] uppercase tracking-[0.16em] text-[#8a8378]">
@@ -166,14 +166,14 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
                     <DrawerTrigger asChild>
                       <button
                         type="button"
-                        className="inline-flex w-full items-center justify-center bg-[#171512] px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#f7f6f3] transition active:scale-[0.98] hover:bg-[#e11d2e] sm:flex-1"
+                        className="inline-flex w-full items-center justify-center bg-[#171512] px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#ffffff] transition active:scale-[0.98] md:hover:bg-[#e11d2e] sm:flex-1"
                       >
                         {addressCollected
                           ? "Update your address"
                           : "Share your address"}
                       </button>
                     </DrawerTrigger>
-                    <DrawerContent className="gap-0 border-0 bg-[#f7f6f3] p-0 text-[#171512] before:inset-0 before:rounded-t-2xl before:bg-[#f7f6f3] data-[vaul-drawer-direction=bottom]:max-h-[88vh] [&>div:first-child]:!hidden">
+                    <DrawerContent className="gap-0 border-0 bg-[#ffffff] p-0 text-[#171512] before:inset-0 before:rounded-t-2xl before:bg-[#ffffff] data-[vaul-drawer-direction=bottom]:max-h-[88vh] [&>div:first-child]:!hidden">
                       <div className="mx-auto mt-3 h-1.5 w-14 shrink-0 rounded-full bg-[#b8b0a4]" />
                       <DrawerHeader className="gap-1 px-5 pb-1 pt-4 text-left">
                         <DrawerTitle className="font-serif text-2xl font-normal tracking-tight">
@@ -197,7 +197,7 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
                   </Drawer>
                   <a
                     href="/wedding/calendar"
-                    className="inline-flex w-full items-center justify-center gap-2 border border-[#171512]/20 px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#171512] transition active:scale-[0.98] hover:border-[#171512] sm:w-auto"
+                    className="inline-flex w-full items-center justify-center gap-2 border border-[#171512]/20 px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#171512] transition active:scale-[0.98] md:hover:border-[#171512] sm:w-auto"
                   >
                     <CalendarPlus className="size-4" />
                     Calendar
@@ -206,7 +206,7 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
               ) : (
                 <a
                   href="/wedding/calendar"
-                  className="inline-flex w-full items-center justify-center gap-2 bg-[#171512] px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#f7f6f3] transition active:scale-[0.98] hover:bg-[#e11d2e] sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 bg-[#171512] px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#ffffff] transition active:scale-[0.98] md:hover:bg-[#e11d2e] sm:w-auto"
                 >
                   <CalendarPlus className="size-4" />
                   Add to calendar
@@ -222,7 +222,7 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
         </div>
       </section>
 
-      <section className="relative h-[40vh] min-h-[14rem] max-h-[26rem] overflow-hidden bg-[#f7f6f3] sm:h-[48vh] sm:max-h-[34rem]">
+      <section className="relative h-[40vh] min-h-[14rem] max-h-[26rem] overflow-hidden bg-[#ffffff] sm:h-[48vh] sm:max-h-[34rem]">
         <Image
           src="/wedding/wedding-03.png"
           alt={`${c.couple.short}`}
@@ -232,7 +232,7 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
         />
       </section>
 
-      <section className="border-t border-[#e4dfd6] bg-[#f7f6f3] px-5 py-14 sm:px-10 sm:py-20 lg:px-16">
+      <section className="border-t border-[#e8e8e8] bg-[#ffffff] px-5 py-14 sm:px-10 sm:py-20 lg:px-16">
         <div className="mx-auto grid max-w-5xl gap-10 sm:gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:gap-20">
           <div>
             <p className="text-[11px] uppercase tracking-[0.16em] text-[#8a8378]">
@@ -263,7 +263,7 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
         </div>
       </section>
 
-      <section className="relative h-[42vh] min-h-[15rem] max-h-[28rem] overflow-hidden bg-[#f7f6f3] sm:h-[50vh] sm:max-h-[36rem]">
+      <section className="relative h-[42vh] min-h-[15rem] max-h-[28rem] overflow-hidden bg-[#ffffff] sm:h-[50vh] sm:max-h-[36rem]">
         <Image
           src="/wedding/wedding-02.png"
           alt={`${c.couple.short}`}
@@ -273,7 +273,7 @@ export function SaveTheDateSite({ party, token }: SaveTheDateSiteProps) {
         />
       </section>
 
-      <footer className="flex items-end justify-between gap-4 border-t border-[#e4dfd6] bg-[#f7f6f3] px-5 pt-8 sm:px-10">
+      <footer className="flex items-end justify-between gap-4 border-t border-[#e8e8e8] bg-[#ffffff] px-5 pt-8 sm:px-10">
         <div className="pb-8 text-left">
           <p className="font-serif text-xl text-[#171512] sm:text-2xl">
             {c.couple.short}

@@ -47,18 +47,18 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  /* Wedding palette — ivory paper, warm linen, ink, a single blood-red accent */
+  /* Wedding palette — white, a light gray, ink, a single blood-red accent */
   --color-blood: #8f0e1f;
   --color-blood-deep: #5c0813;
-  --color-paper: #faf8f4;
-  --color-linen: #f1ece4;
+  --color-paper: #ffffff;
+  --color-linen: #f4f4f4;
   --color-ink: #181415;
   --font-wedding-serif: var(--font-geist-serif), "Iowan Old Style", Georgia, serif;
   --font-wedding-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  --background: oklch(0.98 0.002 60);
+  --background: oklch(1 0 0);
   --foreground: oklch(0.15 0.01 50);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.147 0.004 49.25);

@@ -34,7 +34,7 @@ export function WeddingRegistry() {
         </ul>
         <RegistryRsvpGate>
           <Cta
-            href="/wedding/registry"
+            href={registry.url}
             variant="paper"
             className="mt-12 focus-visible:ring-offset-blood"
           >

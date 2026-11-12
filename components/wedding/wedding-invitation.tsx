@@ -43,7 +43,7 @@ export function WeddingInvitation() {
         <Reveal delay={0.1} className="mt-10 md:mt-14">
           <a
             href="/wedding/calendar"
-            className="group/cta inline-flex min-h-11 items-center gap-3 text-[0.8125rem] font-medium uppercase tracking-[0.18em] text-ink underline-offset-[6px] transition-colors hover:text-blood hover:underline outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-4 focus-visible:ring-offset-paper"
+            className="group/cta inline-flex min-h-11 items-center gap-3 text-[0.8125rem] font-medium uppercase tracking-[0.18em] text-ink underline-offset-[6px] transition-colors md:hover:text-blood md:hover:underline outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-4 focus-visible:ring-offset-paper"
           >
             <svg
               aria-hidden
@@ -53,7 +53,7 @@ export function WeddingInvitation() {
               strokeWidth="1.25"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="size-3.5 transition-transform duration-300 group-hover/cta:translate-y-0.5"
+              className="size-3.5 transition-transform duration-300 md:group-hover/cta:translate-y-0.5"
             >
               <path d="M8 2v9M4 7.5 8 11.5l4-4M2.5 13.5h11" />
             </svg>

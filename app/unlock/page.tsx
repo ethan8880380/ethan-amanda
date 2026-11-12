@@ -70,7 +70,7 @@ export default async function UnlockPage({
 
         <button
           type="submit"
-          className="mt-10 inline-flex min-h-12 w-full items-center justify-center bg-blood px-6 text-[0.8125rem] font-medium uppercase tracking-[0.18em] text-paper transition-colors hover:bg-blood-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+          className="mt-10 inline-flex min-h-12 w-full items-center justify-center bg-blood px-6 text-[0.8125rem] font-medium uppercase tracking-[0.18em] text-paper transition-colors md:hover:bg-blood-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
         >
           Enter
         </button>

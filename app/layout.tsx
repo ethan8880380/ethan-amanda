@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistSerif } from "geist/font/serif";
 import { Manrope, Syne } from "next/font/google";
+import { hasWeddingRsvpCookie } from "@/app/wedding/actions";
+import { WeddingRsvpCookieProvider } from "@/hooks/use-wedding-rsvp-session";
 import "./globals.css";
 
 const syne = Syne({
@@ -28,18 +30,22 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const hasRsvp = await hasWeddingRsvpCookie();
+
   return (
     <html
       lang="en"
       className={`${syne.variable} ${manrope.variable} ${GeistSans.variable} ${GeistSerif.variable}`}
     >
       <body className="antialiased font-sans">
-        {children}
+        <WeddingRsvpCookieProvider hasRsvp={hasRsvp}>
+          {children}
+        </WeddingRsvpCookieProvider>
       </body>
     </html>
   );

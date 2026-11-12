@@ -33,21 +33,14 @@ function sectionHref(id: string, pathname: string) {
 
 export function WeddingNav() {
   const pathname = usePathname();
-  const isRegistryPage = pathname === "/wedding/registry";
   const isPastHero = useIsPastHero(pathname);
-  const observedId = useActiveSection(allIds, pathname);
-  const activeId = isRegistryPage ? "registry" : observedId;
+  const activeId = useActiveSection(allIds, pathname);
   const hasRsvp = useHasWeddingRsvp();
   const shouldReduceMotion = useReducedMotion();
-  const { registry, hero } = weddingContent;
-
-  const cta = getPersistentCta({
-    hasRsvp,
-    isRegistryPage,
-    pathname,
-    rsvpLabel: hero.cta,
-    registry,
-  });
+  const cta = {
+    href: pathname === "/wedding" ? "#rsvp" : "/wedding#rsvp",
+    label: weddingContent.hero.cta,
+  };
 
   return (
     <>
@@ -91,7 +84,7 @@ export function WeddingNav() {
                     "group relative flex h-10 items-center rounded-full px-4 text-[0.9375rem] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blood",
                     !isExternal && activeId === section.id
                       ? "text-ink"
-                      : "text-ink/55 hover:text-ink"
+                      : "text-ink/55 md:hover:text-ink"
                   )}
                 >
                   {section.label}
@@ -101,7 +94,7 @@ export function WeddingNav() {
                       "absolute inset-x-4 bottom-1.5 h-px origin-center bg-current transition-transform duration-300",
                       !isExternal && activeId === section.id
                         ? "scale-x-100"
-                        : "scale-x-0 group-hover:scale-x-100"
+                        : "scale-x-0 md:group-hover:scale-x-100"
                     )}
                   />
                 </a>
@@ -112,11 +105,10 @@ export function WeddingNav() {
 
           <a
             href={cta.href}
-            {...(cta.external
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
-            className="inline-flex h-11 items-center rounded-full bg-ink px-7 text-[0.9375rem] font-medium text-paper transition-colors hover:bg-blood outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+            aria-label={hasRsvp ? "Edit your RSVP" : undefined}
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-7 text-[0.9375rem] font-medium text-paper transition-colors md:hover:bg-blood outline-none focus-visible:ring-2 focus-visible:ring-blood focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
           >
+            {hasRsvp ? <ReplyCheckIcon /> : null}
             {cta.label}
           </a>
           </div>
@@ -177,11 +169,10 @@ export function WeddingNav() {
                 })}
               <a
                 href={cta.href}
-                {...(cta.external
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                className="flex min-w-[5.5rem] items-center justify-center rounded-full bg-ink px-5 text-sm font-medium text-paper transition-colors active:bg-blood outline-none focus-visible:bg-blood"
+                aria-label={hasRsvp ? "Edit your RSVP" : undefined}
+                className="flex min-w-[5.5rem] items-center justify-center gap-1.5 rounded-full bg-ink px-4 text-sm font-medium text-paper transition-colors active:bg-blood outline-none focus-visible:bg-blood"
               >
+                {hasRsvp ? <ReplyCheckIcon /> : null}
                 {cta.label}
               </a>
             </div>
@@ -197,32 +188,21 @@ function withRegistryGate(id: string, link: ReactElement) {
   return <RegistryRsvpGate key={id}>{link}</RegistryRsvpGate>;
 }
 
-function getPersistentCta({
-  hasRsvp,
-  isRegistryPage,
-  pathname,
-  rsvpLabel,
-  registry,
-}: {
-  hasRsvp: boolean;
-  isRegistryPage: boolean;
-  pathname: string;
-  rsvpLabel: string;
-  registry: (typeof weddingContent)["registry"];
-}) {
-  if (!hasRsvp) {
-    return {
-      href: pathname === "/wedding" ? "#rsvp" : "/wedding#rsvp",
-      label: rsvpLabel,
-      external: false,
-    };
-  }
-
-  return {
-    href: registry.url,
-    label: isRegistryPage ? registry.ctaShort : "Registry",
-    external: registry.url.startsWith("http"),
-  };
+function ReplyCheckIcon() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-3.5"
+    >
+      <path d="M3.25 8.25 6.5 11.5 12.75 4.5" />
+    </svg>
+  );
 }
 
 /** True once the hero has mostly scrolled out of view. */

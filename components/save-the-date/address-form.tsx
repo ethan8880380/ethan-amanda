@@ -129,14 +129,14 @@ export function AddressForm({ token, initial, onSaved }: AddressFormProps) {
             rows={2}
             defaultValue={party.food_allergies ?? ""}
             placeholder="None, or list any for your household"
-            className="w-full resize-none border border-[#d8d2c8] bg-white px-3 py-2 text-[15px] text-[#171512] outline-none transition placeholder:text-[#b5a89a] focus:border-[#171512]"
+            className="w-full resize-none border border-[#e8e8e8] bg-white px-3 py-2 text-[15px] text-[#171512] outline-none transition placeholder:text-[#a3a3a3] focus:border-[#171512]"
           />
         </label>
 
         <button
           type="submit"
           disabled={isPending}
-          className="mt-1 w-full bg-[#171512] px-4 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#f7f6f3] transition hover:bg-[#e11d2e] disabled:opacity-60"
+          className="mt-1 w-full bg-[#171512] px-4 py-3.5 text-[11px] uppercase tracking-[0.18em] text-[#ffffff] transition md:hover:bg-[#e11d2e] disabled:opacity-60"
         >
           {isPending ? "Saving…" : "Save details"}
         </button>
@@ -174,7 +174,7 @@ function Field({
         defaultValue={defaultValue ?? ""}
         autoComplete={autoComplete}
         placeholder={placeholder}
-        className="w-full min-w-0 border border-[#d8d2c8] bg-white px-3 py-2 text-[15px] text-[#171512] outline-none transition placeholder:text-[#b5a89a] focus:border-[#171512]"
+        className="w-full min-w-0 border border-[#e8e8e8] bg-white px-3 py-2 text-[15px] text-[#171512] outline-none transition placeholder:text-[#a3a3a3] focus:border-[#171512]"
       />
     </label>
   );

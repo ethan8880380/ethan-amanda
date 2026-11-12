@@ -14,23 +14,47 @@ export interface WebsiteRsvpSnapshot {
   partyName: string;
   source: "manual" | "website";
   email: string;
+  notes: string;
   guests: WebsiteRsvpGuest[];
 }
 
 export interface WebsiteGuestInput {
   name: string;
   attending: "yes" | "no" | null;
-  dietaryNotes: string;
 }
 
 export interface ValidWebsiteRsvp {
   email: string;
   partyName: string;
+  notes: string;
   guests: Array<{
     name: string;
     attending: "yes" | "no";
-    dietaryNotes: string;
   }>;
+}
+
+/** Household note, or the older per-person notes folded into one. */
+export function householdNotes(
+  saved: string | null | undefined,
+  guests: Array<{ dietaryNotes: string }>,
+) {
+  const household = saved?.trim() ?? "";
+  if (household) return household;
+  return [
+    ...new Set(
+      guests.map((guest) => guest.dietaryNotes.trim()).filter(Boolean),
+    ),
+  ].join("\n");
+}
+
+function validateNotes(notes: string):
+  | { ok: true; value: string }
+  | { ok: false; error: string } {
+  const value = notes.trim();
+  if (value.length > 400) {
+    return { ok: false, error: "Notes need to be 400 characters or fewer." };
+  }
+  return { ok: true, value };
 }
 
 export function buildPartyName(names: string[]): string {
@@ -47,6 +71,7 @@ export function buildPartyName(names: string[]): string {
 
 export function validateWebsiteRsvp(input: {
   email: string;
+  notes: string;
   guests: WebsiteGuestInput[];
 }):
   | { ok: true; value: ValidWebsiteRsvp }
@@ -83,22 +108,17 @@ export function validateWebsiteRsvp(input: {
       return { ok: false, error: "Names need to be 80 characters or fewer." };
     }
 
-    const dietaryNotes =
-      guest.attending === "yes" ? guest.dietaryNotes.trim() : "";
-    if (dietaryNotes.length > 400) {
-      return {
-        ok: false,
-        error: "Notes need to be 400 characters or fewer.",
-      };
-    }
-
-    guests.push({ name, attending: guest.attending, dietaryNotes });
+    guests.push({ name, attending: guest.attending });
   }
+
+  const notes = validateNotes(input.notes);
+  if (!notes.ok) return notes;
 
   return {
     ok: true,
     value: {
       email,
+      notes: notes.value,
       partyName: buildPartyName(guests.map((guest) => guest.name)),
       guests,
     },
@@ -112,17 +132,16 @@ export interface GroupRsvpGuestInput {
   id: string | null;
   name: string;
   attending: "yes" | "no" | null;
-  dietaryNotes: string;
 }
 
 export interface ValidGroupRsvp {
   partyId: string;
   email: string;
+  notes: string;
   guests: Array<{
     id: string | null;
     name: string;
     attending: "yes" | "no";
-    dietaryNotes: string;
   }>;
 }
 
@@ -216,6 +235,7 @@ function scoreParty(
 export function validateGroupRsvp(input: {
   partyId: string;
   email: string;
+  notes: string;
   guests: GroupRsvpGuestInput[];
 }):
   | { ok: true; value: ValidGroupRsvp }
@@ -270,17 +290,11 @@ export function validateGroupRsvp(input: {
       return { ok: false, error: "Names need to be 80 characters or fewer." };
     }
 
-    const dietaryNotes =
-      guest.attending === "yes" ? guest.dietaryNotes.trim() : "";
-    if (dietaryNotes.length > 400) {
-      return {
-        ok: false,
-        error: "Notes need to be 400 characters or fewer.",
-      };
-    }
-
-    guests.push({ id, name, attending: guest.attending, dietaryNotes });
+    guests.push({ id, name, attending: guest.attending });
   }
 
-  return { ok: true, value: { partyId, email, guests } };
+  const notes = validateNotes(input.notes);
+  if (!notes.ok) return notes;
+
+  return { ok: true, value: { partyId, email, notes: notes.value, guests } };
 }

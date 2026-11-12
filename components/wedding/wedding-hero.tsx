@@ -68,7 +68,7 @@ export function WeddingHero() {
           </p>
           <a
             href="#rsvp"
-            className="inline-flex h-12 items-center rounded-full bg-paper px-9 text-[0.9375rem] font-medium tracking-[0.01em] text-ink transition-colors hover:bg-linen outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink md:bg-blood md:text-paper md:hover:bg-blood-deep md:focus-visible:ring-blood md:focus-visible:ring-offset-paper"
+            className="inline-flex h-12 items-center rounded-full bg-paper px-9 text-[0.9375rem] font-medium tracking-[0.01em] text-ink transition-colors md:hover:bg-linen outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink md:bg-blood md:text-paper md:hover:bg-blood-deep md:focus-visible:ring-blood md:focus-visible:ring-offset-paper"
           >
             {hero.cta}
           </a>

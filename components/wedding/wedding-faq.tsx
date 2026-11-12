@@ -28,7 +28,7 @@ export function WeddingFaq() {
                 key={item.question}
                 className="wedding-details group border-b border-ink/10"
               >
-                <summary className="flex min-h-20 cursor-pointer select-none items-center justify-between gap-6 py-6 text-left font-wedding-serif text-[1.5rem] leading-snug text-ink transition-colors hover:text-blood outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blood md:text-[1.75rem]">
+                <summary className="flex min-h-20 cursor-pointer select-none items-center justify-between gap-6 py-6 text-left font-wedding-serif text-[1.5rem] leading-snug text-ink transition-colors md:hover:text-blood outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blood md:text-[1.75rem]">
                   <span>{item.question}</span>
                   <span
                     aria-hidden

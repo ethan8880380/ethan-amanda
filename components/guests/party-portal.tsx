@@ -8,7 +8,8 @@ import {
   submitRsvp,
 } from "@/lib/guests";
 import { markWeddingRsvpComplete } from "@/hooks/use-wedding-rsvp-session";
-import { weddingContent } from "@/lib/wedding-content";
+import { comingLine, weddingContent } from "@/lib/wedding-content";
+import { RegistryRsvpGate } from "@/components/wedding/registry-rsvp-gate";
 
 interface PartyPortalProps {
   token: string;
@@ -56,40 +57,42 @@ export function PartyPortal({ token, initial }: PartyPortalProps) {
   }
 
   if (isFinished) {
-    const isAttending = guests.some((guest) => guest.attending);
+    const coming = guests.filter((guest) => guest.attending).length;
     return (
       <div className="mx-auto w-full max-w-xl px-6 py-16">
-        <p className="text-xs uppercase tracking-[0.22em] text-[#8a7462]">
+        <p className="text-xs uppercase tracking-[0.22em] text-[#8a8a8a]">
           {rsvp.thanksEyebrow}
         </p>
         <h1 className="mt-3 font-serif text-4xl tracking-tight text-[#1c1714]">
           {rsvp.thanksTitle}
         </h1>
-        <p className="mt-3 text-[#6f6258]">
-          {isAttending ? rsvp.successYes : rsvp.successNo}
+        <p className="mt-3 text-[#6b6b6b]">
+          {coming ? comingLine(coming) : rsvp.successNo}
         </p>
-        <p className="mt-10 text-[#6f6258]">{rsvp.thanksRegistry}</p>
-        <a
-          href={registry.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-6 flex min-h-12 items-center justify-center bg-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] text-[#f7f3ee]"
-        >
-          {registry.cta}
-        </a>
+        <p className="mt-10 text-[#6b6b6b]">{rsvp.thanksRegistry}</p>
+        <RegistryRsvpGate>
+          <a
+            href={registry.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 flex min-h-12 items-center justify-center bg-[#1c1714] px-4 text-xs uppercase tracking-[0.18em] text-[#ffffff]"
+          >
+            {registry.cta}
+          </a>
+        </RegistryRsvpGate>
       </div>
     );
   }
 
   return (
     <div className="mx-auto w-full max-w-xl px-6 py-16">
-      <p className="text-xs uppercase tracking-[0.22em] text-[#8a7462]">
+      <p className="text-xs uppercase tracking-[0.22em] text-[#8a8a8a]">
         Ethan & Amanda
       </p>
       <h1 className="mt-3 font-serif text-4xl tracking-tight text-[#1c1714]">
         {party.party_name || "Your invitation"}
       </h1>
-      <p className="mt-3 text-[#6f6258]">
+      <p className="mt-3 text-[#6b6b6b]">
         Please RSVP for everyone in your party.
       </p>
 
@@ -103,12 +106,12 @@ export function PartyPortal({ token, initial }: PartyPortalProps) {
         {guests.map((guest) => (
           <fieldset
             key={guest.id}
-            className="border border-[#e4ddd4] bg-white/70 p-5"
+            className="border border-[#e8e8e8] bg-white/70 p-5"
           >
             <legend className="px-2 font-serif text-xl">
               {guest.full_name}
               {guest.is_plus_one ? (
-                <span className="ml-2 text-sm text-[#6f6258]">(+1)</span>
+                <span className="ml-2 text-sm text-[#6b6b6b]">(+1)</span>
               ) : null}
             </legend>
             <div className="mt-3 flex gap-4 text-sm">
@@ -138,7 +141,7 @@ export function PartyPortal({ token, initial }: PartyPortalProps) {
               <select
                 name={`meal_${guest.id}`}
                 defaultValue={guest.meal_choice ?? ""}
-                className="mt-1 w-full border border-[#d9d0c5] bg-white px-3 py-2"
+                className="mt-1 w-full border border-[#e8e8e8] bg-white px-3 py-2"
               >
                 <option value="">Select if attending</option>
                 {MEAL_CHOICES.map((meal) => (
@@ -154,7 +157,7 @@ export function PartyPortal({ token, initial }: PartyPortalProps) {
                 name={`dietary_${guest.id}`}
                 defaultValue={guest.dietary_notes ?? ""}
                 placeholder="Allergies, dietary needs, light sensitivity..."
-                className="mt-1 w-full border border-[#d9d0c5] bg-white px-3 py-2"
+                className="mt-1 w-full border border-[#e8e8e8] bg-white px-3 py-2"
               />
             </label>
           </fieldset>
@@ -162,7 +165,7 @@ export function PartyPortal({ token, initial }: PartyPortalProps) {
         <button
           type="submit"
           disabled={isPending || guests.length === 0}
-          className="w-full bg-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em] text-[#f7f3ee] disabled:opacity-60"
+          className="w-full bg-[#1c1714] px-4 py-3 text-xs uppercase tracking-[0.18em] text-[#ffffff] disabled:opacity-60"
         >
           {isPending ? "Submitting…" : "Submit RSVP"}
         </button>

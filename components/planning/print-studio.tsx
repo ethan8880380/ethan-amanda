@@ -271,7 +271,7 @@ export function PrintStudio({ guests }: { guests: PrintGuest[] }) {
                   <PrintSheets piece={printPiece} plan={plan} roster={roster} />
                 </Preview>
               ) : (
-                <div className="mt-2 grid min-h-[28rem] place-items-center bg-[#e4dfd6] text-sm text-[#5c5c5c]">
+                <div className="mt-2 grid min-h-[28rem] place-items-center bg-[#f0f0f0] text-sm text-[#5c5c5c]">
                   Loading the prints…
                 </div>
               )}
@@ -347,7 +347,7 @@ function Preview({
     pages * heightIn * 96 * scale + Math.max(0, pages - 1) * gap * scale;
 
   return (
-    <div ref={ref} className="bg-[#e4dfd6] px-4 py-6">
+    <div ref={ref} className="bg-[#f0f0f0] px-4 py-6">
       <p className="mb-4 text-center text-sm text-[#5c534c]">{caption}</p>
       <div className="relative mx-auto" style={{ height, width: widthIn * 96 * scale }}>
         <div

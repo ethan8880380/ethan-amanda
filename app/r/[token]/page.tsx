@@ -23,10 +23,10 @@ export default async function GuestTokenPage({
     );
   } catch {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f3ee] px-6">
+      <div className="flex min-h-screen items-center justify-center bg-[#f4f4f4] px-6">
         <div className="max-w-md text-center">
           <p className="font-serif text-3xl text-[#1c1714]">Link not found</p>
-          <p className="mt-3 text-[#6f6258]">
+          <p className="mt-3 text-[#6b6b6b]">
             This invite link is invalid or no longer active. Reach out to Ethan
             or Amanda if you need a new one.
           </p>
