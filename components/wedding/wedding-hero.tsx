@@ -14,7 +14,7 @@ export function WeddingHero() {
     <section
       id="top"
       aria-label="Welcome"
-      className="relative isolate min-h-[100svh] bg-ink md:grid md:h-[100svh] md:min-h-[44rem] md:grid-cols-[minmax(0,36rem)_minmax(0,36rem)] md:items-center md:justify-center md:bg-paper md:px-10 md:pt-20"
+      className="relative isolate -mt-[env(safe-area-inset-top)] min-h-[calc(100lvh+env(safe-area-inset-top))] bg-ink pt-[env(safe-area-inset-top)] md:mt-0 md:grid md:h-[100svh] md:min-h-[44rem] md:grid-cols-[minmax(0,36rem)_minmax(0,36rem)] md:items-center md:justify-center md:bg-paper md:px-10 md:pt-20"
     >
       {/* Photograph — full-bleed on mobile, arched portrait on desktop */}
       <div className="absolute inset-0 md:relative md:inset-auto md:col-start-2 md:row-start-1 md:flex md:h-full md:items-center md:justify-end md:py-12">

@@ -135,6 +135,10 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Match the hero during the iOS status-bar overscroll. */
+  html:has(.wedding-root) {
+    background-color: var(--color-ink);
+  }
 }
 
 .font-serif {

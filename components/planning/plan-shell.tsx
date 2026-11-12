@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Mail, Printer, Users } from "lucide-react";
+import { Mail, Printer, Reply, Users } from "lucide-react";
 import { logoutFromPlan } from "@/app/plan/actions";
 import { Glyph } from "@/components/planning/glyph";
 import { isPlanningAuthenticated } from "@/lib/planning-auth";
@@ -9,6 +9,7 @@ import { daysUntilWedding } from "@/lib/planning-presets";
 const nav = [
   { href: "/plan/guests", label: "Guests", icon: Users },
   { href: "/plan/mail", label: "Mail", icon: Mail },
+  { href: "/plan/rsvp", label: "RSVP", icon: Reply },
   { href: "/plan/prints", label: "Prints", icon: Printer },
 ];
 
@@ -69,7 +70,7 @@ export async function PlanShell({
       )}
 
       <nav className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-[#e4e4e4] bg-white/95 backdrop-blur-xl">
-        <div className="mx-auto grid max-w-md grid-cols-3 pb-[env(safe-area-inset-bottom)]">
+        <div className="mx-auto grid max-w-md grid-cols-4 pb-[env(safe-area-inset-bottom)]">
           {nav.map((item) => {
             const isActive = active === item.href;
             const Icon = item.icon;
